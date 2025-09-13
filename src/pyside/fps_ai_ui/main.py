@@ -2,19 +2,22 @@
 
 import sys
 from PySide6.QtWidgets import QApplication, QWidget
-from pyside.basic.basic_layout import get_vertical_layout
-from pyside.basic.basic_window import create_basic_window
 
-from PySide6.QtWidgets import QLabel, QWidget
-from pyside.basic.basic_layout import get_vertical_layout
+from PySide6.QtWidgets import QLabel, QWidget, QVBoxLayout
+from pyside.UI.basic.basic_layout import create_card, create_vertical_card, get_vertical_layout
+from pyside.UI.basic.basic_window import create_basic_window
+from pyside.fps_ai_ui.layout.pid_layout import get_pid_component
 
 
 
 # PID布局
 def pid_layout():
-    layout = get_vertical_layout()
-    layout.addWidget(QLabel("PID"))
-    return layout
+    card = create_vertical_card("PID test")
+    layout: QVBoxLayout = card._layout
+    # layout.addWidget(QLabel("组件"))
+    # layout.addWidget(QLabel("PID"))
+    layout.addWidget(get_pid_component())
+    return card
 
 
 # 卡尔曼滤波布局
@@ -27,7 +30,7 @@ def kalman_filter_layout():
 # 主布局
 def get_main_layout():
     layout = get_vertical_layout()
-    layout.addLayout(pid_layout())
+    layout.addWidget(pid_layout())
     layout.addLayout(kalman_filter_layout())
     return layout
 
