@@ -8,6 +8,23 @@ from utils.pid.pid import PIDControl
 # 调整 PID 参数，使其更适合瞄准控制
 pid_control = PIDControl()
 
+# 获取pid参数
+
+def get_pid_parameters():
+    """
+    获取pid参数
+    """
+    return pid_control.get_pid_parameters()
+
+# 设置pid参数
+def set_pid_parameters(kp, ki, kd):
+    """
+    设置pid参数
+    """
+    pid_control.set_pid_parameters(kp, ki, kd)
+
+
+
 def get_pid_res(results, image_size, dt = 0.02):
     """
     获取 PID 控制器输出

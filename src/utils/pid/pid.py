@@ -150,4 +150,20 @@ class PIDControl:
             float: 当前的距离阈值
         """
         return self.ki_distance_threshold
+    
+    # 修改pid参数
+    def set_pid_parameters(self, kp, ki, kd):
+        """
+        设置PID参数
+        """
+        self.pid_x.Kp = kp
+        self.pid_x.Ki = ki
+        self.pid_x.Kd = kd
+    
+    # 获取pid参数
+    def get_pid_parameters(self):
+        """
+        获取PID参数
+        """
+        return self.pid_x.Kp, self.pid_x.Ki, self.pid_x.Kd
 

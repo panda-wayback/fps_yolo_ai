@@ -93,32 +93,34 @@ class YoloRecog:
             # 执行推理
             results = self.model(image, conf=conf_threshold, verbose=False)
             
-            # 解析结果
-            detections = []
-            for result in results:
-                boxes = result.boxes
-                if boxes is not None:
-                    for i in range(len(boxes)):
-                        # 获取边界框坐标
-                        bbox = boxes.xyxy[i].cpu().numpy()
-                        # 获取置信度
-                        conf = boxes.conf[i].cpu().numpy()
-                        # 获取类别
-                        cls_id = int(boxes.cls[i].cpu().numpy())
-                        cls_name = self.model.names[cls_id]
+            # # 解析结果
+            # detections = []
+            # for result in results:
+            #     boxes = result.boxes
+            #     if boxes is not None:
+            #         for i in range(len(boxes)):
+            #             # 获取边界框坐标
+            #             bbox = boxes.xyxy[i].cpu().numpy()
+            #             # 获取置信度
+            #             conf = boxes.conf[i].cpu().numpy()
+            #             # 获取类别
+            #             cls_id = int(boxes.cls[i].cpu().numpy())
+            #             cls_name = self.model.names[cls_id]
                         
-                        detections.append({
-                            'bbox': bbox.tolist(),  # [x1, y1, x2, y2]
-                            'conf': float(conf),
-                            'cls': cls_id,
-                            'name': cls_name
-                        })
+            #             detections.append({
+            #                 'bbox': bbox.tolist(),  # [x1, y1, x2, y2]
+            #                 'conf': float(conf),
+            #                 'cls': cls_id,
+            #                 'name': cls_name
+            #             })
             
-            return detections
+            # return detections
+            return results
             
         except Exception as e:
             print(f"❌ 检测失败: {e}")
             return []
+    
     
     def detect_center(self, image: np.ndarray, conf_threshold: float = 0.5) -> List[dict]:
         """
@@ -159,29 +161,17 @@ class YoloRecog:
         return self.model is not None
 
 
-# 便捷函数
-def get_yolo_recog() -> YoloRecog:
-    """获取YOLO识别单例实例"""
-    return YoloRecog()
-
-
-# runs/aimlab_fast/weights/best.pt
-def load_aimlabs_model(model_path: str) -> bool:
-    """加载AimLab模型（便捷函数）"""
-    yolo = get_yolo_recog()
-    return yolo.load_model(model_path)
-
 
 if __name__ == "__main__":
     # 测试代码
     print("=== YOLO识别单例测试 ===")
     
     # 获取单例实例
-    yolo = get_yolo_recog()
+    yolo = YoloRecog()
     print(f"模型信息: {yolo.get_model_info()}")
-    
+   
     # 加载模型
-    if load_aimlabs_model("runs/aimlab_fast/weights/best.pt"):
+    if  YoloRecog().load_model("runs/aimlab_fast/weights/best.pt"):
         print("✅ 模型加载成功")
         print(f"模型信息: {yolo.get_model_info()}")
     else:

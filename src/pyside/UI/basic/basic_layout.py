@@ -35,7 +35,7 @@ def create_vertical_card(title="垂直卡片"):
     return group
 
 # 创建带卡片的水平布局
-def create_horizontal_card(title="水平卡片"):
+def create_horizontal_card(title="水平卡片") -> QGroupBox:
     """创建水平卡片组件 - 直接返回组件"""
     group = QGroupBox(title)
     layout = QHBoxLayout()

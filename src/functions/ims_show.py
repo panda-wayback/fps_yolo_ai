@@ -4,7 +4,7 @@ FPS游戏AI辅助主程序 - 最小示例
 """
 
 import cv2
-
+import numpy as np
 
 def draw_detections(image, boxes, classes, confidences):
     """
@@ -62,7 +62,7 @@ def draw_detections(image, boxes, classes, confidences):
     return result_image
 
 
-def show_image(image, results):
+def get_image(image, results) -> np.ndarray:
     # 处理检测结果
     res = results[0]  # 单张图像
     boxes = res.boxes.xyxy  # 边界框 (x1, y1, x2, y2)
@@ -71,6 +71,18 @@ def show_image(image, results):
     
     # 在图像上绘制检测结果
     result_image = draw_detections(image, boxes, classes, confidences)
+    return result_image
+
+
+def show_image(image, results):
+    # 处理检测结果
+    res = results[0]  # 单张图像
+    boxes = res.boxes.xyxy  # 边界框 (x1, y1, x2, y2)
+    classes = res.boxes.cls  # 类别索引
+    confidences = res.boxes.conf  # 置信度
     
+    # 在图像上绘制检测结果
+    result_image = get_image(image, boxes, classes, confidences)
+
     # 显示结果
     cv2.imshow('FPS AI - 实时检测', result_image)
