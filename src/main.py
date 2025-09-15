@@ -14,6 +14,8 @@ from functions.run_move_mouse import run_move_mouse_by_pid
 
 from fps_models.aimlabs import get_aimlabs_model
 from functions.get_sight_images import get_mouse_region_image
+from singleton_classes.data_center import DataCenter
+from singleton_classes.screenshot_img.main import MouseScreenshot
 
 
 
@@ -98,14 +100,17 @@ def main():
         listener.stop()
         return
     
-    # 设置截图区域大小
-    width, height = 600, 400
+
     
     print("✅ 程序已启动，开始实时检测...")
     print("💡 提示: 按 '1' 键开启自动瞄准功能")
-
+    
+    # 设置截图区域大小
+    width, height = 600, 400
     # 获取鼠标位置（只获取一次，提高性能）
     mouse_x, mouse_y = (756, 509)
+    
+    MouseScreenshot().start((mouse_x, mouse_y), (width, height), 0.02)
     
     try:
         while running:
@@ -117,13 +122,11 @@ def main():
 
             
             # 获取鼠标周围图像（传入鼠标位置避免重复获取）
-            image = get_mouse_region_image(width, height, (mouse_x, mouse_y))
-            
+            image = DataCenter().get_state().screenshot_img
+            # image = get_mouse_region_image(width, height, (mouse_x, mouse_y))
             # 进行目标检测
             results = model(image, verbose=False)
             
-            # 打印检测信息
-            # print_detection_info(results, (width, height))
             # 显示图像
             show_image(image, results)
 

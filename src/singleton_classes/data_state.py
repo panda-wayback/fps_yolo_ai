@@ -12,6 +12,9 @@ class State:
     region: Optional[Tuple[int, int]] = None
     yolo_results: Optional[List[Any]] = None
     
+    # 标记过目标的图片
+    marked_img: Optional[np.ndarray] = None
+
     def to_dict(self) -> Dict[str, Any]:
         """
         将State转换为字典，处理numpy数组的序列化

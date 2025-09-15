@@ -3,6 +3,7 @@ YOLO识别单例类 - 简单易用的目标检测
 提供统一的YOLO模型加载和推理接口
 """
 
+import asyncio
 import sys
 import os
 import torch
@@ -10,6 +11,9 @@ import numpy as np
 from threading import Lock
 from typing import List
 from ultralytics import YOLO
+
+from functions.ims_show import get_yolo_image
+from singleton_classes.data_center import DataCenter
 
 
 
@@ -37,6 +41,7 @@ class YoloRecog:
         self.device = self._get_device()
         self.model_path = None
         self._initialized = True
+        self._image = None
         
         print(f"YoloRecog 单例初始化完成，使用设备: {self.device}")
     
@@ -93,34 +98,27 @@ class YoloRecog:
             # 执行推理
             results = self.model(image, conf=conf_threshold, verbose=False)
             
-            # # 解析结果
-            # detections = []
-            # for result in results:
-            #     boxes = result.boxes
-            #     if boxes is not None:
-            #         for i in range(len(boxes)):
-            #             # 获取边界框坐标
-            #             bbox = boxes.xyxy[i].cpu().numpy()
-            #             # 获取置信度
-            #             conf = boxes.conf[i].cpu().numpy()
-            #             # 获取类别
-            #             cls_id = int(boxes.cls[i].cpu().numpy())
-            #             cls_name = self.model.names[cls_id]
-                        
-            #             detections.append({
-            #                 'bbox': bbox.tolist(),  # [x1, y1, x2, y2]
-            #                 'conf': float(conf),
-            #                 'cls': cls_id,
-            #                 'name': cls_name
-            #             })
-            
-            # return detections
+
+            # 更新图像 异步任务 不影响主线程
+            asyncio.create_task(self.update_image( image, results))
+
             return results
             
         except Exception as e:
             print(f"❌ 检测失败: {e}")
             return []
     
+    async def update_image(self, image: np.ndarray, results: List[dict]):
+        """
+        更新图像
+        """
+        self._image = get_yolo_image( image, results)
+        DataCenter().update_state(marked_img=self._image)
+    
+    def image(self) -> np.ndarray:
+        """获取图像"""
+        return self._image
+
     
     def detect_center(self, image: np.ndarray, conf_threshold: float = 0.5) -> List[dict]:
         """

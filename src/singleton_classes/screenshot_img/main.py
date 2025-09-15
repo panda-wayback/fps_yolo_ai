@@ -48,7 +48,7 @@ class MouseScreenshot:
     
     def start(self, mouse_pos: tuple, 
               region: tuple = (200, 200),
-              interval: float = 0.02):
+              interval: float = 0.01):
         """
         开始截图
         """
@@ -105,9 +105,9 @@ class MouseScreenshot:
                 time.sleep(0.1)
 
 
-# 便捷函数
-def get_screenshot() -> MouseScreenshot:
-    return MouseScreenshot()
+def start_screenshot(mouse_pos: tuple = (756, 509), region: tuple = (600, 400), interval: float = 0.01):
+    
+    MouseScreenshot().start(mouse_pos, region, interval)
 
 if __name__ == "__main__":
     
