@@ -46,6 +46,22 @@ class MouseScreenshot:
         
         self._initialized = True
     
+    def update_config(self, mouse_pos:tuple=None, region:tuple=None, interval:float=None):
+        """
+        更新配置 - 只更新传入的参数
+        
+        Args:
+            mouse_pos: 鼠标位置，不传则不更新
+            region: 截图区域，不传则不更新  
+            interval: 截图间隔，不传则不更新
+        """
+        if mouse_pos is not None:
+            self.mouse_pos = mouse_pos
+        if region is not None:
+            self.region = region
+        if interval is not None:
+            self.interval = interval
+    
     def start(self, mouse_pos: tuple, 
               region: tuple = (200, 200),
               interval: float = 0.01):

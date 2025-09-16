@@ -8,6 +8,7 @@ from pyside.fps_ai_ui.component.img_show.index import get_img_show_component
 from pyside.fps_ai_ui.component.move_mouse.index import get_move_mouse_component
 from pyside.fps_ai_ui.component.pid_component.index import get_pid_component
 from pyside.fps_ai_ui.component.yolo_model.index import get_yolo_model_component
+from pyside.fps_ai_ui.component.target_tracker.index import get_target_tracker_component
 
 
 
@@ -27,6 +28,10 @@ def img_show_component() -> QGroupBox:
 def move_mouse_component() -> QGroupBox:
     return get_move_mouse_component()
 
+# 目标跟踪器组件
+def target_tracker_component() -> QGroupBox:
+    return get_target_tracker_component()
+
 
 # 主布局
 def get_main_layout():
@@ -35,22 +40,26 @@ def get_main_layout():
     
     # 创建两列布局
     columns_layout = QHBoxLayout()
+
+    # 创建三列布局
+    three_columns_layout = QHBoxLayout()
+    three_columns_layout.addWidget(target_tracker_component()) # 目标跟踪器组件
+
     
     # 左列布局
     left_column = QVBoxLayout()
-    left_column.addWidget(move_mouse_component()) # 
-
+    left_column.addWidget(move_mouse_component())   # 鼠标控制组件
     
     # 右列布局  
     right_column = QVBoxLayout()
     right_column.addWidget(img_show_component())   # 图片展示组件
-    
     right_column.addWidget(yolo_model_component())  # YOLO模型选择组件
     right_column.addWidget(pid_component())         # PID参数控制组件
     
     # 将两列添加到水平布局
     columns_layout.addLayout(left_column)
     columns_layout.addLayout(right_column)
+    columns_layout.addLayout(three_columns_layout)
     
     # 将列布局添加到主布局
     main_layout.addLayout(columns_layout)

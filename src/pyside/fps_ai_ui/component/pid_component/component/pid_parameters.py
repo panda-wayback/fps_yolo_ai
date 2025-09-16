@@ -7,8 +7,8 @@
 from PySide6.QtWidgets import (QGroupBox, QHBoxLayout, QSlider, 
                                QDoubleSpinBox, QPushButton, QVBoxLayout)
 from PySide6.QtCore import Qt
-from functions.get_pid_res import get_pid_parameters, set_pid_parameters
 from pyside.UI.basic.basic_layout import create_vertical_card
+from singleton_classes.pid_controller.pid_controller import get_pid_parameters, set_pid_parameters
 
 
 def create_slider_control(title, min_val, max_val, default_val, decimals=2) -> QGroupBox:

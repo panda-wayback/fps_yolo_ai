@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-鼠标模拟器控制组件
+目标跟踪器控制组件
 """
 
-from PySide6.QtWidgets import (QHBoxLayout, QPushButton, 
-                               QLabel, QSlider, QDoubleSpinBox)
+from PySide6.QtWidgets import (QHBoxLayout, QPushButton, QLabel, 
+                               QSlider, QDoubleSpinBox)
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QShortcut, QKeySequence
 from pyside.UI.basic.basic_layout import create_vertical_card
-from singleton_classes.simulation_move_mouse.simulation_move_mouse import MouseSimulator
+from singleton_classes.target_tracker.target_tracker import TargetTracker
 
 
 def create_slider_control(title, min_val, max_val, default_val, decimals=2):
@@ -65,19 +65,19 @@ def create_slider_control(title, min_val, max_val, default_val, decimals=2):
     return group
 
 
-def create_mouse_control():
+def create_target_tracker_control():
     """
-    创建鼠标模拟器控制组件
+    创建目标跟踪器控制组件
     
     Returns:
-        QGroupBox: 鼠标控制组件
+        QGroupBox: 目标跟踪器控制组件
     """
     # 创建主容器
-    group = create_vertical_card("鼠标模拟器控制")
+    group = create_vertical_card("目标跟踪器控制")
     layout = group._layout
     
-    # 获取鼠标模拟器单例
-    mouse_sim = MouseSimulator()
+    # 获取目标跟踪器单例
+    tracker = TargetTracker()
     
     # 状态显示
     status_label = QLabel("状态: 未运行")
@@ -94,9 +94,9 @@ def create_mouse_control():
     layout.addWidget(status_label)
     
     # 控制按钮
-    start_btn = QPushButton("启动 (F4)")
-    stop_btn = QPushButton("停止 (F5)")
-    reset_btn = QPushButton("重置 (F6)")
+    start_btn = QPushButton("启动跟踪 (F1)")
+    stop_btn = QPushButton("停止跟踪 (F2)")
+    reset_btn = QPushButton("重置 (F3)")
     
     # 按钮样式
     start_btn.setStyleSheet("QPushButton { background-color: #4CAF50; color: white; font-weight: bold; }")
@@ -111,24 +111,12 @@ def create_mouse_control():
     layout.addLayout(btn_layout)
     
     # 参数控制区域
-    params_group = create_vertical_card("参数设置")
+    params_group = create_vertical_card("跟踪参数")
     params_layout = params_group._layout
     
     # FPS控制
-    fps_control = create_slider_control("FPS", 100, 1000, 500, 0)
+    fps_control = create_slider_control("跟踪频率", 10, 120, 60, 0)
     params_layout.addWidget(fps_control)
-    
-    # 平滑系数控制
-    smoothing_control = create_slider_control("平滑系数", 0.1, 1.0, 0.4, 2)
-    params_layout.addWidget(smoothing_control)
-    
-    # 减速系数控制
-    decay_control = create_slider_control("减速系数", 0.8, 0.99, 0.95, 3)
-    params_layout.addWidget(decay_control)
-    
-    # 最大持续时间控制
-    duration_control = create_slider_control("最大持续时间(秒)", 0.01, 0.2, 0.05, 3)
-    params_layout.addWidget(duration_control)
     
     # 应用参数按钮
     apply_btn = QPushButton("应用参数")
@@ -136,36 +124,6 @@ def create_mouse_control():
     params_layout.addWidget(apply_btn)
     
     layout.addWidget(params_group)
-    
-    # 速度控制区域
-    speed_group = create_vertical_card("速度控制")
-    speed_layout = speed_group._layout
-    
-    # X轴速度
-    vx_label = QLabel("X轴速度 (像素/秒):")
-    vx_input = QDoubleSpinBox()
-    vx_input.setRange(-1000, 1000)
-    vx_input.setValue(0)
-    vx_input.setSuffix(" px/s")
-    
-    # Y轴速度
-    vy_label = QLabel("Y轴速度 (像素/秒):")
-    vy_input = QDoubleSpinBox()
-    vy_input.setRange(-1000, 1000)
-    vy_input.setValue(0)
-    vy_input.setSuffix(" px/s")
-    
-    # 提交速度按钮
-    submit_btn = QPushButton("提交速度")
-    submit_btn.setStyleSheet("QPushButton { background-color: #9C27B0; color: white; }")
-    
-    speed_layout.addWidget(vx_label)
-    speed_layout.addWidget(vx_input)
-    speed_layout.addWidget(vy_label)
-    speed_layout.addWidget(vy_input)
-    speed_layout.addWidget(submit_btn)
-    
-    layout.addWidget(speed_group)
     
     # 状态监控区域
     monitor_group = create_vertical_card("状态监控")
@@ -199,11 +157,11 @@ def create_mouse_control():
     
     def update_status_display():
         """更新状态显示"""
-        status = mouse_sim.get_status()
+        status = tracker.get_status()
         
         # 更新状态标签
-        if status["running"] and status["thread_alive"]:
-            status_label.setText("状态: 运行中")
+        if status['running'] and status['thread_alive']:
+            status_label.setText("状态: 跟踪中")
             status_label.setStyleSheet("""
                 QLabel {
                     color: #2E7D32; 
@@ -231,54 +189,36 @@ def create_mouse_control():
         
         # 更新详细信息
         info = f"""
-运行状态: {'运行中' if status['running'] and status['thread_alive'] else '已停止'}
-FPS: {status['fps']}
-平滑系数: {status['smoothing']:.3f}
-减速系数: {status['decay_rate']:.3f}
-最大持续时间: {status['max_duration']:.3f}s
-当前速度: X={status['current_velocity'][0]:.2f}, Y={status['current_velocity'][1]:.2f}
-残差: X={status['residual'][0]:.3f}, Y={status['residual'][1]:.3f}
+跟踪状态: {'运行中' if status['running'] and status['thread_alive'] else '已停止'}
+跟踪频率: {status['fps']} FPS
 线程状态: {'活跃' if status['thread_alive'] else '已结束'}
+检测目标数: {status['last_yolo_count']}
+截图状态: {'有' if status['has_screenshot'] else '无'}
         """
         info_text.setText(info.strip())
     
     # 按钮事件处理
     def on_start():
-        """启动鼠标模拟器"""
-        mouse_sim.start()
+        """启动目标跟踪"""
+        tracker.start()
         status_timer.start(100)  # 每100ms更新一次状态
-        print("🔄 启动鼠标模拟器")
+        print("🎯 启动目标跟踪")
     
     def on_stop():
-        """停止鼠标模拟器"""
-        mouse_sim.stop()
-        print("🛑 停止鼠标模拟器")
+        """停止目标跟踪"""
+        tracker.stop()
+        print("🛑 停止目标跟踪")
     
     def on_reset():
-        """重置鼠标模拟器"""
-        mouse_sim.stop()
-        mouse_sim.submit_vector(0, 0)  # 重置速度
-        print("🔄 重置鼠标模拟器")
+        """重置目标跟踪"""
+        tracker.stop()
+        print("🔄 重置目标跟踪")
     
     def on_apply_params():
         """应用参数设置"""
         fps = int(fps_control.spinbox.value())
-        smoothing = smoothing_control.spinbox.value()
-        decay_rate = decay_control.spinbox.value()
-        max_duration = duration_control.spinbox.value()
-        
-        mouse_sim.update_config(fps=fps, smoothing=smoothing)
-        mouse_sim.update_decay_rate(decay_rate)
-        mouse_sim.max_duration = max_duration
-        
-        print(f"✅ 应用参数: FPS={fps}, 平滑={smoothing:.3f}, 减速={decay_rate:.3f}, 持续时间={max_duration:.3f}s")
-    
-    def on_submit_speed():
-        """提交速度向量"""
-        vx = vx_input.value()
-        vy = vy_input.value()
-        mouse_sim.submit_vector(vx, vy)
-        print(f"🎯 提交速度: X={vx}, Y={vy}")
+        tracker.set_fps(fps)
+        print(f"✅ 应用参数: FPS={fps}")
     
     def on_refresh():
         """刷新状态"""
@@ -290,22 +230,21 @@ FPS: {status['fps']}
     stop_btn.clicked.connect(on_stop)
     reset_btn.clicked.connect(on_reset)
     apply_btn.clicked.connect(on_apply_params)
-    submit_btn.clicked.connect(on_submit_speed)
     refresh_btn.clicked.connect(on_refresh)
     
     # 设置快捷键
-    start_shortcut = QShortcut(QKeySequence(Qt.Key_F4), group)
+    start_shortcut = QShortcut(QKeySequence(Qt.Key_F1), group)
     start_shortcut.activated.connect(on_start)
     
-    stop_shortcut = QShortcut(QKeySequence(Qt.Key_F5), group)
+    stop_shortcut = QShortcut(QKeySequence(Qt.Key_F2), group)
     stop_shortcut.activated.connect(on_stop)
     
-    reset_shortcut = QShortcut(QKeySequence(Qt.Key_F6), group)
+    reset_shortcut = QShortcut(QKeySequence(Qt.Key_F3), group)
     reset_shortcut.activated.connect(on_reset)
     
     # 存储引用到组件
     group.status_timer = status_timer
-    group.mouse_sim = mouse_sim
+    group.tracker = tracker
     group.status_label = status_label
     group.info_text = info_text
     group.start_shortcut = start_shortcut
@@ -315,11 +254,11 @@ FPS: {status['fps']}
     return group
 
 
-def get_mouse_control():
+def get_target_tracker_control():
     """
-    获取鼠标模拟器控制组件
+    获取目标跟踪器控制组件
     
     Returns:
-        QGroupBox: 鼠标控制组件
+        QGroupBox: 目标跟踪器控制组件
     """
-    return create_mouse_control()
+    return create_target_tracker_control()
