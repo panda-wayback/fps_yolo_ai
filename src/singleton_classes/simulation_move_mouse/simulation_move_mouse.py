@@ -79,6 +79,28 @@ class MouseSimulator:
         # 标记为已初始化
         self._initialized = True
         print(f"MouseSimulator 单例初始化完成，FPS: {fps}, 平滑系数: {smoothing}")
+    
+    # 修改配置
+    def update_config(self, 
+        fps=None, # 更新频率
+        smoothing=None, # 平滑系数
+        max_duration=None, # 最大执行时间
+        decay_rate=None, # 减速系数
+    ):
+        """
+        修改配置
+        """
+        if fps is not None:
+            self.fps = fps
+        if smoothing is not None:
+            self.smoothing = smoothing
+        if max_duration is not None:
+            self.max_duration = max_duration
+        if decay_rate is not None:
+            self.decay_rate = decay_rate
+        print(f"✅ 更新FPS为: {fps}, 平滑系数: {smoothing}")
+        if fps is None and smoothing is None:
+            print("⚠️  没有提供要更新的参数")
 
     def submit_vector(self, vx, vy):
         """
@@ -161,6 +183,23 @@ class MouseSimulator:
             # 步骤7: 等待下一个控制周期
             time.sleep(delay)
 
+
+    # 开始移动
+    def start(self):
+        """
+        开始移动
+        """
+        self.running = True
+        
+        # 如果线程已经结束，重新创建线程
+        if not self.thread.is_alive():
+            self.thread = threading.Thread(target=self._driver_loop, daemon=True)
+            self.thread.start()
+            print("🔄 重新启动鼠标模拟线程")
+        else:
+            print("✅ 鼠标模拟线程已在运行")
+
+
     def stop(self):
         """
         停止鼠标模拟器
@@ -173,8 +212,12 @@ class MouseSimulator:
         # 设置停止标志，让控制循环退出
         self.running = False
         
-        # 等待控制线程结束
-        self.thread.join()
+        # 如果线程还在运行，等待其结束
+        if self.thread.is_alive():
+            self.thread.join()
+            print("🛑 鼠标模拟线程已停止")
+        else:
+            print("ℹ️ 鼠标模拟线程已经停止")
     
     # 获取位移的累计值
     def get_displacement_history(self, seconds_back=0.02):

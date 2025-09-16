@@ -15,7 +15,8 @@ def get_img_show_component():
     
     # 传入函数，每次调用都会获取最新值
     def get_current_image():
-        return DataCenter().get_state().screenshot_img
+        # return DataCenter().get_state().screenshot_img
+        return DataCenter().get_state().marked_img
     
     img_display.bind_to_data_center(get_current_image)
     return img_display

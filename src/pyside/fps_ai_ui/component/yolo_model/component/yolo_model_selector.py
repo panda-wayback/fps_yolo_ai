@@ -81,6 +81,7 @@ def create_yolo_model_selector():
         if model_path:
             print(f"✅ 加载模型: {os.path.basename(model_path)}")
         if  YoloRecog().load_model(model_path):
+            YoloRecog().start(model_path)
             print("✅ 模型加载成功")
             print(f"模型信息: {YoloRecog().get_model_info()}")
         else:

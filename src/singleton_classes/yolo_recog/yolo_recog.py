@@ -4,8 +4,10 @@ YOLO识别单例类 - 简单易用的目标检测
 """
 
 import asyncio
+import time
 import sys
 import os
+import threading
 import torch
 import numpy as np
 from threading import Lock
@@ -41,8 +43,8 @@ class YoloRecog:
         self.device = self._get_device()
         self.model_path = None
         self._initialized = True
-        self._image = None
-        
+        self._is_running = False
+        self._yolo_thread = None
         print(f"YoloRecog 单例初始化完成，使用设备: {self.device}")
     
     def _get_device(self) -> str:
@@ -53,6 +55,60 @@ class YoloRecog:
             return 'cuda'
         else:
             return 'cpu'
+    
+    def start(self, yolo_model_path: str):
+        """
+        开始YOLO循环
+        """
+        if self._is_running:
+            self.stop()
+            time.sleep(0.1)
+        
+        self._is_running = True
+        self.model_path = yolo_model_path
+        self.load_model(yolo_model_path)
+
+        self._yolo_thread = threading.Thread(target=self._yolo_loop)
+        self._yolo_thread.start()
+    
+    def stop(self):
+        """
+        停止YOLO循环
+        """
+        self._is_running = False
+        if self._yolo_thread:
+            self._yolo_thread.join(timeout=1.0)
+
+    def _yolo_loop(self):
+        """
+        YOLO循环
+        """
+        last_img = None
+        while self._is_running:
+            try:
+            # 如果截图为空，或者截图重复，则不进行检测
+                current_img = DataCenter().get_state().screenshot_img
+                if current_img is None:
+                    time.sleep(0.001)
+                    continue
+                
+                # 使用numpy的array_equal来比较数组
+                if last_img is not None and np.array_equal(current_img, last_img):
+                    time.sleep(0.001)
+                    continue
+                
+                last_img = current_img
+                # 检测
+                results = self.detect(current_img, 0.5)
+                # 图像处理
+                result_img = get_yolo_image(current_img, results)
+                # 更新状态
+                DataCenter().update_state(marked_img=result_img)
+
+            except Exception as e:
+                print(f"❌ YOLO循环错误: {e}")
+
+            time.sleep(0.001)
     
     def load_model(self, model_path: str) -> bool:
         """
@@ -97,27 +153,11 @@ class YoloRecog:
         try:
             # 执行推理
             results = self.model(image, conf=conf_threshold, verbose=False)
-            
-
-            # 更新图像 异步任务 不影响主线程
-            asyncio.create_task(self.update_image( image, results))
-
             return results
             
         except Exception as e:
             print(f"❌ 检测失败: {e}")
             return []
-    
-    async def update_image(self, image: np.ndarray, results: List[dict]):
-        """
-        更新图像
-        """
-        self._image = get_yolo_image( image, results)
-        DataCenter().update_state(marked_img=self._image)
-    
-    def image(self) -> np.ndarray:
-        """获取图像"""
-        return self._image
 
     
     def detect_center(self, image: np.ndarray, conf_threshold: float = 0.5) -> List[dict]:
