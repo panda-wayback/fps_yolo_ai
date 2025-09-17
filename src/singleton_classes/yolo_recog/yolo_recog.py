@@ -57,16 +57,6 @@ class YoloRecog:
         """
         开始YOLO循环
         """
-
-        DataCenter().update_state(model_path=yolo_model_path)
-        print(f"更新状态, 模型路径: {yolo_model_path}")
-        print(f"更新状态, 类别名称: {self.get_class_names()}")
-        print(f"更新状态, 类别ID: {self.get_class_ids()}")
-
-        DataCenter().update_state(model_class_names=self.get_class_names())
-        DataCenter().update_state(model_class_ids=self.get_class_ids())
-
-
         print(f"开始YOLO循环, 模型路径: {yolo_model_path}")
         
         if self._is_running:
@@ -75,10 +65,17 @@ class YoloRecog:
         
         self._is_running = True
         self.model_path = yolo_model_path
-        self.load_model(yolo_model_path)
-
-        self._yolo_thread = threading.Thread(target=self._yolo_loop)
-        self._yolo_thread.start()
+        
+        # 先加载模型
+        if self.load_model(yolo_model_path):
+            # 模型加载成功后更新DataCenter
+            self._update_model_info_to_datacenter()
+            
+            self._yolo_thread = threading.Thread(target=self._yolo_loop)
+            self._yolo_thread.start()
+        else:
+            print("❌ 模型加载失败，无法启动YOLO循环")
+            self._is_running = False
     
     def stop(self):
         """
@@ -246,6 +243,29 @@ class YoloRecog:
     def is_loaded(self) -> bool:
         """检查模型是否已加载"""
         return self.model is not None
+    
+    def _update_model_info_to_datacenter(self):
+        """更新DataCenter中的模型信息"""
+        if self.model is None:
+            return
+        
+        try:
+            class_names = self.get_class_names()
+            class_ids = self.get_class_ids()
+            
+            DataCenter().update_state(
+                model_class_names=class_names,
+                model_class_ids=class_ids,
+                model_path=self.model_path,
+                selected_class_ids=class_ids  # 默认选择所有类别
+            )
+            
+            print(f"✅ 已更新DataCenter模型信息: {len(class_names)}个类别")
+            print(f"类别名称: {class_names}")
+            print(f"类别ID: {class_ids}")
+            
+        except Exception as e:
+            print(f"❌ 更新DataCenter模型信息失败: {e}")
 
 
 

@@ -9,17 +9,19 @@ class State:
     test_text: str = "test"
     screenshot_img: Optional[np.ndarray] = None
     mouse_pos: Optional[Tuple[int, int]] = None
+    
+    # 图片大小
     region: Optional[Tuple[int, int]] = None
-    yolo_results: Optional[List[Any]] = None
-    
-    # 标记过目标的图片
-    marked_img: Optional[np.ndarray] = None
-    
     # YOLO模型类别相关数据
+    yolo_results: Optional[List[Any]] = None
     model_class_names: Optional[List[str]] = None  # 模型的所有类别名称
     model_class_ids: Optional[List[int]] = None    # 模型的所有类别ID
     selected_class_ids: Optional[List[int]] = None # 当前选择的要识别的类别ID
     model_path: Optional[str] = None               # 当前加载的模型路径
+
+
+    # 标记过目标的图片
+    marked_img: Optional[np.ndarray] = None
 
     def to_dict(self) -> Dict[str, Any]:
         """

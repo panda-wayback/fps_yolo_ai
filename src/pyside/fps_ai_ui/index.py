@@ -52,7 +52,7 @@ def get_main_layout():
         img_show_component(),                    # 图片展示组件
         yolo_model_component(),                  # YOLO模型选择组件
         model_class_selector_component(),        # 模型类别选择组件
-        pid_component()                          # PID参数控制组件
+        
 
     ) # 目标跟踪器组件
 
@@ -60,6 +60,7 @@ def get_main_layout():
     # 左列布局
     second_columns_layout = add_widgets_to_vertical(
         target_tracker_component(),
+        pid_component(),                          # PID参数控制组件
     )
     
     # 右列布局  
