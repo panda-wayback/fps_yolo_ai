@@ -72,61 +72,15 @@ def create_target_tracker_control():
     Returns:
         QGroupBox: 目标跟踪器控制组件
     """
-    # 创建主容器
-    group = create_vertical_card("目标跟踪器控制")
+    # 创建主容器（使用紧凑布局）
+    group = create_vertical_card("目标跟踪器控制", compact=True)
     layout = group._layout
     
     # 获取目标跟踪器单例
     tracker = TargetTracker()
     
-    # 状态显示
-    status_label = QLabel("状态: 未运行")
-    status_label.setStyleSheet("""
-        QLabel {
-            color: #666666; 
-            font-weight: bold; 
-            font-size: 14px;
-            padding: 5px;
-            background-color: #f0f0f0;
-            border-radius: 3px;
-        }
-    """)
-    layout.addWidget(status_label)
-    
-    # 控制按钮
-    start_btn = QPushButton("启动跟踪 (F1)")
-    stop_btn = QPushButton("停止跟踪 (F2)")
-    reset_btn = QPushButton("重置 (F3)")
-    
-    # 按钮样式
-    start_btn.setStyleSheet("QPushButton { background-color: #4CAF50; color: white; font-weight: bold; }")
-    stop_btn.setStyleSheet("QPushButton { background-color: #f44336; color: white; font-weight: bold; }")
-    reset_btn.setStyleSheet("QPushButton { background-color: #ff9800; color: white; font-weight: bold; }")
-    
-    # 按钮布局
-    btn_layout = QHBoxLayout()
-    btn_layout.addWidget(start_btn)
-    btn_layout.addWidget(stop_btn)
-    btn_layout.addWidget(reset_btn)
-    layout.addLayout(btn_layout)
-    
-    # 参数控制区域
-    params_group = create_vertical_card("跟踪参数")
-    params_layout = params_group._layout
-    
-    # FPS控制
-    fps_control = create_slider_control("跟踪频率", 10, 120, 60, 0)
-    params_layout.addWidget(fps_control)
-    
-    # 应用参数按钮
-    apply_btn = QPushButton("应用参数")
-    apply_btn.setStyleSheet("QPushButton { background-color: #2196F3; color: white; }")
-    params_layout.addWidget(apply_btn)
-    
-    layout.addWidget(params_group)
-    
-    # 状态监控区域
-    monitor_group = create_vertical_card("状态监控")
+    # 状态监控区域（放在最上方，使用紧凑布局）
+    monitor_group = create_vertical_card("状态监控", compact=True)
     monitor_layout = monitor_group._layout
     
     # 状态信息显示
@@ -151,6 +105,38 @@ def create_target_tracker_control():
     
     layout.addWidget(monitor_group)
     
+    # 控制按钮
+    start_btn = QPushButton("启动跟踪 (F1)")
+    stop_btn = QPushButton("停止跟踪 (F2)")
+    reset_btn = QPushButton("重置 (F3)")
+    
+    # 按钮样式
+    start_btn.setStyleSheet("QPushButton { background-color: #4CAF50; color: white; font-weight: bold; }")
+    stop_btn.setStyleSheet("QPushButton { background-color: #f44336; color: white; font-weight: bold; }")
+    reset_btn.setStyleSheet("QPushButton { background-color: #ff9800; color: white; font-weight: bold; }")
+    
+    # 按钮布局
+    btn_layout = QHBoxLayout()
+    btn_layout.addWidget(start_btn)
+    btn_layout.addWidget(stop_btn)
+    btn_layout.addWidget(reset_btn)
+    layout.addLayout(btn_layout)
+    
+    # 参数控制区域（使用紧凑布局）
+    params_group = create_vertical_card("跟踪参数", compact=True)
+    params_layout = params_group._layout
+    
+    # FPS控制
+    fps_control = create_slider_control("跟踪频率", 10, 120, 60, 0)
+    params_layout.addWidget(fps_control)
+    
+    # 应用参数按钮
+    apply_btn = QPushButton("应用参数")
+    apply_btn.setStyleSheet("QPushButton { background-color: #2196F3; color: white; }")
+    params_layout.addWidget(apply_btn)
+    
+    layout.addWidget(params_group)
+    
     # 定时器用于状态更新
     status_timer = QTimer()
     status_timer.timeout.connect(lambda: update_status_display())
@@ -158,34 +144,6 @@ def create_target_tracker_control():
     def update_status_display():
         """更新状态显示"""
         status = tracker.get_status()
-        
-        # 更新状态标签
-        if status['running'] and status['thread_alive']:
-            status_label.setText("状态: 跟踪中")
-            status_label.setStyleSheet("""
-                QLabel {
-                    color: #2E7D32; 
-                    font-weight: bold; 
-                    font-size: 14px;
-                    padding: 5px;
-                    background-color: #E8F5E8;
-                    border-radius: 3px;
-                    border: 1px solid #4CAF50;
-                }
-            """)
-        else:
-            status_label.setText("状态: 已停止")
-            status_label.setStyleSheet("""
-                QLabel {
-                    color: #C62828; 
-                    font-weight: bold; 
-                    font-size: 14px;
-                    padding: 5px;
-                    background-color: #FFEBEE;
-                    border-radius: 3px;
-                    border: 1px solid #f44336;
-                }
-            """)
         
         # 更新详细信息
         info = f"""
@@ -245,7 +203,6 @@ def create_target_tracker_control():
     # 存储引用到组件
     group.status_timer = status_timer
     group.tracker = tracker
-    group.status_label = status_label
     group.info_text = info_text
     group.start_shortcut = start_shortcut
     group.stop_shortcut = stop_shortcut

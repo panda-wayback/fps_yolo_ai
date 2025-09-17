@@ -72,26 +72,38 @@ def create_mouse_control():
     Returns:
         QGroupBox: 鼠标控制组件
     """
-    # 创建主容器
-    group = create_vertical_card("鼠标模拟器控制")
+    # 创建主容器（使用紧凑布局）
+    group = create_vertical_card("鼠标模拟器控制", compact=True)
     layout = group._layout
     
     # 获取鼠标模拟器单例
     mouse_sim = MouseSimulator()
     
-    # 状态显示
-    status_label = QLabel("状态: 未运行")
-    status_label.setStyleSheet("""
+    # 状态监控区域（放在最上方，使用紧凑布局）
+    monitor_group = create_vertical_card("状态监控", compact=True)
+    monitor_layout = monitor_group._layout
+    
+    # 状态信息显示
+    info_text = QLabel("等待启动...")
+    info_text.setWordWrap(True)
+    info_text.setStyleSheet("""
         QLabel {
-            color: #666666; 
-            font-weight: bold; 
-            font-size: 14px;
-            padding: 5px;
-            background-color: #f0f0f0;
-            border-radius: 3px;
+            background-color: #f5f5f5; 
+            color: #333333;
+            padding: 10px; 
+            border-radius: 5px;
+            border: 1px solid #cccccc;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
         }
     """)
-    layout.addWidget(status_label)
+    monitor_layout.addWidget(info_text)
+    
+    # 刷新按钮
+    refresh_btn = QPushButton("刷新状态")
+    monitor_layout.addWidget(refresh_btn)
+    
+    layout.addWidget(monitor_group)
     
     # 控制按钮
     start_btn = QPushButton("启动 (F4)")
@@ -110,8 +122,8 @@ def create_mouse_control():
     btn_layout.addWidget(reset_btn)
     layout.addLayout(btn_layout)
     
-    # 参数控制区域
-    params_group = create_vertical_card("参数设置")
+    # 参数控制区域（使用紧凑布局）
+    params_group = create_vertical_card("参数设置", compact=True)
     params_layout = params_group._layout
     
     # FPS控制
@@ -137,8 +149,8 @@ def create_mouse_control():
     
     layout.addWidget(params_group)
     
-    # 速度控制区域
-    speed_group = create_vertical_card("速度控制")
+    # 速度控制区域（使用紧凑布局）
+    speed_group = create_vertical_card("速度控制", compact=True)
     speed_layout = speed_group._layout
     
     # X轴速度
@@ -167,32 +179,6 @@ def create_mouse_control():
     
     layout.addWidget(speed_group)
     
-    # 状态监控区域
-    monitor_group = create_vertical_card("状态监控")
-    monitor_layout = monitor_group._layout
-    
-    # 状态信息显示
-    info_text = QLabel("等待启动...")
-    info_text.setWordWrap(True)
-    info_text.setStyleSheet("""
-        QLabel {
-            background-color: #f5f5f5; 
-            color: #333333;
-            padding: 10px; 
-            border-radius: 5px;
-            border: 1px solid #cccccc;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 12px;
-        }
-    """)
-    monitor_layout.addWidget(info_text)
-    
-    # 刷新按钮
-    refresh_btn = QPushButton("刷新状态")
-    monitor_layout.addWidget(refresh_btn)
-    
-    layout.addWidget(monitor_group)
-    
     # 定时器用于状态更新
     status_timer = QTimer()
     status_timer.timeout.connect(lambda: update_status_display())
@@ -200,34 +186,6 @@ def create_mouse_control():
     def update_status_display():
         """更新状态显示"""
         status = mouse_sim.get_status()
-        
-        # 更新状态标签
-        if status["running"] and status["thread_alive"]:
-            status_label.setText("状态: 运行中")
-            status_label.setStyleSheet("""
-                QLabel {
-                    color: #2E7D32; 
-                    font-weight: bold; 
-                    font-size: 14px;
-                    padding: 5px;
-                    background-color: #E8F5E8;
-                    border-radius: 3px;
-                    border: 1px solid #4CAF50;
-                }
-            """)
-        else:
-            status_label.setText("状态: 已停止")
-            status_label.setStyleSheet("""
-                QLabel {
-                    color: #C62828; 
-                    font-weight: bold; 
-                    font-size: 14px;
-                    padding: 5px;
-                    background-color: #FFEBEE;
-                    border-radius: 3px;
-                    border: 1px solid #f44336;
-                }
-            """)
         
         # 更新详细信息
         info = f"""
@@ -306,7 +264,6 @@ FPS: {status['fps']}
     # 存储引用到组件
     group.status_timer = status_timer
     group.mouse_sim = mouse_sim
-    group.status_label = status_label
     group.info_text = info_text
     group.start_shortcut = start_shortcut
     group.stop_shortcut = stop_shortcut

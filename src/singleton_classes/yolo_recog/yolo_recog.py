@@ -3,10 +3,7 @@ YOLO识别单例类 - 简单易用的目标检测
 提供统一的YOLO模型加载和推理接口
 """
 
-import asyncio
 import time
-import sys
-import os
 import threading
 import torch
 import numpy as np
@@ -60,6 +57,18 @@ class YoloRecog:
         """
         开始YOLO循环
         """
+
+        DataCenter().update_state(model_path=yolo_model_path)
+        print(f"更新状态, 模型路径: {yolo_model_path}")
+        print(f"更新状态, 类别名称: {self.get_class_names()}")
+        print(f"更新状态, 类别ID: {self.get_class_ids()}")
+
+        DataCenter().update_state(model_class_names=self.get_class_names())
+        DataCenter().update_state(model_class_ids=self.get_class_ids())
+
+
+        print(f"开始YOLO循环, 模型路径: {yolo_model_path}")
+        
         if self._is_running:
             self.stop()
             time.sleep(0.1)
@@ -194,6 +203,46 @@ class YoloRecog:
             "class_names": list(self.model.names.values()) if hasattr(self.model, 'names') else []
         }
     
+    def get_class_names(self) -> List[str]:
+        """获取模型的所有类别名称"""
+        if self.model is None:
+            return []
+        
+        if hasattr(self.model, 'names'):
+            return list(self.model.names.values())
+        return []
+    
+    def get_class_ids(self) -> List[int]:
+        """获取模型的所有类别ID"""
+        if self.model is None:
+            return []
+        
+        if hasattr(self.model, 'names'):
+            return list(self.model.names.keys())
+        return []
+    
+    def print_model_labels(self):
+        """打印模型的所有标签信息"""
+        if self.model is None:
+            print("❌ 模型未加载，无法获取标签信息")
+            return
+        
+        print("=" * 50)
+        print("📋 YOLO模型标签信息")
+        print("=" * 50)
+        print(f"模型路径: {self.model_path}")
+        print(f"设备: {self.device}")
+        print(f"总类别数: {len(self.model.names) if hasattr(self.model, 'names') else 0}")
+        print()
+        
+        if hasattr(self.model, 'names'):
+            print("🏷️  类别标签列表:")
+            for class_id, class_name in self.model.names.items():
+                print(f"  {class_id:2d}: {class_name}")
+        else:
+            print("❌ 无法获取类别信息")
+        print("=" * 50)
+    
     def is_loaded(self) -> bool:
         """检查模型是否已加载"""
         return self.model is not None
@@ -211,7 +260,11 @@ if __name__ == "__main__":
     # 加载模型
     if  YoloRecog().load_model("runs/aimlab_fast/weights/best.pt"):
         print("✅ 模型加载成功")
-        print(f"模型信息: {yolo.get_model_info()}")
+        # print(f"模型信息: {yolo.get_model_info()}")
+        print(f"类别名称: {yolo.get_class_names()}")
+        print(f"类别ID: {yolo.get_class_ids()}")
+        # print(f"标签信息: {yolo.print_model_labels()}")
+
     else:
         print("❌ 模型加载失败")
  

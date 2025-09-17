@@ -26,10 +26,25 @@ def create_card(title="卡片标题"):
     return group  # 直接返回组件
 
 # 创建带卡片的垂直布局
-def create_vertical_card(title="垂直卡片"):
-    """创建垂直卡片组件 - 直接返回组件"""
+def create_vertical_card(title="垂直卡片", compact=False):
+    """创建垂直卡片组件 - 直接返回组件
+    
+    Args:
+        title: 卡片标题
+        compact: 是否使用紧凑布局，减少留白
+    """
     group = QGroupBox(title)
     layout = get_vertical_layout()
+    
+    # 如果启用紧凑模式，减少边距和间距
+    if compact:
+        layout.setContentsMargins(8, 8, 8, 8)  # 减少外边距
+        layout.setSpacing(4)  # 减少组件间距
+        group.setMaximumHeight(300)  # 设置最大高度
+    else:
+        layout.setContentsMargins(10, 10, 10, 10)  # 默认边距
+        layout.setSpacing(6)  # 默认间距
+    
     group.setLayout(layout)
     group._layout = layout
     return group

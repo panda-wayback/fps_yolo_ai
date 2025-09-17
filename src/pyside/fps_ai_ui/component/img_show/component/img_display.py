@@ -28,7 +28,8 @@ def create_img_display():
     # 图片标签
     img_label = QLabel()
     img_label.setAlignment(Qt.AlignCenter)
-    img_label.setMinimumSize(400, 300)
+    img_label.setMinimumSize(300, 200)
+    img_label.setMaximumSize(500, 300)
     img_label.setText("暂无图片")
     img_label.setStyleSheet("border: 1px solid #ccc; background-color: #f5f5f5;")
     

@@ -1,14 +1,16 @@
 
 
 import sys
-from PySide6.QtWidgets import QApplication, QGroupBox, QWidget, QVBoxLayout, QHBoxLayout
+from PySide6.QtWidgets import QApplication, QGroupBox, QWidget, QHBoxLayout
 from pyside.UI.basic.basic_layout import get_vertical_layout
-from pyside.UI.basic.basic_window import create_basic_window
+from pyside.UI.basic.basic_window import create_scrollable_window
+from pyside.UI.basic.multi_widget import add_widgets_to_vertical, add_layouts
 from pyside.fps_ai_ui.component.img_show.index import get_img_show_component
 from pyside.fps_ai_ui.component.move_mouse.index import get_move_mouse_component
 from pyside.fps_ai_ui.component.pid_component.index import get_pid_component
 from pyside.fps_ai_ui.component.yolo_model.index import get_yolo_model_component
 from pyside.fps_ai_ui.component.target_tracker.index import get_target_tracker_component
+from pyside.fps_ai_ui.component.model_class_select.index import get_model_class_selector
 
 
 
@@ -32,6 +34,10 @@ def move_mouse_component() -> QGroupBox:
 def target_tracker_component() -> QGroupBox:
     return get_target_tracker_component()
 
+# 模型类别选择组件
+def model_class_selector_component() -> QGroupBox:
+    return get_model_class_selector()
+
 
 # 主布局
 def get_main_layout():
@@ -42,24 +48,28 @@ def get_main_layout():
     columns_layout = QHBoxLayout()
 
     # 创建三列布局
-    three_columns_layout = QHBoxLayout()
-    three_columns_layout.addWidget(target_tracker_component()) # 目标跟踪器组件
+    first_columns_layout = add_widgets_to_vertical(
+        img_show_component(),                    # 图片展示组件
+        yolo_model_component(),                  # YOLO模型选择组件
+        model_class_selector_component(),        # 模型类别选择组件
+        pid_component()                          # PID参数控制组件
+
+    ) # 目标跟踪器组件
 
     
     # 左列布局
-    left_column = QVBoxLayout()
-    left_column.addWidget(move_mouse_component())   # 鼠标控制组件
+    second_columns_layout = add_widgets_to_vertical(
+        target_tracker_component(),
+    )
     
     # 右列布局  
-    right_column = QVBoxLayout()
-    right_column.addWidget(img_show_component())   # 图片展示组件
-    right_column.addWidget(yolo_model_component())  # YOLO模型选择组件
-    right_column.addWidget(pid_component())         # PID参数控制组件
+    third_columns_layout = add_widgets_to_vertical(
+        
+        move_mouse_component()   # 鼠标控制组件
+    )
     
-    # 将两列添加到水平布局
-    columns_layout.addLayout(left_column)
-    columns_layout.addLayout(right_column)
-    columns_layout.addLayout(three_columns_layout)
+    # 将列添加到水平布局
+    add_layouts(columns_layout, first_columns_layout, second_columns_layout, third_columns_layout)
     
     # 将列布局添加到主布局
     main_layout.addLayout(columns_layout)
@@ -80,9 +90,11 @@ def prompt_window(window: QWidget):
 
 def main_window():
     app = QApplication(sys.argv)
-    window = create_basic_window()
+    window = create_scrollable_window()
 
-    window.setLayout(get_main_layout())
+    # 将布局设置到内容容器中
+    content_layout = get_main_layout()
+    window.content_widget.setLayout(content_layout)
 
     prompt_window(window)
     sys.exit(app.exec())
