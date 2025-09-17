@@ -72,15 +72,15 @@ def create_target_tracker_control():
     Returns:
         QGroupBox: 目标跟踪器控制组件
     """
-    # 创建主容器（使用紧凑布局）
-    group = create_vertical_card("目标跟踪器控制", compact=True)
+    # 创建主容器
+    group = create_vertical_card("目标跟踪器控制")
     layout = group._layout
     
     # 获取目标跟踪器单例
     tracker = TargetTracker()
     
-    # 状态监控区域（放在最上方，使用紧凑布局）
-    monitor_group = create_vertical_card("状态监控", compact=True)
+    # 状态监控区域（放在最上方）
+    monitor_group = create_vertical_card("状态监控")
     monitor_layout = monitor_group._layout
     
     # 状态信息显示
@@ -122,8 +122,8 @@ def create_target_tracker_control():
     btn_layout.addWidget(reset_btn)
     layout.addLayout(btn_layout)
     
-    # 参数控制区域（使用紧凑布局）
-    params_group = create_vertical_card("跟踪参数", compact=True)
+    # 参数控制区域
+    params_group = create_vertical_card("跟踪参数")
     params_layout = params_group._layout
     
     # FPS控制

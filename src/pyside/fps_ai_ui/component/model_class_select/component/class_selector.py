@@ -19,15 +19,15 @@ def create_class_selector():
     Returns:
         QGroupBox: 类别选择组件
     """
-    # 创建主容器（使用紧凑布局）
-    group = create_vertical_card("类别选择", compact=True)
+    # 创建主容器
+    group = create_vertical_card("类别选择")
     layout = group._layout
     
     # 状态显示
     status_label = QLabel("等待模型加载...")
     status_label.setStyleSheet("""
         QLabel {
-            color: #666666; 
+            color: #333333; 
             font-weight: bold; 
             font-size: 12px;
             padding: 5px;

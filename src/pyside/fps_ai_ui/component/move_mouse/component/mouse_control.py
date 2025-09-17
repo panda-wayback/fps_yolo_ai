@@ -72,15 +72,15 @@ def create_mouse_control():
     Returns:
         QGroupBox: 鼠标控制组件
     """
-    # 创建主容器（使用紧凑布局）
-    group = create_vertical_card("鼠标模拟器控制", compact=True)
+    # 创建主容器
+    group = create_vertical_card("鼠标模拟器控制")
     layout = group._layout
     
     # 获取鼠标模拟器单例
     mouse_sim = MouseSimulator()
     
-    # 状态监控区域（放在最上方，使用紧凑布局）
-    monitor_group = create_vertical_card("状态监控", compact=True)
+    # 状态监控区域（放在最上方）
+    monitor_group = create_vertical_card("状态监控")
     monitor_layout = monitor_group._layout
     
     # 状态信息显示
@@ -122,8 +122,8 @@ def create_mouse_control():
     btn_layout.addWidget(reset_btn)
     layout.addLayout(btn_layout)
     
-    # 参数控制区域（使用紧凑布局）
-    params_group = create_vertical_card("参数设置", compact=True)
+    # 参数控制区域
+    params_group = create_vertical_card("参数设置")
     params_layout = params_group._layout
     
     # FPS控制
@@ -149,8 +149,8 @@ def create_mouse_control():
     
     layout.addWidget(params_group)
     
-    # 速度控制区域（使用紧凑布局）
-    speed_group = create_vertical_card("速度控制", compact=True)
+    # 速度控制区域
+    speed_group = create_vertical_card("速度控制")
     speed_layout = speed_group._layout
     
     # X轴速度
