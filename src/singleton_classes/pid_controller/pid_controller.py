@@ -37,6 +37,12 @@ class PIDController:
     def set_pid_parameters(self, kp, ki, kd):
         """设置PID参数"""
         self.pid_control.set_pid_parameters(kp, ki, kd)
+
+    def get_vector_pid_res(self, vector: tuple[float, float], dt=0.02) -> tuple[float, float]:
+        """获取PID控制器输出"""
+        error_x, error_y = vector
+        x_output, y_output = self.pid_control.update(error_x, error_y, dt)
+        return x_output, y_output
     
     def get_pid_res(self, results, image_size, dt=0.02) -> tuple[float, float]:
         """
@@ -79,3 +85,7 @@ def set_pid_parameters(kp, ki, kd):
 def get_pid_res(results, image_size, dt=0.02) -> tuple[float, float]:
     """获取PID控制器输出"""
     return _pid_controller.get_pid_res(results, image_size, dt)
+
+def get_vector_pid_res(vector: tuple[float, float], dt=0.02) -> tuple[float, float]:
+    """获取PID控制器输出"""
+    return _pid_controller.get_vector_pid_res(vector, dt)

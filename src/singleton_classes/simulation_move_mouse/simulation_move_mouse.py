@@ -28,7 +28,7 @@ class MouseSimulator:
                     cls._instance._initialized = False
         return cls._instance
     
-    def __init__(self, fps=500, smoothing=0.4):
+    def __init__(self, fps=1000, smoothing=0.4):
         """
         初始化鼠标模拟器（单例模式）
         
@@ -299,24 +299,15 @@ class MouseSimulator:
             print("⚠️  减速系数必须在0-1之间")
 
 
+mouse_simulator = MouseSimulator()
+
 # 便捷函数
-def get_mouse_simulator(fps=500, smoothing=0.4):
+def get_mouse_simulator():
     """
     获取鼠标模拟器单例实例
-    
-    Args:
-        fps (int): 控制频率，默认500Hz
-        smoothing (float): 平滑系数，默认0.4
-        
-    Returns:
-        MouseSimulator: 鼠标模拟器单例实例
     """
-    return MouseSimulator(fps, smoothing)
+    return mouse_simulator
 
-
-def get_default_mouse_simulator():
-    """获取默认配置的鼠标模拟器实例"""
-    return MouseSimulator()
 
 
 # 测试代码

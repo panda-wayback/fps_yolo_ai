@@ -9,7 +9,11 @@ import time
 import threading
 from threading import Lock
 from singleton_classes.data_center import DataCenter
+from singleton_classes.pid_controller.pid_controller import get_vector_pid_res
+from singleton_classes.screenshot_img.main import start_screenshot
+from singleton_classes.simulation_move_mouse.simulation_move_mouse import get_mouse_simulator
 from singleton_classes.target_selector.target_selector import TargetSelector
+from singleton_classes.yolo_recog.yolo_recog import YoloRecog
 
 
 class TargetTracker:
@@ -41,10 +45,6 @@ class TargetTracker:
         self.fps = 60
         self._delay = 1.0 / self.fps
         
-        # 状态变量
-        self.last_yolo_results = None
-        self.last_screenshot_img = None
-        
         # 目标选择器
         self.target_selector = TargetSelector()
         
@@ -59,6 +59,8 @@ class TargetTracker:
         
         # 启动目标选择器
         self.target_selector.start()
+        YoloRecog().start()
+        start_screenshot()
         
         self._running = True
         self._thread = threading.Thread(target=self._loop, daemon=True)
@@ -73,7 +75,8 @@ class TargetTracker:
         
         # 停止目标选择器
         self.target_selector.stop()
-        
+        YoloRecog().stop()
+
         self._running = False
         if self._thread and self._thread.is_alive():
             self._thread.join(timeout=1)
@@ -81,27 +84,30 @@ class TargetTracker:
     
     def _loop(self):
         """主循环线程"""
+
+        best_target_history = None
+
         while self._running:
             try:
                 # 获取DataCenter状态
                 state = self.data_center.get_state()
-                
-                # 简单的状态监控
-                if state.yolo_results:
-                    print(f"🎯 检测到 {len(state.yolo_results)} 个目标")
-                
-                if state.screenshot_img is not None:
-                    print("📸 截图更新")
-                
-                if state.mouse_pos:
-                    print(f"🖱️ 鼠标位置: {state.mouse_pos}")
+
+                best_target = state.best_target
+                if id(best_target) != id(best_target_history):
+                    best_target_history = best_target
+                    self._process_best_target(best_target)
                 
             except Exception as e:
                 print(f"❌ 跟踪循环错误: {e}")
             
             time.sleep(self._delay)
     
-    
+    def _process_best_target(self, best_target):
+        """处理最佳目标"""
+        print(f"✅ 目标跟踪: {best_target}")
+        x_output, y_output = get_vector_pid_res(best_target["vector"])
+        get_mouse_simulator().submit_vector(-x_output, -y_output)
+
     
     def set_fps(self, fps):
         """设置处理频率"""
@@ -116,7 +122,8 @@ class TargetTracker:
             'running': self._running,
             'fps': self.fps,
             'thread_alive': self._thread.is_alive() if self._thread else False,
-            'target_selector': target_status
+            'target_selector': target_status,
+            'current_target': self.target_selector.get_current_target(),
         }
     
     def clear_target(self):

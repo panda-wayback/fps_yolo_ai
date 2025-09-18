@@ -8,8 +8,8 @@
 import time
 import threading
 from threading import Lock
-from singleton_classes.data_center import DataCenter
-from utils.yolo.yolo_result_utils import best_target, select_best_target
+from singleton_classes.data_center import DataCenter, get_data_center
+from utils.yolo.yolo_result_utils import select_best_target
 
 
 class TargetSelector:
@@ -69,33 +69,45 @@ class TargetSelector:
     
     def _loop(self):
         """主循环线程"""
+        last_yolo_results = None
         while self._running:
             try:
                 # 获取DataCenter状态
                 state = self.data_center.get_state()
+                # print(f"🎯 目标选择循环: {id(last_yolo_results)} != {id(state.yolo_results)}  {state.yolo_results}")
                 
                 # 处理YOLO结果
-                if state.yolo_results:
+                if id(last_yolo_results) != id(state.yolo_results):
+                    last_yolo_results = state.yolo_results
                     self._process_yolo_results(state.yolo_results)
                 
                 
             except Exception as e:
-                print(f"❌ 目标选择循环错误: {e}")
+                print(f"❌ 目标选择循环错误: {e} ")
             
             time.sleep(self._delay)
     
     
     def _process_yolo_results(self, yolo_results):
         """处理YOLO检测结果"""
+        if yolo_results is None:
+            print("🎯 处理YOLO结果: 无结果")
+            self.current_target = None
+            return
+            
         print(f"🎯 处理YOLO结果: {len(yolo_results)} 个目标")
-        if not yolo_results:
+        if yolo_results is None:
+            print("🎯 处理YOLO结果: 无结果")
             self.current_target = None
             return
         
+        print(f"🎯 参考向量: {self.data_center.get_state().region}")
+
         screen_center = (
             self.data_center.get_state().region[0] /  2 ,
             self.data_center.get_state().region[1] / 2
         )
+        print(f"🎯 屏幕中心: {screen_center}")
         class_ids = DataCenter().get_state().model_class_ids
         best_target = select_best_target(
             yolo_results = yolo_results,
@@ -106,6 +118,10 @@ class TargetSelector:
         
         self.current_target = best_target
         self.reference_vector = self.current_target["vector"]
+        
+        print(f"🎯 选择目标: {self.reference_vector}")
+
+        get_data_center().update_state(best_target=best_target)
 
         print(f"✅ 选择目标: {self.current_target}")
     

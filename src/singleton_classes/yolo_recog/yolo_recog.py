@@ -53,21 +53,21 @@ class YoloRecog:
         else:
             return 'cpu'
     
-    def start(self, yolo_model_path: str):
+    def start(self):
         """
         开始YOLO循环
         """
-        print(f"开始YOLO循环, 模型路径: {yolo_model_path}")
+        print(f"开始YOLO循环, 模型路径: {self.model_path}")
         
         if self._is_running:
             self.stop()
             time.sleep(0.1)
         
+
         self._is_running = True
-        self.model_path = yolo_model_path
         
         # 先加载模型
-        if self.load_model(yolo_model_path):
+        if self.load_model(self.model_path):
             # 模型加载成功后更新DataCenter
             self._update_model_info_to_datacenter()
             
@@ -101,11 +101,13 @@ class YoloRecog:
                 # 使用numpy的array_equal来比较数组
                 if last_img is not None and np.array_equal(current_img, last_img):
                     time.sleep(0.001)
+                    
                     continue
                 
                 last_img = current_img
                 # 检测
-                results = self.detect(current_img, 0.5)
+                results = self.detect(current_img)
+                DataCenter().update_state(yolo_results=results)
                 # 图像处理
                 result_img = get_yolo_image(current_img, results)
                 # 更新状态

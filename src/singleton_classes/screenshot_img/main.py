@@ -73,6 +73,9 @@ class MouseScreenshot:
             self.stop()
             time.sleep(0.1)
         
+        DataCenter().update_state(region=region)
+        DataCenter().update_state(mouse_pos=mouse_pos)
+        
         # 设置参数
         self.mouse_pos = mouse_pos
         self.region = region

@@ -74,6 +74,10 @@ class DataCenter:
         )
         return task
 
+data_center = DataCenter()
+# 获取数据中心实例
+def get_data_center():
+    return data_center
 
 if __name__ == "__main__":
     dc = DataCenter()

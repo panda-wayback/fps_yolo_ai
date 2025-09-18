@@ -143,17 +143,20 @@ def create_target_tracker_control():
     
     def update_status_display():
         """更新状态显示"""
-        status = tracker.get_status()
-        
-        # 更新详细信息
-        info = f"""
-跟踪状态: {'运行中' if status['running'] and status['thread_alive'] else '已停止'}
-跟踪频率: {status['fps']} FPS
-线程状态: {'活跃' if status['thread_alive'] else '已结束'}
-检测目标数: {status['last_yolo_count']}
-截图状态: {'有' if status['has_screenshot'] else '无'}
-        """
-        info_text.setText(info.strip())
+        try:
+            status = tracker.get_status()
+            
+            # 更新详细信息
+            info = f"""
+                跟踪状态: {'运行中' if status['running'] and status['thread_alive'] else '已停止'}
+                跟踪频率: {status['fps']} FPS
+                线程状态: {'活跃' if status['thread_alive'] else '已结束'}
+                目标选择状态: {status['target_selector']}
+                当前目标: {status['current_target']}
+            """
+            info_text.setText(info.strip())
+        except Exception as e:
+            info_text.setText(f"状态获取错误: {e}")
     
     # 按钮事件处理
     def on_start():
