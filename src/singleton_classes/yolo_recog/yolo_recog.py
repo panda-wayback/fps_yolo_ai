@@ -10,6 +10,8 @@ import numpy as np
 from threading import Lock
 from typing import List
 from ultralytics import YOLO
+from data_center.index import get_data_center
+from data_center.models.yolo_model.subjects.subject import get_yolo_model_state_subject
 from singleton_classes.data_center import DataCenter
 
 
@@ -33,28 +35,13 @@ class YoloRecog:
         """初始化YOLO模型"""
         if self._initialized:
             return
-            
-        self.model = None
-        self.device = self._get_device()
-        self.model_path = None
+        
         self._initialized = True
-        self._is_running = False
-        self._yolo_thread = None
-        print(f"YoloRecog 单例初始化完成，使用设备: {self.device}")
     
-    def _get_device(self) -> str:
-        """获取最佳计算设备"""
-        if torch.backends.mps.is_available():
-            return 'mps'
-        elif torch.cuda.is_available():
-            return 'cuda'
-        else:
-            return 'cpu'
-    
-    def get_model(self) -> YOLO:
-        """获取模型"""
-        return self.model
-
+    def get_state(self):
+        """获取当前YOLO模型状态（实时更新）"""
+        return get_data_center().state.yolo_model_state
+        
     def load_model(self, model_path: str) -> bool:
         """
         加载YOLO模型
@@ -66,11 +53,8 @@ class YoloRecog:
             bool: 加载是否成功
         """
         try:
-            print(f"正在加载YOLO模型: {model_path}")
-            self.model = YOLO(model_path)
-            self.model.to(self.device)
-            self.model_path = model_path
-            print(f"✅ 模型加载成功，使用设备: {self.device}")
+            get_yolo_model_state_subject().on_next(model_path)
+
             return True
         except Exception as e:
             print(f"❌ 模型加载失败: {e}")
@@ -91,7 +75,7 @@ class YoloRecog:
                 - cls: 类别ID
                 - name: 类别名称
         """
-        if self.model is None:
+        if self.get_state().model is None:
             print("❌ 模型未加载，请先调用 load_model()")
             return []
         
@@ -105,84 +89,6 @@ class YoloRecog:
             return []
 
     
-    def get_model_info(self) -> dict:
-        """获取模型信息"""
-        if self.model is None:
-            return {"status": "未加载"}
-        
-        return {
-            "status": "已加载",
-            "model_path": self.model_path,
-            "device": self.device,
-            "class_names": list(self.model.names.values()) if hasattr(self.model, 'names') else []
-        }
-    
-    def get_class_names(self) -> List[str]:
-        """获取模型的所有类别名称"""
-        if self.model is None:
-            return []
-        
-        if hasattr(self.model, 'names'):
-            return list(self.model.names.values())
-        return []
-    
-    def get_class_ids(self) -> List[int]:
-        """获取模型的所有类别ID"""
-        if self.model is None:
-            return []
-        
-        if hasattr(self.model, 'names'):
-            return list(self.model.names.keys())
-        return []
-    
-    def print_model_labels(self):
-        """打印模型的所有标签信息"""
-        if self.model is None:
-            print("❌ 模型未加载，无法获取标签信息")
-            return
-        
-        print("=" * 50)
-        print("📋 YOLO模型标签信息")
-        print("=" * 50)
-        print(f"模型路径: {self.model_path}")
-        print(f"设备: {self.device}")
-        print(f"总类别数: {len(self.model.names) if hasattr(self.model, 'names') else 0}")
-        print()
-        
-        if hasattr(self.model, 'names'):
-            print("🏷️  类别标签列表:")
-            for class_id, class_name in self.model.names.items():
-                print(f"  {class_id:2d}: {class_name}")
-        else:
-            print("❌ 无法获取类别信息")
-        print("=" * 50)
-    
-    def is_loaded(self) -> bool:
-        """检查模型是否已加载"""
-        return self.model is not None
-    
-    def _update_model_info_to_datacenter(self):
-        """更新DataCenter中的模型信息"""
-        if self.model is None:
-            return
-        
-        try:
-            class_names = self.get_class_names()
-            class_ids = self.get_class_ids()
-            
-            DataCenter().update_state(
-                model_class_names=class_names,
-                model_class_ids=class_ids,
-                model_path=self.model_path,
-                selected_class_ids=class_ids  # 默认选择所有类别
-            )
-            
-            print(f"✅ 已更新DataCenter模型信息: {len(class_names)}个类别")
-            print(f"类别名称: {class_names}")
-            print(f"类别ID: {class_ids}")
-            
-        except Exception as e:
-            print(f"❌ 更新DataCenter模型信息失败: {e}")
 
 
 
@@ -191,15 +97,13 @@ if __name__ == "__main__":
     print("=== YOLO识别单例测试 ===")
     
     # 获取单例实例
-    yolo = YoloRecog()
-    print(f"模型信息: {yolo.get_model_info()}")
-   
+    yolo = YoloRecog() 
     # 加载模型
     if  YoloRecog().load_model("runs/aimlab_fast/weights/best.pt"):
         print("✅ 模型加载成功")
         # print(f"模型信息: {yolo.get_model_info()}")
-        print(f"类别名称: {yolo.get_class_names()}")
-        print(f"类别ID: {yolo.get_class_ids()}")
+        print(f"类别名称: {yolo.get_state().model_class_names}")
+        print(f"类别ID: {yolo.get_state().model_class_ids}")
         # print(f"标签信息: {yolo.print_model_labels()}")
 
     else:

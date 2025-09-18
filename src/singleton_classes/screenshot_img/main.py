@@ -18,7 +18,6 @@ class MouseScreenshot:
     鼠标区域截图单例类
     内部线程不断截图，外部获取最新截图
     """
-    
     _instance = None
     _lock = threading.Lock()
     
@@ -33,17 +32,14 @@ class MouseScreenshot:
     def __init__(self):
         if self._initialized:
             return
-        
-        self.state = get_data_center().state.screenshot_state
-        
         # 线程控制
         self._thread = None
         self._running = False
-        
-        # 最新截图
-        self._latest_image = None
-        
         self._initialized = True
+    
+    def get_state(self):
+        """获取当前截图状态"""
+        return get_data_center().state.screenshot_state
     
     def update_config(self, mouse_pos:tuple=None, region_size:tuple=None, interval:float=None):
         """
@@ -55,7 +51,6 @@ class MouseScreenshot:
             interval: 截图间隔，不传则不更新
         """
         get_screenshot_state_subject().on_next(ScreenshotState(mouse_pos=mouse_pos, region_size=region_size, interval=interval))
-
         
     def start(self):
         """
@@ -79,19 +74,17 @@ class MouseScreenshot:
         if self._thread:
             self._thread.join(timeout=1.0)
 
-        
-    
     def _screenshot_loop(self):
         """
         截图循环
         """
         while self._running:
             try:
-                image = capture_screenshot_bgr(self.state.region)
+                image = capture_screenshot_bgr(self.get_state().region)
 
                 self.process_img(image)
 
-                time.sleep(self.state.interval)
+                time.sleep(self.get_state().interval)
                 
             except Exception as e:
                 print(f"截图错误: {e}")
@@ -102,15 +95,7 @@ class MouseScreenshot:
         处理截图
         """
         get_img_subject().on_next(img)
-
-        # get_result_subject().on_next(yolo_result)
-
         pass
-
-
-def start_screenshot(mouse_pos: tuple = (756, 509), region: tuple = (600, 400), interval: float = 0.01):
-    
-    MouseScreenshot().start(mouse_pos, region, interval)
 
 if __name__ == "__main__":
     

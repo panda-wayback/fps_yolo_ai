@@ -4,7 +4,7 @@ from data_center.index import get_data_center
 import numpy as np
 from typing import List, Any, Optional, Dict, Tuple
 
-from data_center.models.yolo_model.index import YoloModelState
+from data_center.models.yolo_model.state import YoloModelState
 
 # 定义YOLO检测结果的类型
 YoloDetection = Dict[str, Any]  # 单个检测结果
