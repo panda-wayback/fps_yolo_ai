@@ -39,15 +39,7 @@ def capture_screenshot(region: Optional[Tuple[int, int, int, int]] = None) -> np
         # 执行截图
         screenshot = sct.grab(monitor)
         
-        # 将PIL图像转换为numpy数组
-        # MSS返回的是BGRA格式，我们需要转换为BGR
-        img_array = np.array(screenshot)
-        
-        # 移除alpha通道，只保留BGR
-        if img_array.shape[2] == 4:  # 如果有alpha通道
-            img_array = img_array[:, :, :3]  # 只取前3个通道(BGR)
-        
-        return img_array
+        return screenshot
 
 
 def capture_screenshot_bgr(region: Optional[Tuple[int, int, int, int]] = None) -> np.ndarray:
@@ -61,7 +53,19 @@ def capture_screenshot_bgr(region: Optional[Tuple[int, int, int, int]] = None) -
     Returns:
         np.ndarray: 截图的numpy数组，格式为BGR
     """
-    return capture_screenshot(region)
+
+    screenshot = capture_screenshot(region)
+
+        # 将PIL图像转换为numpy数组
+    # MSS返回的是BGRA格式，我们需要转换为BGR
+    img_array = np.array(screenshot)
+    
+    # 移除alpha通道，只保留BGR
+    if img_array.shape[2] == 4:  # 如果有alpha通道
+        img_array = img_array[:, :, :3]  # 只取前3个通道(BGR)
+    
+    return img_array
+    # return capture_screenshot(region)
 
 
 def capture_screenshot_rgb(region: Optional[Tuple[int, int, int, int]] = None) -> np.ndarray:
@@ -75,7 +79,7 @@ def capture_screenshot_rgb(region: Optional[Tuple[int, int, int, int]] = None) -
     Returns:
         np.ndarray: 截图的numpy数组，格式为RGB
     """
-    bgr_img = capture_screenshot(region)
+    bgr_img = capture_screenshot_bgr(region)
     # 将BGR转换为RGB
     rgb_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
     return rgb_img

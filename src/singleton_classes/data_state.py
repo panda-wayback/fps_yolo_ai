@@ -7,11 +7,13 @@ import base64
 @dataclass
 class State:
     test_text: str = "test"
+    
     screenshot_img: Optional[np.ndarray] = None
+    region: Optional[Tuple[int, int]] = None # 图片大小
+
     mouse_pos: Optional[Tuple[int, int]] = None
 
-    # 图片大小
-    region: Optional[Tuple[int, int]] = None
+
     screen_center: Optional[Tuple[int, int]] = None
     # YOLO模型类别相关数据
     yolo_results: Optional[List[Any]] = None

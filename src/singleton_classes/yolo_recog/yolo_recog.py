@@ -10,8 +10,6 @@ import numpy as np
 from threading import Lock
 from typing import List
 from ultralytics import YOLO
-
-from functions.ims_show import get_yolo_image
 from singleton_classes.data_center import DataCenter
 
 
@@ -53,71 +51,10 @@ class YoloRecog:
         else:
             return 'cpu'
     
-    def start(self):
-        """
-        开始YOLO循环
-        """
-        print(f"开始YOLO循环, 模型路径: {self.model_path}")
-        
-        if self._is_running:
-            self.stop()
-            time.sleep(0.1)
-        
+    def get_model(self) -> YOLO:
+        """获取模型"""
+        return self.model
 
-        self._is_running = True
-        
-        # 先加载模型
-        if self.load_model(self.model_path):
-            # 模型加载成功后更新DataCenter
-            self._update_model_info_to_datacenter()
-            
-            self._yolo_thread = threading.Thread(target=self._yolo_loop)
-            self._yolo_thread.start()
-        else:
-            print("❌ 模型加载失败，无法启动YOLO循环")
-            self._is_running = False
-    
-    def stop(self):
-        """
-        停止YOLO循环
-        """
-        self._is_running = False
-        if self._yolo_thread:
-            self._yolo_thread.join(timeout=1.0)
-
-    def _yolo_loop(self):
-        """
-        YOLO循环
-        """
-        last_img = None
-        while self._is_running:
-            try:
-            # 如果截图为空，或者截图重复，则不进行检测
-                current_img = DataCenter().get_state().screenshot_img
-                if current_img is None:
-                    time.sleep(0.001)
-                    continue
-                
-                # 使用numpy的array_equal来比较数组
-                if last_img is not None and np.array_equal(current_img, last_img):
-                    time.sleep(0.001)
-                    
-                    continue
-                
-                last_img = current_img
-                # 检测
-                results = self.detect(current_img)
-                DataCenter().update_state(yolo_results=results)
-                # 图像处理
-                result_img = get_yolo_image(current_img, results)
-                # 更新状态
-                DataCenter().update_state(marked_img=result_img)
-
-            except Exception as e:
-                print(f"❌ YOLO循环错误: {e}")
-
-            time.sleep(0.001)
-    
     def load_model(self, model_path: str) -> bool:
         """
         加载YOLO模型
@@ -167,28 +104,6 @@ class YoloRecog:
             print(f"❌ 检测失败: {e}")
             return []
 
-    
-    def detect_center(self, image: np.ndarray, conf_threshold: float = 0.5) -> List[dict]:
-        """
-        检测目标并返回中心点坐标
-        
-        Args:
-            image: 输入图像
-            conf_threshold: 置信度阈值
-            
-        Returns:
-            List[dict]: 包含中心点坐标的检测结果
-        """
-        detections = self.detect(image, conf_threshold)
-        
-        # 为每个检测结果添加中心点坐标
-        for detection in detections:
-            bbox = detection['bbox']
-            center_x = (bbox[0] + bbox[2]) / 2
-            center_y = (bbox[1] + bbox[3]) / 2
-            detection['center'] = [center_x, center_y]
-        
-        return detections
     
     def get_model_info(self) -> dict:
         """获取模型信息"""

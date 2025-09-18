@@ -76,7 +76,7 @@ class DataCenter:
 
 data_center = DataCenter()
 # 获取数据中心实例
-def get_data_center():
+def get_data_center() -> DataCenter:
     return data_center
 
 if __name__ == "__main__":
