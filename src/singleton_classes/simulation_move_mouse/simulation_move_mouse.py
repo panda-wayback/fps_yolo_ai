@@ -9,6 +9,8 @@ import threading
 from pynput.mouse import Controller
 from collections import deque
 
+# 移除循环导入，使用延迟导入
+
 class MouseSimulator:
     """
     鼠标模拟器单例类
@@ -46,39 +48,18 @@ class MouseSimulator:
             
         # 创建鼠标控制器实例
         self.mouse = Controller()
-        
-        # 当前速度向量（像素/秒）
-        self.vx = 0  # X轴速度
-        self.vy = 0  # Y轴速度
-        
-        # 平滑参数
-        self.smoothing = smoothing  # 指数平滑系数
-        
-        # 控制参数
-        self.fps = fps  # 更新频率
-        self.running = True  # 运行状态标志
-        
-        # 残差累积变量，用于处理小数像素移动
-        self.rx = 0  # X轴残差累积
-        self.ry = 0  # Y轴残差累积
-        
         # 向量执行时间控制
         self.vector_start_time = 0  # 向量开始时间
-        self.max_duration = 0.05  # 最大执行时间（秒）
-        self.decay_rate = 0.95  # 减速系数，每次循环速度乘以这个值
+
+        self.vx = 0  # 向量X轴速度
+        self.vy = 0  # 向量Y轴速度
 
         # 位移历史记录 
-        # 已经使用了maxlen参数，所以不需要再手动清理过期记录
         self.displacement_history = deque(maxlen=1000)  # 存储 (timestamp, dx, dy) 的队列
-        
-        # 创建并启动控制线程
-        # daemon=True 确保主程序退出时线程也会退出
-        self.thread = threading.Thread(target=self._driver_loop, daemon=True)
-        self.thread.start()
-        
+        self.thread = None
+
         # 标记为已初始化
         self._initialized = True
-        print(f"MouseSimulator 单例初始化完成，FPS: {fps}, 平滑系数: {smoothing}")
     
     # 修改配置
     def update_config(self, 
@@ -102,7 +83,7 @@ class MouseSimulator:
         if fps is None and smoothing is None:
             print("⚠️  没有提供要更新的参数")
 
-    def submit_vector(self, vx, vy):
+    def submit_vector(self,vector: tuple[float, float]):
         """
         提交新的速度向量
         
@@ -115,8 +96,9 @@ class MouseSimulator:
             速度向量会在下一个控制循环中被应用
             每个向量最多执行0.1秒
         """
-        self.vx = vx
-        self.vy = vy
+
+        self.vx = vector[0]
+        self.vy = vector[1]
         self.vector_start_time = time.time()  # 记录开始时间
 
     def _driver_loop(self):
@@ -129,19 +111,30 @@ class MouseSimulator:
             3. 使用残差累积确保精确的像素级移动
             4. 只在实际需要移动时才调用鼠标API
         """
+
+        # 残差累积变量，用于处理小数像素移动
+        error_x = 0  # X轴残差累积
+        error_y = 0  # Y轴残差累积
+        
         # 计算每次循环的延迟时间
-        delay = 1.0 / self.fps
+        from data_center.models.mouse_driver_model.subject import MouseDriverSubject
+
+        delay = 1.0 / MouseDriverSubject.get_state().fps
+        max_duration = MouseDriverSubject.get_state().max_duration
+        decay_rate = MouseDriverSubject.get_state().decay_rate
+        smoothing = MouseDriverSubject.get_state().smoothing
+        
         
         # 平滑处理用的临时变量
         sx, sy = 0, 0
         
         # 主控制循环
-        while self.running:
+        while MouseDriverSubject.get_state().running:
             # 检查向量执行时间是否超过最大持续时间
-            if time.time() - self.vector_start_time > self.max_duration:
+            if time.time() - self.vector_start_time > max_duration:
                 # 平滑减速而不是突然归0
-                self.vx *= self.decay_rate
-                self.vy *= self.decay_rate
+                self.vx *= decay_rate
+                self.vy *= decay_rate
                 
                 # 当速度很小时，直接设为0避免无限接近0
                 if abs(self.vx) < 0.1:
@@ -157,67 +150,44 @@ class MouseSimulator:
             # 步骤2: 应用指数平滑算法
             # 平滑系数越小，移动越平滑，但响应越慢
             # 正确的指数平滑：新值 = 平滑系数 * 目标值 + (1-平滑系数) * 旧值
-            sx = self.smoothing * target_sx + (1 - self.smoothing) * sx
-            sy = self.smoothing * target_sy + (1 - self.smoothing) * sy
+            sx = smoothing * target_sx + (1 - smoothing) * sx
+            sy = smoothing * target_sy + (1 - smoothing) * sy
 
             # 步骤3: 残差累积处理
             # 将小数部分累积起来，避免丢失精度
-            self.rx += sx
-            self.ry += sy
+            error_x += sx
+            error_y += sy
             
             # 步骤4: 提取整数部分作为实际移动量
-            move_x = int(self.rx)
-            move_y = int(self.ry)
+            move_x = int(error_x)
+            move_y = int(error_y)
             
             # 步骤5: 更新残差（减去已移动的整数部分）
-            self.rx -= move_x
-            self.ry -= move_y
+            error_x -= move_x
+            error_y -= move_y
 
             # 步骤6: 执行鼠标移动（只在需要时移动）
             if move_x != 0 or move_y != 0:
                 self.mouse.move(move_x, move_y)
-                # current_time = time.time()
-                # self.displacement_history.append((current_time, move_x, move_y))
-                
+                self.record_displacement(move_x, move_y)
 
             # 步骤7: 等待下一个控制周期
             time.sleep(delay)
-
+    # 记录位移
+    def record_displacement(self, move_x, move_y):
+        """
+        记录位移
+        """
+        current_time = time.time()
+        self.displacement_history.append((current_time, move_x, move_y))
 
     # 开始移动
-    def start(self):
+    def run(self):
         """
         开始移动
         """
-        self.running = True
-        
-        # 如果线程已经结束，重新创建线程
-        if not self.thread.is_alive():
-            self.thread = threading.Thread(target=self._driver_loop, daemon=True)
-            self.thread.start()
-            print("🔄 重新启动鼠标模拟线程")
-        else:
-            print("✅ 鼠标模拟线程已在运行")
-
-
-    def stop(self):
-        """
-        停止鼠标模拟器
-        
-        功能:
-            1. 设置停止标志
-            2. 等待控制线程结束
-            3. 确保资源正确释放
-        """
-        # 设置停止标志，让控制循环退出
-        self.running = False
-        
-        # 如果线程还在运行，等待其结束
-        if self.thread.is_alive():
-            self.thread.join()
-            print("🛑 鼠标模拟线程已停止")
-        else:
-            print("ℹ️ 鼠标模拟线程已经停止")
+        self.thread = threading.Thread(target=self._driver_loop, daemon=True)
+        self.thread.start()
     
     # 获取位移的累计值
     def get_displacement_history(self, seconds_back=0.02):
@@ -236,67 +206,6 @@ class MouseSimulator:
                 total_dy += dy
         
         return total_dx, total_dy
-
-    
-    def get_status(self):
-        """
-        获取鼠标模拟器状态信息
-        
-        Returns:
-            dict: 包含当前状态信息的字典
-        """
-        return {
-            "running": self.running,
-            "fps": self.fps,
-            "smoothing": self.smoothing,
-            "decay_rate": self.decay_rate,
-            "max_duration": self.max_duration,
-            "current_velocity": (self.vx, self.vy),
-            "residual": (self.rx, self.ry),
-            "thread_alive": self.thread.is_alive() if hasattr(self, 'thread') else False
-        }
-    
-    def is_running(self):
-        """检查模拟器是否正在运行"""
-        return self.running and hasattr(self, 'thread') and self.thread.is_alive()
-    
-    def update_config(self, fps=None, smoothing=None):
-        """
-        动态更新配置参数
-        
-        Args:
-            fps (int, optional): 新的控制频率
-            smoothing (float, optional): 新的平滑系数
-            
-        注意:
-            这个方法允许在运行时动态调整配置
-            但不会重新创建线程，只是更新参数
-        """
-        if fps is not None:
-            self.fps = fps
-            print(f"✅ 更新FPS为: {fps}")
-        
-        if smoothing is not None:
-            self.smoothing = smoothing
-            print(f"✅ 更新平滑系数为: {smoothing}")
-        
-        if fps is None and smoothing is None:
-            print("⚠️  没有提供要更新的参数")
-    
-    def update_decay_rate(self, decay_rate):
-        """
-        动态更新减速系数
-        
-        Args:
-            decay_rate (float): 新的减速系数，范围0-1
-                               值越大减速越慢，值越小减速越快
-                               默认值: 0.95
-        """
-        if 0 < decay_rate < 1:
-            self.decay_rate = decay_rate
-            print(f"✅ 更新减速系数为: {decay_rate}")
-        else:
-            print("⚠️  减速系数必须在0-1之间")
 
 
 mouse_simulator = MouseSimulator()

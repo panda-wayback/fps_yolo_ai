@@ -1,11 +1,11 @@
-from rx.subject import BehaviorSubject
+from rx.subject import Subject
 from data_center.index import get_data_center
 from data_center.models.screenshot.state import ScreenshotState
 import numpy as np
 
 from utils.screenshot_tool.mss_screenshot import capture_screenshot_bgr
 
-subject = BehaviorSubject(ScreenshotState(
+subject = Subject(ScreenshotState(
     interval=0.001
 ))
 state = get_data_center().state.screenshot_state

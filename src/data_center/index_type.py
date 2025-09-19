@@ -6,6 +6,7 @@ from data_center.models.base_state import BaseState
 from data_center.models.screenshot.state import ScreenshotState
 from data_center.models.pid_model.state import PIDModelState
 from data_center.models.yolo_model.state import YoloModelState
+from data_center.models.mouse_driver_model.state import MouseDriverState
 
 
 
@@ -24,3 +25,4 @@ class State(BaseModel):
     yolo_model_state: Optional[YoloModelState] = YoloModelState()
     screenshot_state: Optional[ScreenshotState] = ScreenshotState()
     pid_model_state: Optional[PIDModelState] = PIDModelState()
+    mouse_driver_state: Optional[MouseDriverState] = MouseDriverState()
