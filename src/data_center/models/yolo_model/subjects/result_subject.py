@@ -1,5 +1,5 @@
 
-from rx.subject import BehaviorSubject
+from rx.subject import Subject
 from data_center.index import get_data_center
 import numpy as np
 from typing import List, Any, Optional, Dict, Tuple
@@ -10,9 +10,12 @@ from data_center.models.yolo_model.state import YoloModelState
 YoloDetection = Dict[str, Any]  # 单个检测结果
 YoloResults = List[YoloDetection]  # YOLO检测结果列表
 
-subject = BehaviorSubject(None)
+subject = Subject()
 
-def use_yolo_result_subject(img:np.ndarray = None, value: Optional[YoloResults] = None):
+def use_yolo_result_subject(value: Optional[YoloResults] = None):
+
+    if value is None:
+        return
     subject.on_next(value)
 
 def set_result_subject(value: Optional[YoloResults] = None):
@@ -21,7 +24,10 @@ def set_result_subject(value: Optional[YoloResults] = None):
         # 检测结果
         get_data_center().state.yolo_model_state.yolo_results = value
         # 标记图片
-        get_data_center().state.yolo_model_state.marked_img = value.plot()
+        get_data_center().state.yolo_model_state.marked_img = value[0].plot()
+        # import matplotlib.pyplot as plt
+        # plt.imshow(value[0].plot())
+        # plt.show()
 
     except Exception as e:
         print(f"设置YOLO检测结果错误: {e}")

@@ -1,7 +1,6 @@
 from rx.subject import Subject
 from ultralytics import YOLO
 from data_center.index import get_data_center
-from singleton_classes.yolo_recog.yolo_recog import get_yolo_recog
 from utils.yolo.utils import get_device
 
 
@@ -25,8 +24,6 @@ def set_yolo_model_state_results(model_path: str = None):
     model = YOLO(model_path)
     model.to(get_device())
     print(f"使用设备: {get_device()}")
-   
-    # print(f"模型: {model}")
     
     get_data_center().state.yolo_model_state.update_state(model=model)
     print(f"✅ 模型加载成功: {model_path}")
