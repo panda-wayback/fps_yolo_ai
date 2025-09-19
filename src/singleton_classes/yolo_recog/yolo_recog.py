@@ -11,8 +11,6 @@ from threading import Lock
 from typing import List
 from ultralytics import YOLO
 from data_center.index import get_data_center
-from data_center.models.yolo_model.subjects.subject import get_yolo_model_state_subject
-from singleton_classes.data_center import DataCenter
 
 
 
@@ -35,7 +33,7 @@ class YoloRecog:
         """初始化YOLO模型"""
         if self._initialized:
             return
-        
+        self.model = None
         self._initialized = True
     
     def get_state(self):
@@ -53,8 +51,7 @@ class YoloRecog:
             bool: 加载是否成功
         """
         try:
-            get_yolo_model_state_subject().on_next(model_path)
-
+            self.model = YOLO(model_path)
             return True
         except Exception as e:
             print(f"❌ 模型加载失败: {e}")

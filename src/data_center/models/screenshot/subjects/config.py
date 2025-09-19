@@ -5,13 +5,24 @@ import numpy as np
 
 from utils.screenshot_tool.mss_screenshot import capture_screenshot_bgr
 
-state_subject = BehaviorSubject(ScreenshotState())
+subject = BehaviorSubject(ScreenshotState())
 state = get_data_center().state.screenshot_state
 
-def get_screenshot_state_subject():
-    return state_subject
+def get_screenshot_config_subject():
+    return subject
 
-
+def use_screenshot_config_subject(
+    mouse_pos: tuple[int, int] = None,
+    region_size: tuple[int, int] = None,
+    interval: float = None
+):
+    subject.on_next(
+        ScreenshotState(
+            mouse_pos=mouse_pos,
+            region_size=region_size,
+            interval=interval
+        )
+    )
 
 def set_screenshot_state_settings(value: ScreenshotState):
 
@@ -32,16 +43,19 @@ def set_screenshot_state_settings(value: ScreenshotState):
         )
     
 
+def init_screenshot_config_subject():
+    subject.subscribe(set_screenshot_state_settings)
+
+init_screenshot_config_subject()
+
 if __name__ == "__main__":
 
-    state_subject.subscribe(set_screenshot_state_settings)
+   
 
     img = capture_screenshot_bgr()
-
-    state_subject.on_next(ScreenshotState(
+    use_screenshot_config_subject(
         mouse_pos=(100, 200),
         region_size=(100, 100),
-    ))
-
+    )
     print(state.region)
     print(state.screen_center)

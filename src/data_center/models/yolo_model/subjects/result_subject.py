@@ -11,8 +11,9 @@ YoloDetection = Dict[str, Any]  # 单个检测结果
 YoloResults = List[YoloDetection]  # YOLO检测结果列表
 
 subject = BehaviorSubject(None)
-def get_yolo_result_subject():
-    return subject
+
+def use_yolo_result_subject(value: Optional[YoloResults] = None):
+    subject.on_next(value)
 
 state = get_data_center().state.yolo_model_state
 
@@ -20,9 +21,11 @@ def set_result_subject(value: Optional[YoloResults] = None):
     """设置YOLO检测结果"""
     state.yolo_results = value
 
-def detect_yolo_result(value: Optional[YoloResults] = None):
-    """处理YOLO检测结果"""
-    state.yolo_results = value
+def init_yolo_result_subject():
+    """初始化YOLO检测结果订阅"""
+    subject.subscribe(set_result_subject)
+
+init_yolo_result_subject()
 
 if __name__ == "__main__":
     subject.subscribe(set_result_subject)

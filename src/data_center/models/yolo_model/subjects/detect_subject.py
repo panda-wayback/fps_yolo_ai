@@ -1,24 +1,27 @@
-
-from rx.subject import BehaviorSubject
+from rx.subject import Subject
 from data_center.index import get_data_center
 
 import numpy as np
 
-from data_center.models.yolo_model.index import YoloModelState
+from data_center.models.yolo_model.subject import YoloSubject
 from singleton_classes.yolo_recog.yolo_recog import YoloRecog
 
-detect_subject = BehaviorSubject( None)
+subject = Subject( )
 
-state = get_data_center().state.yolo_model_state
-
-def get_detect_subject():
-    return detect_subject
+def use_yolo_detect_subject(img:np.ndarray = None):
+    subject.on_next(img)
 
 
-def set_detect_subject(value:np.ndarray = None):
-    result = YoloRecog().detect(value)
-    state.yolo_results = result
+def set_detect_subject(img:np.ndarray = None):
+    result = YoloRecog().detect(img)
+    YoloSubject.send_result(result)
 
+def init_yolo_detect_subject():
+    """初始化YOLO检测订阅"""
+    subject.subscribe(set_detect_subject)
+
+init_yolo_detect_subject()
+        
 if __name__ == "__main__":
-    detect_subject.subscribe(set_detect_subject)
-    detect_subject.on_next(YoloModelState(yolo_results=[1, 2, 3]))
+    use_yolo_detect_subject(np.zeros((100, 100, 3), dtype=np.uint8))
+    
