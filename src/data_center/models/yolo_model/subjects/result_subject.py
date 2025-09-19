@@ -15,13 +15,14 @@ subject = BehaviorSubject(None)
 def use_yolo_result_subject(img:np.ndarray = None, value: Optional[YoloResults] = None):
     subject.on_next(value)
 
-state = get_data_center().state.yolo_model_state
-
 def set_result_subject(value: Optional[YoloResults] = None):
     """设置YOLO检测结果"""
     try:
-        state.yolo_results = value
-        state.marked_img = value.plot()
+        # 检测结果
+        get_data_center().state.yolo_model_state.yolo_results = value
+        # 标记图片
+        get_data_center().state.yolo_model_state.marked_img = value.plot()
+
     except Exception as e:
         print(f"设置YOLO检测结果错误: {e}")
 

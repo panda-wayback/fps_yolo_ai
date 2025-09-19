@@ -1,16 +1,16 @@
 from rx.subject import Subject
 from ultralytics import YOLO
 from data_center.index import get_data_center
-from data_center.models.yolo_model.state import YoloModelState
-from data_center.models.yolo_model.subjects.detect_subject import get_yolo_detect_subject
-from data_center.models.yolo_model.subjects.result_subject import get_yolo_result_subject
+from singleton_classes.yolo_recog.yolo_recog import get_yolo_recog
+from utils.yolo.utils import get_device
+
 
 subject = Subject()
 
 def get_yolo_model_state_subject():
     return subject
 
-def use_yolo_model_state_subject(model_path: str):
+def use_yolo_model_path_subject(model_path: str):
     subject.on_next(model_path)
 
 def set_class_info(model: YOLO):
@@ -22,14 +22,11 @@ def set_class_info(model: YOLO):
     print(f"✅ 模型类别信息设置成功")
 
 def set_yolo_model_state_results(model_path: str = None):
-    try:
-        model = YOLO(model_path)
-        if model is None:
-            print(f"❌ 模型加载失败: {model_path}")
-            return
-    except Exception as e:
-        print(f"❌ 模型加载失败: {e}")
-        return
+    model = YOLO(model_path)
+    model.to(get_device())
+    print(f"使用设备: {get_device()}")
+   
+    # print(f"模型: {model}")
     
     get_data_center().state.yolo_model_state.update_state(model=model)
     print(f"✅ 模型加载成功: {model_path}")
@@ -45,4 +42,4 @@ init_yolo_model_state_subject()
 
 
 if __name__ == "__main__":
-    use_yolo_model_state_subject("runs/aimlab_fast/weights/best.pt")
+    use_yolo_model_path_subject("runs/aimlab_fast/weights/best.pt")

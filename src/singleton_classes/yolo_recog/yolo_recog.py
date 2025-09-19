@@ -2,17 +2,9 @@
 YOLO识别单例类 - 简单易用的目标检测
 提供统一的YOLO模型加载和推理接口
 """
-
-import time
-import threading
-import torch
 import numpy as np
 from threading import Lock
 from typing import List
-from ultralytics import YOLO
-from data_center.index import get_data_center
-
-
 
 class YoloRecog:
     """YOLO识别单例类 - 线程安全的模型管理"""
@@ -33,29 +25,12 @@ class YoloRecog:
         """初始化YOLO模型"""
         if self._initialized:
             return
-        self.model = None
         self._initialized = True
     
     def get_state(self):
         """获取当前YOLO模型状态（实时更新）"""
-        return get_data_center().state.yolo_model_state
-        
-    def load_model(self, model_path: str) -> bool:
-        """
-        加载YOLO模型
-        
-        Args:
-            model_path: 模型文件路径
-            
-        Returns:
-            bool: 加载是否成功
-        """
-        try:
-            self.model = YOLO(model_path)
-            return True
-        except Exception as e:
-            print(f"❌ 模型加载失败: {e}")
-            return False
+        from data_center.models.yolo_model.subject import YoloSubject
+        return YoloSubject.get_yolo_model_state()
     
     def detect(self, image: np.ndarray, conf_threshold: float = 0.5) -> List[dict]:
         """
@@ -78,28 +53,18 @@ class YoloRecog:
         
         try:
             # 执行推理
-            results = self.model(image, conf=conf_threshold, verbose=False)
+            results = self.get_state().model(image, conf=conf_threshold, verbose=False)
             return results
             
         except Exception as e:
             print(f"❌ 检测失败: {e}")
             return []
 
+_yolo_recog = YoloRecog()
+def get_yolo_recog():
+    return _yolo_recog
 
 if __name__ == "__main__":
     # 测试代码
     print("=== YOLO识别单例测试 ===")
     
-    # 获取单例实例
-    yolo = YoloRecog() 
-    # 加载模型
-    if  YoloRecog().load_model("runs/aimlab_fast/weights/best.pt"):
-        print("✅ 模型加载成功")
-        # print(f"模型信息: {yolo.get_model_info()}")
-        print(f"类别名称: {yolo.get_state().model_class_names}")
-        print(f"类别ID: {yolo.get_state().model_class_ids}")
-        # print(f"标签信息: {yolo.print_model_labels()}")
-
-    else:
-        print("❌ 模型加载失败")
- 

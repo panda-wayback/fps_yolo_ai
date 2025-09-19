@@ -1,7 +1,7 @@
 import torch
 
 
-def get_device(self) -> str:
+def get_device() -> str:
     """获取最佳计算设备"""
     if torch.backends.mps.is_available():
         return 'mps'
