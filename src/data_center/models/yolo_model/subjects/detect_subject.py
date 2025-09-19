@@ -4,7 +4,6 @@ from data_center.index import get_data_center
 import numpy as np
 
 from data_center.models.yolo_model.subject import YoloSubject
-from singleton_classes.yolo_recog.yolo_recog import YoloRecog
 
 subject = Subject( )
 
@@ -13,7 +12,7 @@ def use_yolo_detect_subject(img:np.ndarray = None):
 
 
 def set_detect_subject(img:np.ndarray = None):
-    result = YoloRecog().detect(img)
+    result = YoloSubject.get_yolo_model_state().model.predict(img)
     YoloSubject.send_result(result)
 
 def init_yolo_detect_subject():
