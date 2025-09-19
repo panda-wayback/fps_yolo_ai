@@ -106,19 +106,6 @@ class PIDControl:
         self.pid_x.setpoint = 0
         self.pid_y.setpoint = 0
 
-        # 计算到目标的距离
-        distance = (error_x**2 + error_y**2)**0.5
-        
-        # # 根据距离条件控制KI
-        # if distance <= self.ki_distance_threshold:
-        #     # 距离目标10像素内，使用KI
-        #     self.pid_x.Ki = 0.001  # 恢复原始KI值
-        #     self.pid_y.Ki = 0.001
-        # else:
-        #     # 距离目标超过10像素，KI设为0
-        #     self.pid_x.Ki = 0.0
-        #     self.pid_y.Ki = 0.0
-
         # 更新 X 轴 PID 控制器
         # 传入当前误差值和时间步长，计算控制输出
         x_output = self.pid_x(error_x, dt=dt)

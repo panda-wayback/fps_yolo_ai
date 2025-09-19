@@ -12,14 +12,18 @@ YoloResults = List[YoloDetection]  # YOLO检测结果列表
 
 subject = BehaviorSubject(None)
 
-def use_yolo_result_subject(value: Optional[YoloResults] = None):
+def use_yolo_result_subject(img:np.ndarray = None, value: Optional[YoloResults] = None):
     subject.on_next(value)
 
 state = get_data_center().state.yolo_model_state
 
 def set_result_subject(value: Optional[YoloResults] = None):
     """设置YOLO检测结果"""
-    state.yolo_results = value
+    try:
+        state.yolo_results = value
+        state.marked_img = value.plot()
+    except Exception as e:
+        print(f"设置YOLO检测结果错误: {e}")
 
 def init_yolo_result_subject():
     """初始化YOLO检测结果订阅"""

@@ -5,7 +5,9 @@ import numpy as np
 
 from utils.screenshot_tool.mss_screenshot import capture_screenshot_bgr
 
-subject = BehaviorSubject(ScreenshotState())
+subject = BehaviorSubject(ScreenshotState(
+    interval=0.001
+))
 state = get_data_center().state.screenshot_state
 
 def get_screenshot_config_subject():

@@ -85,9 +85,6 @@ class YoloRecog:
             print(f"❌ 检测失败: {e}")
             return []
 
-    
-
-
 
 if __name__ == "__main__":
     # 测试代码

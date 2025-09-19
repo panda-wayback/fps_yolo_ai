@@ -3,7 +3,6 @@ import time
 import numpy as np
 from typing import Optional
 
-from data_center.models.screenshot.state import ScreenshotState
 from data_center.index import get_data_center
 from data_center.models.screenshot.subject import ScreenshotSubject
 from utils.screenshot_tool.mss_screenshot import capture_screenshot_bgr
@@ -66,23 +65,20 @@ class MouseScreenshot:
         while self._running:
             try:
                 image = capture_screenshot_bgr(self.get_state().region)
-                
                 ScreenshotSubject.send_image(image)
-
-                time.sleep(self.get_state().interval)
-                
             except Exception as e:
                 print(f"截图错误: {e}")
-                time.sleep(0.1)
-    
+            time.sleep(self.get_state().interval)
+
+_screenshot = MouseScreenshot()
+def get_screenshot():
+    return _screenshot
 
 if __name__ == "__main__":
-    
-    screenshot = MouseScreenshot()
-    screenshot.start((200, 200), (200, 200), 0.1)
+    screenshot = get_screenshot()
+    screenshot.start()
     time.sleep(1)
-    img = screenshot.get_img()
-    if img is not None:
-        print(f"截图成功，尺寸: {img.shape}")
+    if screenshot.get_state().screenshot_img is not None:
+        print(f"截图成功，尺寸: {screenshot.get_state().screenshot_img.shape}")
     screenshot.stop()
     pass
