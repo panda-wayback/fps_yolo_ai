@@ -19,7 +19,7 @@ def get_state():
 def on_img_change(img):
     """图片变化时的回调函数"""
     if img is not None:
-        print(f"检测到图片变化: {img.shape}")
+        # print(f"检测到图片变化: {img.shape}")
         get_state().screenshot_img = img
     else:
         print(f"图片被清空")
@@ -36,6 +36,8 @@ def subscribe_img_subject():
     # 订阅图片变化 - 使用独立线程确保并行处理
     subject.subscribe(threaded(on_img_change))  # 图片保存 - 轻量级任务
     subject.subscribe(threaded(detect_img))     # YOLO检测 - 重量级任务
+    # subject.subscribe(on_img_change)  # 图片保存 - 轻量级任务
+    # subject.subscribe(detect_img)     # YOLO检测 - 重量级任务
     print(f"✅ 订阅图片变化成功")
 
 subscribe_img_subject()

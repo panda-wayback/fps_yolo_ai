@@ -17,9 +17,9 @@ class YoloSubject:
         use_yolo_model_path_subject(model_path)
     
     @staticmethod
-    def send_result(result: Optional[YoloResults] = None):
+    def send_result(result: Optional[YoloResults] = None, current_time: float = None):
         """发送YOLO检测结果"""
-        use_yolo_result_subject(result)
+        use_yolo_result_subject(result, current_time)
     
     @staticmethod
     def send_detect(img:np.ndarray = None):

@@ -1,3 +1,4 @@
+import time
 from rx.subject import Subject
 
 import numpy as np
@@ -17,10 +18,10 @@ def use_yolo_detect_subject(img:np.ndarray = None):
 
 
 def set_detect_subject(img:np.ndarray = None):
-
-    result = get_state().model(img , verbose=False)
+    result = get_state().model(img, verbose=False)
+    current_time = time.time()
     from data_center.models.yolo_model.subject import YoloSubject
-    YoloSubject.send_result(result)
+    YoloSubject.send_result(result , current_time)
 
 def init_yolo_detect_subject():
     """初始化YOLO检测订阅"""

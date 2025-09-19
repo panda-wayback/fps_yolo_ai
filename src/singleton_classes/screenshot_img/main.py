@@ -5,6 +5,7 @@ from typing import Optional
 
 from data_center.index import get_data_center
 from data_center.models.screenshot.subject import ScreenshotSubject
+from data_center.models.yolo_model.subjects.config import use_yolo_model_path_subject
 from utils.screenshot_tool.mss_screenshot import capture_screenshot_bgr
 
 
@@ -68,13 +69,14 @@ class MouseScreenshot:
                 ScreenshotSubject.send_image(image)
             except Exception as e:
                 print(f"截图错误: {e}")
-            time.sleep(self.get_state().interval)
+            # time.sleep(0.02)
 
 _screenshot = MouseScreenshot()
 def get_screenshot():
     return _screenshot
 
 if __name__ == "__main__":
+    use_yolo_model_path_subject("runs/aimlab_fast/weights/best.pt")
     screenshot = get_screenshot()
     screenshot.start()
     time.sleep(1)

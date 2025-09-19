@@ -5,9 +5,8 @@ import numpy as np
 
 from utils.screenshot_tool.mss_screenshot import capture_screenshot_bgr
 
-subject = Subject(ScreenshotState(
-    interval=0.001
-))
+subject = Subject()
+
 state = get_data_center().state.screenshot_state
 
 def get_screenshot_config_subject():
