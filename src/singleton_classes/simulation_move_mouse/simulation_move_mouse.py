@@ -99,6 +99,7 @@ class MouseSimulator:
 
         self.vx = vector[0]
         self.vy = vector[1]
+        print(f"✅ 提交新的速度向量: vx={vector[0]}, vy={vector[1]}")
         self.vector_start_time = time.time()  # 记录开始时间
 
     def _driver_loop(self):

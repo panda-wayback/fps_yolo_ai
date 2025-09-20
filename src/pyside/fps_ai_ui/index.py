@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QApplication, QGroupBox, QWidget, QHBoxLayout
 from pyside.UI.basic.basic_layout import get_vertical_layout
 from pyside.UI.basic.basic_window import create_scrollable_window
 from pyside.UI.basic.multi_widget import add_widgets_to_vertical, add_layouts
+from pyside.fps_ai_ui.component.mouse_driver.index import get_mouse_driver_component
 from pyside.fps_ai_ui.component.screenshot.index import get_screenshot_component
 from pyside.fps_ai_ui.component.target_selector.index import get_target_selector_component
 from pyside.fps_ai_ui.component.yolo_model.index import get_yolo_model_component
@@ -23,6 +24,10 @@ def screenshot_component() -> QGroupBox:
 # 目标选择器组件
 def target_selector_component() -> QGroupBox:
     return get_target_selector_component()
+
+# 鼠标驱动组件
+def mouse_driver_component() -> QGroupBox:
+    return get_mouse_driver_component()
 # 主布局
 def get_main_layout():
     # 设置主垂直布局
@@ -35,18 +40,19 @@ def get_main_layout():
     first_columns_layout = add_widgets_to_vertical(
         yolo_model_component(),                  # YOLO模型选择组件
        
-        target_selector_component(),                  # 目标选择器组件
+        
     ) # 目标跟踪器组件
 
     
     # 左列布局
     second_columns_layout = add_widgets_to_vertical(
          screenshot_component(),                  # 截图组件
+         mouse_driver_component(),                  # 鼠标驱动组件
     )
     
     # 右列布局  
     third_columns_layout = add_widgets_to_vertical(
-
+        target_selector_component(),                  # 目标选择器组件
     )
     
     # 将列添加到水平布局
