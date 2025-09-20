@@ -3,18 +3,9 @@
 
 from rx.subject import Subject
 from data_center.index import get_data_center
-from data_center.models.pid_model.state import PIDModelState
+from data_center.models.pid_model.state_model import PIDModelState
+from data_center.models.pid_model.subject_model import PIDSubjectModel
 from singleton_classes.pid_controller.pid_controller import PIDController
-
-# 创建PID模型状态的BehaviorSubject
-subject = Subject()
-
-def use_subject_pid_config(kp: float, ki: float, kd: float):
-    """
-    使用PID模型状态的BehaviorSubject
-    """
-    print(f"使用PID模型状态: kp={kp}, ki={ki}, kd={kd}")
-    subject.on_next(PIDModelState(kp=kp, ki=ki, kd=kd))
 
 
 def set_pid_config(config: PIDModelState):
@@ -29,12 +20,12 @@ def init_subject():
     """
     初始化PID模型状态的BehaviorSubject
     """
-    subject.subscribe(set_pid_config)
+    PIDSubjectModel.config_subject.subscribe(set_pid_config)
 
-    subject.subscribe(PIDController().set_pid_parameters)
+    PIDSubjectModel.config_subject.subscribe(PIDController().set_pid_parameters)
 
 init_subject()
     
 
 if __name__ == "__main__":
-    use_subject_pid_config(1.0, 0.0, 0.0)
+    PIDSubjectModel.config_subject.on_next(PIDModelState(kp=1.0, ki=0.0, kd=0.0))

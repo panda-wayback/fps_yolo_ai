@@ -1,9 +1,7 @@
 
 from rx.subject import Subject
 from data_center.index import get_data_center
-import numpy as np
-from typing import List, Any, Optional, Dict, Tuple
-
+from typing import List, Any, Optional, Dict
 from data_center.models.yolo_model.state import YoloModelState
 
 # 定义YOLO检测结果的类型
@@ -35,6 +33,8 @@ def set_result_subject(value: Optional[YoloResults] = None):
 def init_yolo_result_subject():
     """初始化YOLO检测结果订阅"""
     subject.subscribe(set_result_subject)
+    from data_center.models.target_selector.subject import TargetSelectorSubject
+    subject.subscribe(TargetSelectorSubject.send_yolo_results)
 
 init_yolo_result_subject()
 

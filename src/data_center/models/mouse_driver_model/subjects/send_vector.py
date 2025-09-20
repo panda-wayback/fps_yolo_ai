@@ -18,9 +18,10 @@ def submit_vector(vector: tuple[float, float]):
 def update_data_center_vector(vector: tuple[float, float]):
     get_data_center().get_state().mouse_driver_state.vx = vector[0]
     get_data_center().get_state().mouse_driver_state.vy = vector[1]
-    
+
+
 def init_send_vector_subject():
-    subject.subscribe(lambda x: submit_vector(x))
+    subject.subscribe(submit_vector)
     pass
 
 init_send_vector_subject()

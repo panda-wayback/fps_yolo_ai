@@ -5,7 +5,7 @@
 PID控制器单例类
 """
 from threading import Lock
-from data_center.models.pid_model.state import PIDModelState
+from data_center.models.pid_model.state_model import PIDModelState
 
 from data_center.models.pid_model.subject import PIDSubject
 from utils.pid.pid import PIDControl
