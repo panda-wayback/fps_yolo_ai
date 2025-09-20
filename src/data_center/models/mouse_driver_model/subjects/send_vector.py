@@ -4,7 +4,6 @@
 """
 
 from data_center.index import get_data_center
-from data_center.models.mouse_driver_model.subject_model import MouseDriverSubjectModel
 from singleton_classes.simulation_move_mouse.simulation_move_mouse import get_mouse_simulator
 
 
@@ -28,15 +27,9 @@ def update_data_center_vector(vector: tuple[float, float]):
         print(f"❌ 数据中心向量状态更新失败: {e}")
 
 
-def init_vector_subject():
-    """初始化鼠标向量订阅"""
-    MouseDriverSubjectModel.vector_subject.subscribe(submit_vector)
-    MouseDriverSubjectModel.vector_subject.subscribe(update_data_center_vector)
-
-
-init_vector_subject()
 
 
 if __name__ == "__main__":
     # 测试用例
+    from data_center.models.mouse_driver_model.subject_model import MouseDriverSubjectModel
     MouseDriverSubjectModel.vector_subject.on_next((1.0, 1.0))
