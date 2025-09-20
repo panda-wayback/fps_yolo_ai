@@ -22,11 +22,5 @@ def set_last_output(params: tuple[tuple[float, float], tuple[float, float]]):
         print(f"设置上一次PID 结果失败: {e}")
 
 
-def init_last_output_subject():
-    """
-    初始化last_output的BehaviorSubject
-    """
-    PIDSubjectModel.output_subject.subscribe(set_last_output)
 
 
-init_last_output_subject()

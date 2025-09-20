@@ -4,6 +4,8 @@
 
 from rx.subject import Subject
 
+
+
 class PIDSubjectModel:
     """PID模型订阅统一接口"""
     config_subject = Subject()

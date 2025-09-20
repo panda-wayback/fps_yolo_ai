@@ -2,7 +2,7 @@ import threading
 import time
 
 from data_center.models.screenshot.subject import ScreenshotSubject
-from data_center.models.yolo_model.subjects.load_model import use_yolo_model_path_subject
+from data_center.models.yolo_model.subject import YoloSubject
 from utils.screenshot_tool.mss_screenshot import capture_screenshot_bgr
 
 
@@ -80,11 +80,8 @@ def get_screenshot():
     return _screenshot
 
 if __name__ == "__main__":
-    use_yolo_model_path_subject("runs/aimlab_fast/weights/best.pt")
+    YoloSubject.send_model_path("runs/aimlab_fast/weights/best.pt")
     screenshot = get_screenshot()
     screenshot.start()
     time.sleep(100)
-    if screenshot.get_state().screenshot_img is not None:
-        print(f"截图成功，尺寸: {screenshot.get_state().screenshot_img.shape}")
-    screenshot.stop()
     pass

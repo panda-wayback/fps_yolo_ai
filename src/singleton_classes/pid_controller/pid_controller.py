@@ -6,8 +6,6 @@ PID控制器单例类
 """
 from threading import Lock
 from data_center.models.pid_model.state_model import PIDModelState
-
-from data_center.models.pid_model.subject import PIDSubject
 from utils.pid.pid import PIDControl
 
 class PIDController:
@@ -52,5 +50,5 @@ def get_pid_controller():
 
 
 if __name__ == "__main__":
+    from data_center.models.pid_model.subject import PIDSubject
     PIDSubject.send_config(1.0, 0.0, 0.0)
-    PIDSubject.send_update((0.0, 0.0), 0.02)
