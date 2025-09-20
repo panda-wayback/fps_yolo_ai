@@ -7,6 +7,7 @@ from data_center.models.screenshot.state import ScreenshotState
 from data_center.models.pid_model.state import PIDModelState
 from data_center.models.yolo_model.state import YoloModelState
 from data_center.models.mouse_driver_model.state import MouseDriverState
+from data_center.models.target_selector.state import TargetSelectorState
 
 
 
@@ -26,3 +27,4 @@ class State(BaseModel):
     screenshot_state: Optional[ScreenshotState] = ScreenshotState()
     pid_model_state: Optional[PIDModelState] = PIDModelState()
     mouse_driver_state: Optional[MouseDriverState] = MouseDriverState()
+    target_selector_state: Optional[TargetSelectorState] = TargetSelectorState()

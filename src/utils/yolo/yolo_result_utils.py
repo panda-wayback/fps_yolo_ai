@@ -288,12 +288,12 @@ def _calculate_target_scores(targets: List[Dict[str, Any]],
 
 
 def select_best_target(yolo_results: List[Any], 
-                      screen_center: Tuple[float, float], 
                       reference_vector: Optional[np.ndarray] = None,
                       class_ids: Optional[List[int]] = None,
                       distance_weight: float = 0.3,
                       similarity_weight: float = 0.4,
-                      confidence_weight: float = 0.3) -> Optional[Dict[str, Any]]:
+                      confidence_weight: float = 0.3,
+                      class_weight: float = 0.3) -> Optional[Dict[str, Any]]:
     """
     根据向量相似度、距离和置信度计算综合评分，选择最佳目标
     
@@ -310,6 +310,8 @@ def select_best_target(yolo_results: List[Any],
         评分最高的目标信息，如果没有目标则返回None
     """
     # 处理YOLO结果
+    img_shape = yolo_results[0].plot().shape[:2]  # (height, width)
+    screen_center = (int(img_shape[1] / 2), int(img_shape[0] / 2))  # (width/2, height/2)
     targets = process_yolo_results(yolo_results, screen_center, class_ids)
     
     if not targets:

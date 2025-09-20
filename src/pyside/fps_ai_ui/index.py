@@ -6,6 +6,7 @@ from pyside.UI.basic.basic_layout import get_vertical_layout
 from pyside.UI.basic.basic_window import create_scrollable_window
 from pyside.UI.basic.multi_widget import add_widgets_to_vertical, add_layouts
 from pyside.fps_ai_ui.component.screenshot.index import get_screenshot_component
+from pyside.fps_ai_ui.component.target_selector.index import get_target_selector_component
 from pyside.fps_ai_ui.component.yolo_model.index import get_yolo_model_component
 
 
@@ -19,6 +20,9 @@ def yolo_model_component() -> QGroupBox:
 def screenshot_component() -> QGroupBox:
     return get_screenshot_component()
 
+# 目标选择器组件
+def target_selector_component() -> QGroupBox:
+    return get_target_selector_component()
 # 主布局
 def get_main_layout():
     # 设置主垂直布局
@@ -37,7 +41,7 @@ def get_main_layout():
     
     # 左列布局
     second_columns_layout = add_widgets_to_vertical(
-
+        target_selector_component(),                  # 目标选择器组件
     )
     
     # 右列布局  
