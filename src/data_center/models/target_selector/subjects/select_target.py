@@ -4,6 +4,7 @@
 """
 
 from data_center.index import get_data_center
+from data_center.models.pid_model.subject import PIDSubject
 from singleton_classes.target_selector.target_selector import get_target_selector
 
 
@@ -17,6 +18,8 @@ def set_target_select_subject(yolo_results=None):
                 selected_confidence=selected_confidence,
                 selected_class_id=selected_class_id
             )
+        # 发送更新
+        PIDSubject.send_update(selected_point)
     except Exception as e:
         print(f"❌ 目标选择错误: {e}")
 

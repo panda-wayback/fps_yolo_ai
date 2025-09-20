@@ -2,7 +2,7 @@
 该模块用于记录PID模型的上一次输出结果（last_output）。
 """
 from data_center.index import get_data_center
-from data_center.models.pid_model.subject_model import PIDSubjectModel
+from data_center.models.mouse_driver_model.subject import MouseDriverSubject
 
 
 def set_last_output(params: tuple[tuple[float, float], tuple[float, float]]):
@@ -22,5 +22,13 @@ def set_last_output(params: tuple[tuple[float, float], tuple[float, float]]):
         print(f"设置上一次PID 结果失败: {e}")
 
 
-
-
+# 调用鼠标驱动
+def call_mouse_driver(params: tuple[tuple[float, float], tuple[float, float]]):
+    """
+    调用鼠标驱动
+    """
+    try:
+        output, error = params
+        MouseDriverSubject.send_vector(output)
+    except Exception as e:
+        print(f"调用鼠标驱动失败: {e}")

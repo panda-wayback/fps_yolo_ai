@@ -8,11 +8,6 @@ PID模型相关的统一接口
 
 from data_center.models.pid_model.state_model import PIDModelState
 from data_center.models.pid_model.subject_model import PIDSubjectModel
-from data_center.models.pid_model.subjects.config import set_pid_config
-from data_center.models.pid_model.subjects.last_output import set_last_output
-from data_center.models.pid_model.subjects.pid_update import handle_pid_update
-from singleton_classes.pid_controller.pid_controller import PIDController
-
 
 class PIDSubject:
     """PID模型订阅统一接口"""
@@ -34,12 +29,13 @@ class PIDSubject:
 
 
 
-
-
 def init_config_subject():
     """
     初始化PID模型状态的BehaviorSubject
     """
+    from data_center.models.pid_model.subjects.config import set_pid_config
+
+
     PIDSubjectModel.config_subject.subscribe(set_pid_config)
 
 
@@ -47,9 +43,13 @@ def init_last_output_subject():
     """
     初始化last_output的BehaviorSubject
     """
+    from data_center.models.pid_model.subjects.last_output import call_mouse_driver, set_last_output
+
     PIDSubjectModel.output_subject.subscribe(set_last_output)
+    PIDSubjectModel.output_subject.subscribe(call_mouse_driver)
 
 def init_pid_update_subject():
+    from data_center.models.pid_model.subjects.pid_update import handle_pid_update
     PIDSubjectModel.update_subject.subscribe(handle_pid_update)
 
 
