@@ -33,7 +33,7 @@ class TargetSelector:
     def target_selector(self, yolo_result):
         """目标选择器主函数"""
         if not yolo_result:
-            return None
+            return None, None, None, None
         
         # 直接导入避免循环导入
         from data_center.index import get_data_center
@@ -52,7 +52,16 @@ class TargetSelector:
             class_weight=target_selector_state.class_weight
         )
 
-        return target
+        if target:
+            selected_point = target['center']
+            selected_bbox = target['bbox']
+            selected_confidence = target['confidence']
+            selected_class_id = target['class_id']
+            return selected_point, selected_bbox, selected_confidence, selected_class_id    
+        else:
+            return None, None, None, None
+
+
 
 _target_selector = TargetSelector()
 def get_target_selector():

@@ -5,8 +5,6 @@ YOLO检测话题处理
 
 import numpy as np
 from data_center.index import get_data_center
-from data_center.models.yolo_model.subject_model import YoloSubjectModel
-from data_center.models.yolo_model.subject import YoloSubject
 
 
 def set_detect_subject(img: np.ndarray = None):
@@ -15,21 +13,17 @@ def set_detect_subject(img: np.ndarray = None):
         return
     try:
         result = get_data_center().state.yolo_model_state.model(img, verbose=False)
+
+        from data_center.models.yolo_model.subject import YoloSubject
         YoloSubject.send_result(result)
+        
     except Exception as e:
         print(f"YOLO检测错误: {e}")
-
-
-def init_detect_subject():
-    """初始化YOLO检测订阅"""
-    YoloSubjectModel.detect_subject.subscribe(set_detect_subject)
-
-
-init_detect_subject()
 
 
 if __name__ == "__main__":
     # 测试用例
     import numpy as np
     test_img = np.zeros((300, 400, 3), dtype=np.uint8)
-    YoloSubjectModel.detect_subject.on_next(test_img)
+    from data_center.models.yolo_model.subject import YoloSubject
+    YoloSubject.send_detect(test_img)

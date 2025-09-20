@@ -31,7 +31,8 @@ def update_mouse_driver_state(config: MouseDriverState):
 
 
 if __name__ == "__main__":
-    from data_center.models.mouse_driver_model.subject_model import MouseDriverSubjectModel
+    
+    from data_center.models.mouse_driver_model.subject import MouseDriverSubject
     # 测试用例
     config = MouseDriverState(
         fps=1000, 
@@ -40,5 +41,5 @@ if __name__ == "__main__":
         decay_rate=0.95, 
         running=True
     )
-    MouseDriverSubjectModel.config_subject.on_next(config)
+    MouseDriverSubject.send_config(config)
     time.sleep(1)

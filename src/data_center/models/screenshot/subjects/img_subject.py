@@ -6,8 +6,6 @@
 import time
 import numpy as np
 from data_center.index import get_data_center
-from data_center.models.screenshot.subject_model import ScreenshotSubjectModel
-from utils.thread.utils import threaded
 
 
 def get_state():
@@ -38,16 +36,6 @@ def detect_img(img: np.ndarray):
         print(f"❌ YOLO检测发送失败: {e}")
 
 
-def init_img_subject():
-    """初始化截图图片订阅"""
-    # 订阅图片变化 - 使用独立线程确保并行处理
-    ScreenshotSubjectModel.img_subject.subscribe(on_img_change)  # 图片保存 - 轻量级任务
-    ScreenshotSubjectModel.img_subject.subscribe(detect_img)     # YOLO检测 - 重量级任务
-    print("✅ 截图图片订阅初始化成功")
-
-
-init_img_subject()
-
 
 if __name__ == "__main__":
     # 测试用例
@@ -56,7 +44,3 @@ if __name__ == "__main__":
     # 模拟图片更新
     fake_img1 = np.zeros((480, 640, 3), dtype=np.uint8)
     fake_img2 = np.ones((720, 1280, 3), dtype=np.uint8) * 255
-    
-    ScreenshotSubjectModel.img_subject.on_next(fake_img1)
-    time.sleep(0.1)
-    ScreenshotSubjectModel.img_subject.on_next(fake_img2)

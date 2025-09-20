@@ -5,7 +5,7 @@
 
 from data_center.index import get_data_center
 from data_center.models.screenshot.state_model import ScreenshotState
-from data_center.models.screenshot.subject_model import ScreenshotSubjectModel
+
 from utils.screenshot_tool.mss_screenshot import capture_screenshot_bgr
 
 
@@ -41,18 +41,10 @@ def set_screenshot_state_settings(value: ScreenshotState):
         print(f"❌ 截图配置更新失败: {e}")
 
 
-def init_config_subject():
-    """初始化截图配置订阅"""
-    ScreenshotSubjectModel.config_subject.subscribe(set_screenshot_state_settings)
-
-
-init_config_subject()
-
 
 if __name__ == "__main__":
     # 测试用例
-    from utils.screenshot_tool.mss_screenshot import capture_screenshot_bgr
-    
+    from data_center.models.screenshot.subject_model import ScreenshotSubjectModel
     img = capture_screenshot_bgr()
     ScreenshotSubjectModel.config_subject.on_next(
         ScreenshotState(

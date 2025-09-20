@@ -3,9 +3,8 @@ YOLO选中类别话题处理
 基于PID模型的最佳实践
 """
 
-from typing import List, Optional
+from typing import List
 from data_center.index import get_data_center
-from data_center.models.yolo_model.subject_model import YoloSubjectModel
 
 
 def update_selected_class_ids(selected_class_ids: List[int]):
@@ -27,14 +26,7 @@ def update_selected_class_ids(selected_class_ids: List[int]):
         print(f"❌ 更新选中类别失败: {str(e)}")
 
 
-def init_selected_class_subject():
-    """初始化YOLO选中类别订阅"""
-    YoloSubjectModel.selected_class_subject.subscribe(update_selected_class_ids)
-
-
-init_selected_class_subject()
-
-
 if __name__ == "__main__":
     # 测试用例
-    YoloSubjectModel.selected_class_subject.on_next([0, 1, 2])
+    from data_center.models.yolo_model.subject import YoloSubject
+    YoloSubject.send_selected_class_ids([0, 1, 2])

@@ -5,7 +5,6 @@ YOLO模型加载话题处理
 
 from ultralytics import YOLO
 from data_center.index import get_data_center
-from data_center.models.yolo_model.subject_model import YoloSubjectModel
 
 
 def set_class_info(model: YOLO):
@@ -45,14 +44,9 @@ def set_yolo_model_state_results(model_path: str):
         print(f"❌ 模型加载失败: {e}")
 
 
-def init_load_model_subject():
-    """初始化YOLO模型加载订阅"""
-    YoloSubjectModel.load_model_subject.subscribe(set_yolo_model_state_results)
-
-
-init_load_model_subject()
 
 
 if __name__ == "__main__":
     # 测试用例
-    YoloSubjectModel.load_model_subject.on_next("runs/aimlab_fast/weights/best.pt")
+    from data_center.models.yolo_model.subject import YoloSubject
+    YoloSubject.send_model_path("runs/aimlab_fast/weights/best.pt")

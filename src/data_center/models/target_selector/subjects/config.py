@@ -5,7 +5,7 @@
 
 from data_center.index import get_data_center
 from data_center.models.target_selector.state_model import TargetSelectorState
-from data_center.models.target_selector.subject_model import TargetSelectorSubjectModel
+
 
 
 def set_target_selector_config(config: TargetSelectorState):
@@ -21,20 +21,14 @@ def set_target_selector_config(config: TargetSelectorState):
         print(f"❌ 目标选择器配置更新失败: {e}")
 
 
-def init_config_subject():
-    """初始化目标选择器配置订阅"""
-    TargetSelectorSubjectModel.config_subject.subscribe(set_target_selector_config)
-
-
-init_config_subject()
 
 
 if __name__ == "__main__":
+    from data_center.models.target_selector.subject import TargetSelectorSubject
     # 测试用例
-    config = TargetSelectorState(
+    TargetSelectorSubject.set_config(
         distance_weight=0.3,
         confidence_weight=0.4,
         similarity_weight=0.2,
         class_weight=0.1
     )
-    TargetSelectorSubjectModel.config_subject.on_next(config)

@@ -31,5 +31,5 @@ def update_data_center_vector(vector: tuple[float, float]):
 
 if __name__ == "__main__":
     # 测试用例
-    from data_center.models.mouse_driver_model.subject_model import MouseDriverSubjectModel
-    MouseDriverSubjectModel.vector_subject.on_next((1.0, 1.0))
+    from data_center.models.mouse_driver_model.subject import MouseDriverSubject
+    MouseDriverSubject.send_vector((1.0, 1.0))
