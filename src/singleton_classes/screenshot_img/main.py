@@ -66,10 +66,15 @@ class MouseScreenshot:
         while self._running:
             try:
                 image = capture_screenshot_bgr(self.get_state().region)
+                begin_time = time.time()
                 ScreenshotSubject.send_image(image)
+                end_time = time.time()
+                print(f"截图时间: {(end_time - begin_time)*1000}ms")
+            
             except Exception as e:
                 print(f"截图错误: {e}")
-            # time.sleep(0.02)
+
+            time.sleep(0.01)
 
 _screenshot = MouseScreenshot()
 def get_screenshot():
@@ -79,7 +84,7 @@ if __name__ == "__main__":
     use_yolo_model_path_subject("runs/aimlab_fast/weights/best.pt")
     screenshot = get_screenshot()
     screenshot.start()
-    time.sleep(1)
+    time.sleep(100)
     if screenshot.get_state().screenshot_img is not None:
         print(f"截图成功，尺寸: {screenshot.get_state().screenshot_img.shape}")
     screenshot.stop()

@@ -5,13 +5,11 @@
 只提供文件选择功能，获取模型路径
 """
 
-from PySide6.QtWidgets import (QHBoxLayout, QPushButton, QLabel, 
-                               QFileDialog, QLineEdit)
-from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QPushButton, QFileDialog
 from pyside.UI.basic.basic_layout import create_vertical_card
 import os
 
-from singleton_classes.yolo_recog.yolo_recog import YoloRecog
+from data_center.models.yolo_model.subject import YoloSubject
 
 
 def create_yolo_model_selector():
@@ -25,38 +23,14 @@ def create_yolo_model_selector():
     group = create_vertical_card("YOLO模型选择")
     layout = group._layout
     
-    # 模型路径输入框
-    path_label = QLabel("模型路径:")
-    path_input = QLineEdit()
-    path_input.setPlaceholderText("请选择YOLO模型文件...")
-    path_input.setReadOnly(True)
+    # 选择并加载模型按钮
+    load_btn = QPushButton("选择并加载模型")
     
-    # 选择按钮
-    select_btn = QPushButton("选择模型")
+    layout.addWidget(load_btn)
     
-    # 清除按钮
-    clear_btn = QPushButton("清除")
-
-    # 加载按钮
-    load_btn = QPushButton("加载模型")
-    
-    # 布局
-    path_layout = QHBoxLayout()
-    path_layout.addWidget(path_label)
-    path_layout.addWidget(path_input)
-    
-    button_layout = QHBoxLayout()
-    button_layout.addWidget(load_btn)
-    button_layout.addWidget(select_btn)
-    button_layout.addWidget(clear_btn)
-    
-
-    layout.addLayout(path_layout)
-    layout.addLayout(button_layout)
-    
-    # 选择文件功能
-    def select_model():
-        """选择模型文件"""
+    # 选择并加载模型功能
+    def select_and_load_model():
+        """选择并加载模型文件"""
         file_path, _ = QFileDialog.getOpenFileName(
             None,
             "选择YOLO模型文件",
@@ -64,43 +38,25 @@ def create_yolo_model_selector():
             "模型文件 (*.pt *.onnx *.engine);;所有文件 (*.*)"
         )
         
-        if file_path:
-            path_input.setText(file_path)
-            print(f"✅ 选择模型: {os.path.basename(file_path)}")
-    
-    # 清除路径功能
-    def clear_path():
-        """清除选择的路径"""
-        path_input.clear()
-        print("🔄 清除模型路径")
-    
-    # 加载模型功能
-    def load_model():
-        """加载模型"""
-        model_path = path_input.text()
-        if model_path:
-            print(f"✅ 加载模型: {os.path.basename(model_path)}")
-        if  YoloRecog().load_model(model_path):
-            YoloRecog().start()
-            print("✅ 模型加载成功")
-            print(f"模型信息: {YoloRecog().get_model_info()}")
-        else:
-            print("❌ 模型加载失败")
-    
+        if not file_path:
+            return
+            
+        if not os.path.exists(file_path):
+            print(f"❌ 模型文件不存在: {file_path}")
+            return
+            
+        print(f"🔄 正在加载模型: {os.path.basename(file_path)}")
+        try:
+            # 通过话题发送模型路径
+            YoloSubject.send_model_path(file_path)
+            print("✅ 模型加载请求已发送")
+        except Exception as e:
+            print(f"❌ 模型加载失败: {str(e)}")
     
     # 连接按钮事件
-    load_btn.clicked.connect(load_model)
-    select_btn.clicked.connect(select_model)
-    clear_btn.clicked.connect(clear_path)
-    
-    
-    # 存储引用到组件
-    group.path_input = path_input
-    group.select_model = select_model
-    group.clear_path = clear_path
+    load_btn.clicked.connect(select_and_load_model)
     
     return group
-
 
 def get_yolo_model_selector():
     """

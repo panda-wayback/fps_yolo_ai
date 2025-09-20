@@ -34,10 +34,10 @@ def detect_img(img):
 
 def subscribe_img_subject():
     # 订阅图片变化 - 使用独立线程确保并行处理
-    subject.subscribe(threaded(on_img_change))  # 图片保存 - 轻量级任务
-    subject.subscribe(threaded(detect_img))     # YOLO检测 - 重量级任务
-    # subject.subscribe(on_img_change)  # 图片保存 - 轻量级任务
-    # subject.subscribe(detect_img)     # YOLO检测 - 重量级任务
+    # subject.subscribe(threaded(on_img_change))  # 图片保存 - 轻量级任务
+    # subject.subscribe(threaded(detect_img))     # YOLO检测 - 重量级任务
+    subject.subscribe(on_img_change)  # 图片保存 - 轻量级任务
+    subject.subscribe(detect_img)     # YOLO检测 - 重量级任务
     print(f"✅ 订阅图片变化成功")
 
 subscribe_img_subject()

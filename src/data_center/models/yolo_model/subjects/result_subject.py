@@ -13,14 +13,7 @@ YoloResults = List[YoloDetection]  # YOLO检测结果列表
 subject = Subject()
 last_time = 0
 
-def use_yolo_result_subject(value: Optional[YoloResults] = None, current_time: float = None):
-    # 防止过早的结果覆盖过晚的结果
-    global last_time
-    if current_time is not None and current_time  > last_time:
-        last_time = current_time
-    else:
-        return
-    # print(f"time: {current_time * 1000 % 1e9}")
+def use_yolo_result_subject(value: Optional[YoloResults] = None):
     if value is None:
         return
     subject.on_next(value)
