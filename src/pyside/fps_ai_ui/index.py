@@ -34,14 +34,14 @@ def get_main_layout():
     # 创建三列布局
     first_columns_layout = add_widgets_to_vertical(
         yolo_model_component(),                  # YOLO模型选择组件
-        screenshot_component(),                  # 截图组件
-
+       
+        target_selector_component(),                  # 目标选择器组件
     ) # 目标跟踪器组件
 
     
     # 左列布局
     second_columns_layout = add_widgets_to_vertical(
-        target_selector_component(),                  # 目标选择器组件
+         screenshot_component(),                  # 截图组件
     )
     
     # 右列布局  

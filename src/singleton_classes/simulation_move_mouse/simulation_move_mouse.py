@@ -124,7 +124,6 @@ class MouseSimulator:
         decay_rate = MouseDriverSubject.get_state().decay_rate
         smoothing = MouseDriverSubject.get_state().smoothing
         
-        
         # 平滑处理用的临时变量
         sx, sy = 0, 0
         

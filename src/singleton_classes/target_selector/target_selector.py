@@ -44,7 +44,7 @@ class TargetSelector:
            
         target = select_best_target(
             yolo_result,
-            reference_vector=target_selector_state.reference_vector,
+            reference_vector = self.reference_vector,
             class_ids=yolo_state.selected_class_ids,
             distance_weight=target_selector_state.distance_weight,
             similarity_weight=target_selector_state.similarity_weight,
@@ -57,8 +57,10 @@ class TargetSelector:
             selected_bbox = target['bbox']
             selected_confidence = target['confidence']
             selected_class_id = target['class_id']
+            self.reference_vector = selected_point
             return selected_point, selected_bbox, selected_confidence, selected_class_id    
         else:
+            self.reference_vector = None
             return None, None, None, None
 
 
