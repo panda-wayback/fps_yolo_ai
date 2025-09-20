@@ -6,7 +6,7 @@ from data_center.models.base_state import BaseState
 from data_center.models.screenshot.state import ScreenshotState
 from data_center.models.pid_model.state_model import PIDModelState
 from data_center.models.yolo_model.state_model import YoloModelState
-from data_center.models.mouse_driver_model.state import MouseDriverState
+from data_center.models.mouse_driver_model.state_model import MouseDriverState
 from data_center.models.target_selector.state_model import TargetSelectorState
 
 
