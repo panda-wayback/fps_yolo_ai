@@ -14,3 +14,4 @@ class YoloModelState(BaseState):
     selected_class_ids: Optional[List[int]] = None # 当前选择的要识别的类别ID
     marked_img: Optional[np.ndarray] = None        # 标记过目标的图片
     yolo_results: Optional[List[Any]] = None       # YOLO模型输出
+

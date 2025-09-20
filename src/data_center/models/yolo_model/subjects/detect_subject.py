@@ -4,22 +4,17 @@ YOLO检测话题处理
 """
 
 import numpy as np
+from data_center.index import get_data_center
 from data_center.models.yolo_model.subject_model import YoloSubjectModel
 from data_center.models.yolo_model.subject import YoloSubject
-
-
-def get_state():
-    from data_center.index import get_data_center
-    return get_data_center().state.yolo_model_state
 
 
 def set_detect_subject(img: np.ndarray = None):
     """处理YOLO检测"""
     if img is None:
         return
-        
     try:
-        result = get_state().model(img, verbose=False)
+        result = get_data_center().state.yolo_model_state.model(img, verbose=False)
         YoloSubject.send_result(result)
     except Exception as e:
         print(f"YOLO检测错误: {e}")
