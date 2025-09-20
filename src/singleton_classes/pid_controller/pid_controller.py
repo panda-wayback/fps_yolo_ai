@@ -5,7 +5,6 @@
 PID控制器单例类
 """
 from threading import Lock
-from data_center.models.pid_model.state_model import PIDModelState
 from utils.pid.pid import PIDControl
 
 class PIDController:
@@ -29,9 +28,12 @@ class PIDController:
 
         self._initialized = True
     
-    def set_pid_parameters(self, params: PIDModelState):
+    def set_pid_parameters(self, 
+        kp: float,
+        ki: float,
+        kd: float
+    ):
         """设置PID参数"""
-        kp, ki, kd = params.kp, params.ki, params.kd
         self.pid_control.set_pid_parameters(kp, ki, kd)
 
     def get_vector_pid_res(self, vector: tuple[float, float], dt=0.02) -> tuple[float, float]:

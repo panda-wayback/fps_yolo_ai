@@ -42,8 +42,6 @@ def init_config_subject():
     """
     PIDSubjectModel.config_subject.subscribe(set_pid_config)
 
-    PIDSubjectModel.config_subject.subscribe(PIDController().set_pid_parameters)
-
 
 def init_last_output_subject():
     """
