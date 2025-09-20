@@ -1,7 +1,6 @@
 
 
 
-from rx.subject import Subject
 from data_center.index import get_data_center
 from data_center.models.pid_model.state_model import PIDModelState
 from data_center.models.pid_model.subject_model import PIDSubjectModel

@@ -1,11 +1,11 @@
 """
 目标选择器相关的统一接口
+基于PID模型的最佳实践
 """
 
-from data_center.index import get_data_center
-from data_center.models.target_selector.subjects.select_target import use_target_select_subject
-from data_center.models.target_selector.subjects.config import use_target_selector_config_subject
 from typing import Optional, Tuple
+from data_center.models.target_selector.state_model import TargetSelectorState
+from data_center.models.target_selector.subject_model import TargetSelectorSubjectModel
 
 
 class TargetSelectorSubject:
@@ -14,7 +14,7 @@ class TargetSelectorSubject:
     @staticmethod
     def send_yolo_results(yolo_results):
         """发送YOLO检测结果进行目标选择"""
-        use_target_select_subject(yolo_results)
+        TargetSelectorSubjectModel.select_subject.on_next(yolo_results)
     
     @staticmethod
     def set_config(
@@ -25,15 +25,23 @@ class TargetSelectorSubject:
         reference_vector: Optional[Tuple[float, float]] = None
     ):
         """设置目标选择器配置"""
-        use_target_selector_config_subject(
-            distance_weight=distance_weight,
-            confidence_weight=confidence_weight,
-            similarity_weight=similarity_weight,
-            class_weight=class_weight,
-            reference_vector=reference_vector
-        )
+        config_data = {}
+        if distance_weight is not None:
+            config_data['distance_weight'] = distance_weight
+        if confidence_weight is not None:
+            config_data['confidence_weight'] = confidence_weight
+        if similarity_weight is not None:
+            config_data['similarity_weight'] = similarity_weight
+        if class_weight is not None:
+            config_data['class_weight'] = class_weight
+        if reference_vector is not None:
+            config_data['reference_vector'] = reference_vector
+        
+        config = TargetSelectorState(**config_data)
+        TargetSelectorSubjectModel.config_subject.on_next(config)
     
     @staticmethod
     def get_state():
         """获取目标选择器状态"""
+        from data_center.index import get_data_center
         return get_data_center().state.target_selector_state

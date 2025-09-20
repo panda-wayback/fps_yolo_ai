@@ -4,7 +4,7 @@ from data_center.models.base_state import BaseState
 
 
 class TargetSelectorState(BaseState):
-    """目标选择器状态"""
+    """目标选择器状态类"""
     model_config = ConfigDict(arbitrary_types_allowed=True)
     
     # 目标信息
@@ -17,8 +17,5 @@ class TargetSelectorState(BaseState):
     distance_weight: float = 0.5  # 距离权重
     confidence_weight: float = 0.5  # 置信度权重
     similarity_weight: float = 0.5  # 相似度权重
-    # 类别权重
     class_weight: float = 0.5  # 类别权重
-    # 参考向量
     reference_vector: Optional[Tuple[float, float]] = None  # 参考向量
-    
