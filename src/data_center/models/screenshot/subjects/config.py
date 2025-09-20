@@ -1,7 +1,6 @@
 from rx.subject import Subject
 from data_center.index import get_data_center
 from data_center.models.screenshot.state import ScreenshotState
-import numpy as np
 
 from utils.screenshot_tool.mss_screenshot import capture_screenshot_bgr
 
@@ -15,13 +14,13 @@ def get_screenshot_config_subject():
 def use_screenshot_config_subject(
     mouse_pos: tuple[int, int] = None,
     region_size: tuple[int, int] = None,
-    interval: float = None
+    fps: float = None
 ):
     subject.on_next(
         ScreenshotState(
             mouse_pos=mouse_pos,
             region_size=region_size,
-            interval=interval
+            fps=fps
         )
     )
 

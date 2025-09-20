@@ -5,39 +5,19 @@ from PySide6.QtWidgets import QApplication, QGroupBox, QWidget, QHBoxLayout
 from pyside.UI.basic.basic_layout import get_vertical_layout
 from pyside.UI.basic.basic_window import create_scrollable_window
 from pyside.UI.basic.multi_widget import add_widgets_to_vertical, add_layouts
-from pyside.fps_ai_ui.component.img_show.index import get_img_show_component
-from pyside.fps_ai_ui.component.move_mouse.index import get_move_mouse_component
-from pyside.fps_ai_ui.component.pid_component.index import get_pid_component
+from pyside.fps_ai_ui.component.screenshot.index import get_screenshot_component
 from pyside.fps_ai_ui.component.yolo_model.index import get_yolo_model_component
-from pyside.fps_ai_ui.component.target_tracker.index import get_target_tracker_component
-from pyside.fps_ai_ui.component.model_class_select.index import get_model_class_selector
 
 
-
-# PID参数控制组件
-def pid_component() -> QGroupBox:
-    return get_pid_component()
 
 # YOLO模型选择组件
 def yolo_model_component() -> QGroupBox:
     return get_yolo_model_component()
 
-# 图片展示组件
-def img_show_component() -> QGroupBox:
-    return get_img_show_component()
 
-# 鼠标控制组件
-def move_mouse_component() -> QGroupBox:
-    return get_move_mouse_component()
-
-# 目标跟踪器组件
-def target_tracker_component() -> QGroupBox:
-    return get_target_tracker_component()
-
-# 模型类别选择组件
-def model_class_selector_component() -> QGroupBox:
-    return get_model_class_selector()
-
+# 截图组件
+def screenshot_component() -> QGroupBox:
+    return get_screenshot_component()
 
 # 主布局
 def get_main_layout():
@@ -49,24 +29,20 @@ def get_main_layout():
 
     # 创建三列布局
     first_columns_layout = add_widgets_to_vertical(
-        img_show_component(),                    # 图片展示组件
         yolo_model_component(),                  # YOLO模型选择组件
-        model_class_selector_component(),        # 模型类别选择组件
-        
+        screenshot_component(),                  # 截图组件
 
     ) # 目标跟踪器组件
 
     
     # 左列布局
     second_columns_layout = add_widgets_to_vertical(
-        target_tracker_component(),
-        pid_component(),                          # PID参数控制组件
+
     )
     
     # 右列布局  
     third_columns_layout = add_widgets_to_vertical(
-        
-        move_mouse_component()   # 鼠标控制组件
+
     )
     
     # 将列添加到水平布局

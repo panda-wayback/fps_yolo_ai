@@ -3,9 +3,8 @@ from rx.subject import Subject
 
 import numpy as np
 
-from data_center.models.yolo_model.subjects.config import use_yolo_model_path_subject
+from data_center.models.yolo_model.subjects.load_model import use_yolo_model_path_subject
 from utils.screenshot_tool.mss_screenshot import capture_screenshot_bgr
-from utils.thread.utils import threaded
 
 
 subject = Subject( )

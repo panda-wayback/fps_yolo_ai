@@ -1,11 +1,8 @@
 import threading
 import time
-import numpy as np
-from typing import Optional
 
-from data_center.index import get_data_center
 from data_center.models.screenshot.subject import ScreenshotSubject
-from data_center.models.yolo_model.subjects.config import use_yolo_model_path_subject
+from data_center.models.yolo_model.subjects.load_model import use_yolo_model_path_subject
 from utils.screenshot_tool.mss_screenshot import capture_screenshot_bgr
 
 
@@ -33,9 +30,6 @@ class MouseScreenshot:
         self._running = False
         self._initialized = True
     
-    def get_state(self):
-        """获取当前截图状态"""
-        return get_data_center().state.screenshot_state
         
     def start(self):
         """
@@ -65,7 +59,7 @@ class MouseScreenshot:
         """
         while self._running:
             try:
-                image = capture_screenshot_bgr(self.get_state().region)
+                image = capture_screenshot_bgr(ScreenshotSubject.get_state().region)
                 begin_time = time.time()
                 ScreenshotSubject.send_image(image)
                 end_time = time.time()
@@ -73,8 +67,13 @@ class MouseScreenshot:
             
             except Exception as e:
                 print(f"截图错误: {e}")
-
-            time.sleep(0.01)
+            
+            if ScreenshotSubject.get_state().fps is not None:
+                # 将FPS转换为间隔时间
+                interval = 1.0 / ScreenshotSubject.get_state().fps
+                time.sleep(interval)
+            else:
+                time.sleep(0.01)
 
 _screenshot = MouseScreenshot()
 def get_screenshot():
