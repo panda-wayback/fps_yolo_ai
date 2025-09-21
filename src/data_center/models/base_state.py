@@ -1,10 +1,63 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Any, Dict
+from rx.subject import BehaviorSubject
+
+
+class ReactiveVar:
+    """包装一个可观察的变量"""
+    def __init__(self, initial=None):
+        self._value = initial
+        self._subject = BehaviorSubject(initial)
+        self._initialized = False  # 标记是否已经初始化
+
+    def set(self, value):
+        # 只有当值真正发生变化时才触发通知
+        if self._value != value:
+            self._value = value
+            self._subject.on_next(value)
+        # 标记为已初始化
+        self._initialized = True
+
+    def get(self):
+        return self._value
+
+    def subscribe(self, callback):
+        return self._subject.subscribe(callback)
+
+    def __repr__(self):
+        return f"ReactiveVar({self._value})"
+    
+    def __deepcopy__(self, memo):
+        """自定义深拷贝，避免 BehaviorSubject 的序列化问题"""
+        # 创建一个新的 ReactiveVar 实例，只复制值，不复制 subject
+        new_instance = ReactiveVar(self._value)
+        return new_instance
+    
+    def __getstate__(self):
+        """序列化时只保存值，不保存 subject"""
+        return {'_value': self._value}
+    
+    def __setstate__(self, state):
+        """反序列化时重建 subject"""
+        self._value = state['_value']
+        self._subject = BehaviorSubject(self._value)
 
 
 class BaseState(BaseModel):
-    """状态管理基类，提供通用的更新方法"""
+    """状态管理基类，提供响应式状态管理和通用的更新方法"""
     model_config = ConfigDict(arbitrary_types_allowed=True)
+    
+    def __init__(self, **data):
+        super().__init__(**data)
+        # 遍历字段，把普通值替换成 ReactiveVar
+        for name, value in self.__dict__.items():
+            super().__setattr__(name, ReactiveVar(value))
+
+    def __setattr__(self, name, value):
+        current = self.__dict__.get(name, None)
+        if isinstance(current, ReactiveVar):
+            current.set(value)  # 更新并通知
+        else:
+            super().__setattr__(name, value)
     
     def update_state(self, **kwargs):
         """更新状态，只更新提供的字段，保持其他字段不变"""
@@ -21,21 +74,3 @@ class BaseState(BaseModel):
                 if value is not None:
                     update_data[key] = value
             self.update_state(**update_data)
-    
-    def reset_to_defaults(self):
-        """重置所有字段为默认值"""
-        for field_name, field_info in self.model_fields.items():
-            setattr(self, field_name, field_info.default)
-    
-    def get_changed_fields(self, other_state: 'BaseState') -> Dict[str, Any]:
-        """获取与另一个状态对象不同的字段"""
-        if other_state is None:
-            return {}
-        
-        changed = {}
-        for key in self.model_fields:
-            current_value = getattr(self, key)
-            other_value = getattr(other_state, key)
-            if current_value != other_value:
-                changed[key] = current_value
-        return changed
