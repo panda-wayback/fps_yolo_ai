@@ -6,10 +6,8 @@
 """
 
 from threading import Lock
-
-from data_center.models.yolo_model.subject import YoloSubject
 from utils.yolo.yolo_result_utils import select_best_target
-
+from data_center.models.yolo_model.subject import YoloSubject
 
 class TargetSelector:
     """目标选择器单例类"""

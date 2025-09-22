@@ -5,51 +5,43 @@ YOLO模型相关的统一接口
 
 from typing import Optional, List
 import numpy as np
-from data_center.index import get_data_center
 from ultralytics import YOLO
 
-from data_center.models.target_selector.subject import TargetSelectorSubject
-from data_center.models.yolo_model.subjects.result_subject import send_result_to_target_selector
-
-
+from data_center.models.yolo_model.state import YoloModelState
 
 class YoloSubject:
-
-    """YOLO模型订阅统一接口"""
-    @staticmethod
-    def get_state():
-        """获取YOLO模型状态"""
-        return get_data_center().state.yolo_model_state
-    
-    @staticmethod
-    def init_subscribes():
-        """初始化YOLO模型订阅"""
-        YoloSubject.get_state().yolo_results.subscribe(send_result_to_target_selector)
 
     @staticmethod
     def send_model_path(model_path: str):
         """发送YOLO模型路径"""
-        YoloSubject.get_state().model_path.set(model_path)
+        YoloModelState.get_state().model_path.set(model_path)
         model = YOLO(model_path)
-        YoloSubject.get_state().model.set(model)
+        YoloModelState.get_state().model.set(model)
 
         # 设置模型类别信息
         class_names = list(model.names.values())
         class_ids = list(model.names.keys())
 
-        YoloSubject.get_state().class_names.set(class_names)
-        YoloSubject.get_state().class_ids.set(class_ids)
+        YoloModelState.get_state().class_names.set(class_names)
+        YoloModelState.get_state().class_ids.set(class_ids)
     
     @staticmethod
     def send_detect(img: np.ndarray = None):
         """发送YOLO检测图片"""
-        result = YoloSubject.get_state().model(img, verbose=False)
-        YoloSubject.get_state().yolo_results.set(result)
+        result = YoloModelState.get_state().model.get()(img, verbose=False)
+        YoloModelState.get_state().yolo_results.set(result)
 
     @staticmethod
     def send_selected_class_ids(selected_class_ids: List[int]):
         """发送选中的类别ID"""
-        YoloSubject.get_state().selected_class_ids.set(selected_class_ids)
+        YoloModelState.get_state().selected_class_ids.set(selected_class_ids)
 
 
-YoloSubject.init_subscribes()
+if __name__ == "__main__":
+    # 测试用例
+    from data_center.models.yolo_model.subject import YoloSubject
+    YoloSubject.send_model_path("runs/aimlab_fast/weights/best.pt")
+    print(YoloModelState.get_state().model.get().names)
+    YoloSubject.send_detect(np.zeros((300, 400, 3), dtype=np.uint8))
+    YoloSubject.send_selected_class_ids([0])
+    print(YoloModelState.get_state().selected_class_ids.get())

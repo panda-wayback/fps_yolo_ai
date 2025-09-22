@@ -3,7 +3,6 @@ import time
 
 from data_center.models.screenshot.state import ScreenshotModelState
 from data_center.models.screenshot.subject import ScreenshotSubject
-from data_center.models.yolo_model.subject import YoloSubject
 from utils.screenshot_tool.mss_screenshot import capture_screenshot_bgr
 
 
@@ -72,10 +71,12 @@ class MouseScreenshot:
             time.sleep(ScreenshotModelState.get_state().interval)
 
 _screenshot = MouseScreenshot()
+
 def get_screenshot():
     return _screenshot
 
 if __name__ == "__main__":
+    from data_center.models.yolo_model.subject import YoloSubject
     YoloSubject.send_model_path("runs/aimlab_fast/weights/best.pt")
     screenshot = get_screenshot()
     screenshot.start()

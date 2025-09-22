@@ -5,7 +5,7 @@ from ultralytics import YOLO
 from data_center.models.base_state import BaseState, ReactiveVar
 
 
-class YoloModelState(BaseState):
+class YoloModel(BaseState):
     """YOLO模型状态类"""
 
     model: ReactiveVar[YOLO] = None  

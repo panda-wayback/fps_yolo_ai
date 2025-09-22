@@ -7,16 +7,10 @@ from typing import Tuple, Optional
 import numpy as np
 from data_center.models.screenshot.state import ScreenshotModelState
 from data_center.models.screenshot.subjects.config import get_screenshot_state_settings
-from data_center.models.screenshot.subjects.screenshot_img import on_screenshot_img
 
 
 class ScreenshotSubject:
     """截图订阅统一接口"""
-
-    @staticmethod
-    def init_subscribes():
-        """初始化截图订阅"""
-        ScreenshotModelState.get_state().screenshot_img.subscribe(on_screenshot_img)
 
     @staticmethod
     def send_config(
