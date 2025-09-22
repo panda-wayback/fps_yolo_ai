@@ -12,7 +12,6 @@ class ScreenshotModelState:
     @staticmethod
     def get_state():
         """获取截图状态"""
-        
         return get_data_center().state.screenshot_state
     
     @staticmethod

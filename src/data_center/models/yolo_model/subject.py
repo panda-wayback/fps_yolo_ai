@@ -9,6 +9,7 @@ from data_center.index import get_data_center
 from ultralytics import YOLO
 
 from data_center.models.target_selector.subject import TargetSelectorSubject
+from data_center.models.yolo_model.subjects.result_subject import send_result_to_target_selector
 
 
 
@@ -23,7 +24,7 @@ class YoloSubject:
     @staticmethod
     def init_subscribes():
         """初始化YOLO模型订阅"""
-        YoloSubject.get_state().yolo_results.subscribe(TargetSelectorSubject.send_yolo_results)
+        YoloSubject.get_state().yolo_results.subscribe(send_result_to_target_selector)
 
     @staticmethod
     def send_model_path(model_path: str):

@@ -1,6 +1,7 @@
 import threading
 import time
 
+from data_center.models.screenshot.state import ScreenshotModelState
 from data_center.models.screenshot.subject import ScreenshotSubject
 from data_center.models.yolo_model.subject import YoloSubject
 from utils.screenshot_tool.mss_screenshot import capture_screenshot_bgr
@@ -68,12 +69,7 @@ class MouseScreenshot:
             except Exception as e:
                 print(f"截图错误: {e}")
             
-            if ScreenshotSubject.get_state().fps is not None:
-                # 将FPS转换为间隔时间
-                interval = 1.0 / ScreenshotSubject.get_state().fps
-                time.sleep(interval)
-            else:
-                time.sleep(0.01)
+            time.sleep(ScreenshotModelState.get_state().interval)
 
 _screenshot = MouseScreenshot()
 def get_screenshot():

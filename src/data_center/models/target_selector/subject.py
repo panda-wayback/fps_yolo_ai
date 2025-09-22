@@ -3,7 +3,7 @@
 基于PID模型的最佳实践
 """
 
-from typing import Optional, Tuple
+from typing import Any, List, Optional, Tuple
 from singleton_classes.target_selector.target_selector import get_target_selector
 
 
@@ -22,7 +22,7 @@ class TargetSelectorSubject:
         TargetSelectorSubject.get_state().selected_point.subscribe( )
 
     @staticmethod
-    def send_yolo_results(yolo_results):
+    def send_yolo_results(yolo_results: List[Any]):
         """发送YOLO检测结果进行目标选择"""
         selected_point, selected_bbox, selected_confidence, selected_class_id  = get_target_selector().target_selector(yolo_results)
         TargetSelectorSubject.get_state().selected_point.set(selected_point)

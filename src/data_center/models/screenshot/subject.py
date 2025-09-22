@@ -20,9 +20,9 @@ class ScreenshotSubject:
 
     @staticmethod
     def send_config(
-        mouse_pos: Optional[Tuple[int, int]] = None,
-        region_size: Optional[Tuple[int, int]] = None,
-        fps: Optional[float] = None
+        mouse_pos: Optional[Tuple[int, int]] = (0, 0),
+        region_size: Optional[Tuple[int, int]] = (100, 100),
+        fps: Optional[float] = 1000
     ):
         # 设置截图状态
         ScreenshotModelState.get_state().mouse_pos.set(mouse_pos)

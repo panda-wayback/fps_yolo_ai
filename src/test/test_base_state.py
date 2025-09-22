@@ -1,6 +1,7 @@
 from rx.subject import BehaviorSubject
 from pydantic import BaseModel, ConfigDict
 from typing import TypeVar, Generic, Callable, Any
+import copy
 
 
 T = TypeVar('T')
@@ -25,6 +26,12 @@ class ReactiveVar(Generic[T]):
 
     def __repr__(self) -> str:
         return f"ReactiveVar({self._value})"
+    
+    def __deepcopy__(self, memo):
+        """支持深拷贝操作，创建新的 ReactiveVar 实例"""
+        # 创建一个新的 ReactiveVar 实例，只复制值，不复制 BehaviorSubject
+        new_instance = ReactiveVar(self._value)
+        return new_instance
 
 
 
@@ -47,46 +54,33 @@ class BaseState(BaseModel):
             current.set(value)  # 更新并通知
         else:
             super().__setattr__(name, value)
+    
+    def __deepcopy__(self, memo):
+        """支持深拷贝操作"""
+        # 创建一个新的实例
+        new_instance = self.__class__()
+        
+        # 复制所有字段的值（不是 ReactiveVar 对象）
+        for name, value in self.__dict__.items():
+            if isinstance(value, ReactiveVar):
+                # 对于 ReactiveVar，只复制其值
+                new_instance.__setattr__(name, value.get())
+            else:
+                new_instance.__setattr__(name, value)
+        
+        return new_instance
+
+class TestBaseState(BaseState):
+    a: ReactiveVar[int] = 1
+    b: ReactiveVar[str] = "b"
+    c: ReactiveVar[float] = 1.0
+    d: ReactiveVar[bool] = True
+    e: ReactiveVar[list[int]] = [1, 2, 3]
+    f: ReactiveVar[dict[str, int]] = {"a": 1, "b": 2, "c": 3}
+    g: ReactiveVar[tuple[int, str, float]] = (1, "b", 1.0)
+    h: ReactiveVar[set[int]] = {1, 2, 3}
+    i: ReactiveVar[frozenset[int]] = frozenset({1, 2, 3})
 
 
-# ---------------- 使用 ----------------
-class PIDModelState(BaseState):
-    kp: ReactiveVar[float| None] = 0.5
-    ki: ReactiveVar[float | None] = None
-    kd: ReactiveVar[float | None] = None
-
-
-pid = PIDModelState()
-
-# 直接在字段上订阅
-pid.ki.subscribe(lambda v: print(f"[观察者] ki 更新: {v}"))
-
-# 普通赋值
-pid.ki = 0.1
-pid.ki = 0.5
-
-# 测试相同值不会触发通知
-print("--- 测试相同值 ---")
-pid.ki = 0.5  # 相同值，不应该触发通知
-pid.ki = 0.5  # 再次相同值，不应该触发通知
-pid.ki = 0.5  # 第三次相同值，不应该触发通知
-
-print(f"当前 ki 值: {pid.ki.get()}")
-
-# 只有真正变化时才触发
-print("--- 测试值变化 ---")
-pid.ki = 0.3  # 不同值，应该触发通知
-pid.ki = 0.3  # 相同值，不应该触发通知
-
-# 测试深拷贝功能
-print("--- 测试深拷贝 ---")
-import copy
-try:
-    pid_copy = copy.deepcopy(pid)
-    print(f"原始 pid.ki: {pid.ki.get()}")
-    print(f"拷贝 pid_copy.ki: {pid_copy.ki.get()}")
-    print(f"它们是同一个对象吗: {pid.ki is pid_copy.ki}")
-    print(f"它们的值相等吗: {pid.ki.get() == pid_copy.ki.get()}")
-except Exception as e:
-    print(f"深拷贝失败: {e}")
-    print("但这不影响主要功能的使用")
+test = TestBaseState()
+print(test)

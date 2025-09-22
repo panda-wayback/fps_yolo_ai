@@ -18,5 +18,5 @@ class ScreenshotModel(BaseState):
     screenshot_img: ReactiveVar[np.ndarray] = None    # 截图图片数据
     
     # 配置参数
-    fps: ReactiveVar[float] = None    # 截图帧率
-    interval: ReactiveVar[float] = None    # 截图间隔
+    fps: ReactiveVar[float] = 1000
+    interval: ReactiveVar[float] = 1.0 / 1000    # 截图间隔
