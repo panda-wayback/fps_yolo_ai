@@ -12,6 +12,7 @@ from PySide6.QtCore import Qt, QTimer
 try:
     from pyside.UI.basic.basic_layout import create_vertical_card
     from data_center.models.target_selector.subject import TargetSelectorSubject
+    from data_center.models.target_selector.state import TargetSelectorState
 except ImportError:
     # 直接运行时需要添加路径
     import sys
@@ -19,6 +20,7 @@ except ImportError:
     sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../'))
     from pyside.UI.basic.basic_layout import create_vertical_card
     from data_center.models.target_selector.subject import TargetSelectorSubject
+    from data_center.models.target_selector.state import TargetSelectorState
 
 
 class TargetSelectorStateWidget(QGroupBox):
@@ -115,37 +117,43 @@ class TargetSelectorStateWidget(QGroupBox):
     def update_state(self):
         """更新状态显示"""
         try:
-            state = TargetSelectorSubject.get_state()
+            state = TargetSelectorState.get_state()
+            
+            # 获取状态值
+            selected_target_point = state.selected_target_point.get()
+            selected_target_bbox = state.selected_target_bbox.get()
+            selected_target_confidence = state.selected_target_confidence.get()
+            selected_target_class_id = state.selected_target_class_id.get()
             
             # 更新目标信息
-            if state.selected_point:
+            if selected_target_point:
                 self.status_label.setText("已选中目标")
                 self.status_label.setStyleSheet("color: green; font-weight: bold;")
                 
                 # 中心点
-                center_text = f"({state.selected_point[0]:.1f}, {state.selected_point[1]:.1f})"
+                center_text = f"({selected_target_point[0]:.1f}, {selected_target_point[1]:.1f})"
                 self.center_label.setText(center_text)
                 
                 # 边界框
-                if state.selected_bbox:
-                    bbox_text = f"({state.selected_bbox[0]:.0f}, {state.selected_bbox[1]:.0f}, {state.selected_bbox[2]:.0f}, {state.selected_bbox[3]:.0f})"
+                if selected_target_bbox:
+                    bbox_text = f"({selected_target_bbox[0]:.0f}, {selected_target_bbox[1]:.0f}, {selected_target_bbox[2]:.0f}, {selected_target_bbox[3]:.0f})"
                     self.bbox_label.setText(bbox_text)
                 else:
                     self.bbox_label.setText("N/A")
                 
                 # 置信度
-                if state.selected_confidence:
-                    conf_text = f"{state.selected_confidence:.3f}"
+                if selected_target_confidence is not None:
+                    conf_text = f"{selected_target_confidence:.3f}"
                     self.confidence_label.setText(conf_text)
-                    self.confidence_bar.setValue(int(state.selected_confidence * 100))
+                    self.confidence_bar.setValue(int(selected_target_confidence * 100))
                     self.confidence_bar.setVisible(True)
                 else:
                     self.confidence_label.setText("N/A")
                     self.confidence_bar.setVisible(False)
                 
                 # 类别ID
-                if state.selected_class_id is not None:
-                    self.class_label.setText(str(state.selected_class_id))
+                if selected_target_class_id is not None:
+                    self.class_label.setText(str(selected_target_class_id))
                 else:
                     self.class_label.setText("N/A")
                     
@@ -159,10 +167,10 @@ class TargetSelectorStateWidget(QGroupBox):
                 self.confidence_bar.setVisible(False)
             
             # 更新配置显示
-            self.distance_weight_label.setText(f"{state.distance_weight:.2f}")
-            self.confidence_weight_label.setText(f"{state.confidence_weight:.2f}")
-            self.similarity_weight_label.setText(f"{state.similarity_weight:.2f}")
-            self.class_weight_label.setText(f"{state.class_weight:.2f}")
+            self.distance_weight_label.setText(f"{state.distance_weight.get():.2f}")
+            self.confidence_weight_label.setText(f"{state.confidence_weight.get():.2f}")
+            self.similarity_weight_label.setText(f"{state.similarity_weight.get():.2f}")
+            self.class_weight_label.setText(f"{state.class_weight.get():.2f}")
             
             # 更新时间
             from datetime import datetime

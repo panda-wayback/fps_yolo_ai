@@ -9,16 +9,9 @@ from PySide6.QtWidgets import (QSlider, QLabel, QHBoxLayout, QVBoxLayout,
                                QGroupBox, QSpinBox, QDoubleSpinBox, QPushButton, QWidget)
 from PySide6.QtCore import Qt, Signal
 
-try:
-    from pyside.UI.basic.basic_layout import create_vertical_card
-    from data_center.models.target_selector.subject import TargetSelectorSubject
-except ImportError:
-    # 直接运行时需要添加路径
-    import sys
-    import os
-    sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../'))
-    from pyside.UI.basic.basic_layout import create_vertical_card
-    from data_center.models.target_selector.subject import TargetSelectorSubject
+from data_center.models.target_selector.state import TargetSelectorState
+from data_center.models.target_selector.subject import TargetSelectorSubject
+
 
 
 class WeightSlider(QWidget):
@@ -153,15 +146,16 @@ class TargetSelectorConfigWidget(QGroupBox):
     def load_current_config(self):
         """加载当前配置"""
         try:
-            state = TargetSelectorSubject.get_state()
-            self.distance_weight.set_value(state.distance_weight)
-            self.confidence_weight.set_value(state.confidence_weight)
-            self.similarity_weight.set_value(state.similarity_weight)
-            self.class_weight.set_value(state.class_weight)
+            state = TargetSelectorState.get_state()
+            self.distance_weight.set_value(state.distance_weight.get())
+            self.confidence_weight.set_value(state.confidence_weight.get())
+            self.similarity_weight.set_value(state.similarity_weight.get())
+            self.class_weight.set_value(state.class_weight.get())
             
-            if state.reference_vector:
-                self.ref_x_spinbox.setValue(int(state.reference_vector[0]))
-                self.ref_y_spinbox.setValue(int(state.reference_vector[1]))
+            ref_vector = state.reference_vector.get()
+            if ref_vector:
+                self.ref_x_spinbox.setValue(int(ref_vector[0]))
+                self.ref_y_spinbox.setValue(int(ref_vector[1]))
         except Exception as e:
             print(f"加载配置失败: {e}")
             
