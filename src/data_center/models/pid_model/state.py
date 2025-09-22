@@ -20,6 +20,8 @@ class PIDModelState:
 
     @staticmethod
     def init_subscribes():
+        from data_center.models.pid_model.subscribes.send_mouse_driver import send_mouse_driver
+        PIDModelState.get_state().output.subscribe(send_mouse_driver)
         pass
 
 # init subscribes

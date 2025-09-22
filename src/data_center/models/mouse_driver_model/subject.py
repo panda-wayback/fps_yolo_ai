@@ -3,25 +3,38 @@
 基于PID模型的最佳实践
 """
 
-from typing import Tuple
-from data_center.models.mouse_driver_model.state_model import MouseDriverState
-from data_center.models.mouse_driver_model.subject_model import MouseDriverSubjectModel
-from data_center.models.mouse_driver_model.subjects.config import submit_config, update_mouse_driver_state
-from data_center.models.mouse_driver_model.subjects.send_vector import submit_vector, update_data_center_vector
-
+from typing import Optional, Tuple
+from data_center.models.mouse_driver_model.model import MouseDriverModel
+from data_center.models.mouse_driver_model.state import MouseDriverState
 
 class MouseDriverSubject:
     """鼠标驱动模型订阅统一接口"""
     
     @staticmethod
-    def send_config(config: MouseDriverState):
+    def send_config(
+        smoothing: Optional[float] = None,
+        fps: Optional[int] = None,
+        running: Optional[bool] = None,
+        max_duration: Optional[float] = None,
+        decay_rate: Optional[float] = None,
+    ):
         """发送鼠标驱动配置"""
-        MouseDriverSubjectModel.config_subject.on_next(config)
+        if smoothing is not None:
+            MouseDriverState.get_state().smoothing.set(smoothing)
+        if fps is not None:
+            MouseDriverState.get_state().fps.set(fps)
+            MouseDriverState.get_state().interval.set(1.0 / fps)
+        if running is not None:
+            MouseDriverState.get_state().running.set(running)
+        if max_duration is not None:
+            MouseDriverState.get_state().max_duration.set(max_duration)
+        if decay_rate is not None:
+            MouseDriverState.get_state().decay_rate.set(decay_rate)
     
     @staticmethod
     def send_vector(vector: Tuple[float, float]):
         """发送鼠标向量"""
-        MouseDriverSubjectModel.vector_subject.on_next(vector)
+        MouseDriverState.get_state().vector.set(vector)
     
     @staticmethod
     def get_state():
@@ -29,25 +42,3 @@ class MouseDriverSubject:
         from data_center.index import get_data_center
         return get_data_center().state.mouse_driver_state
 
-
-
-def init_config_subject():
-    """初始化鼠标驱动配置订阅"""
-    MouseDriverSubjectModel.config_subject.subscribe(submit_config)
-    MouseDriverSubjectModel.config_subject.subscribe(update_mouse_driver_state)
-
-
-
-def init_vector_subject():
-    """初始化鼠标向量订阅"""
-    MouseDriverSubjectModel.vector_subject.subscribe(submit_vector)
-    MouseDriverSubjectModel.vector_subject.subscribe(update_data_center_vector)
-
-
-def init_mouse_driver_subject_model():
-    """初始化鼠标驱动所有话题绑定"""
-    init_config_subject()
-    init_vector_subject()
-
-
-init_mouse_driver_subject_model()
