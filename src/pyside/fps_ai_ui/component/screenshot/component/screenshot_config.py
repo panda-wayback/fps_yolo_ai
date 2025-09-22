@@ -11,6 +11,7 @@ from PySide6.QtCore import QThread, Signal
 from pyside.UI.basic.basic_layout import create_vertical_card
 
 from data_center.models.screenshot.subject import ScreenshotSubject
+from data_center.models.screenshot.state import ScreenshotModelState
 from singleton_classes.screenshot_img.main import get_screenshot
 from utils.move_mouse.move_mouse import get_mouse_position
 import time
@@ -170,8 +171,37 @@ def create_screenshot_config():
     status_label = QLabel("就绪")
     status_label.setStyleSheet("color: green; font-size: 12px;")
     
+    # 当前配置显示标签
+    config_label = QLabel("")
+    config_label.setStyleSheet("color: blue; font-size: 10px;")
+    config_label.setWordWrap(True)
+    
     # 监控线程引用
     monitor_thread = None
+    
+    # 更新配置显示
+    def update_config_display():
+        """更新当前配置显示"""
+        try:
+            screenshot_state = ScreenshotModelState.get_state()
+            
+            mouse_pos = screenshot_state.mouse_pos.get()
+            region_size = screenshot_state.region_size.get()
+            fps = screenshot_state.fps.get()
+            is_running = screenshot_state.is_running.get()
+            
+            if mouse_pos and region_size and fps is not None:
+                config_text = f"当前配置: 位置={mouse_pos}, 区域={region_size}, FPS={fps}"
+                if is_running:
+                    config_text += " [运行中]"
+                else:
+                    config_text += " [已停止]"
+                config_label.setText(config_text)
+            else:
+                config_label.setText("当前配置: 未设置")
+                
+        except Exception as e:
+            config_label.setText(f"配置显示错误: {str(e)}")
     
     # 应用设置功能
     def apply_settings():
@@ -181,10 +211,13 @@ def create_screenshot_config():
             region_size = (width_spinbox.value(), height_spinbox.value())
             fps = fps_spinbox.value()
             
-            ScreenshotSubject.use_config(mouse_pos, region_size, fps)
+            ScreenshotSubject.send_config(mouse_pos, region_size, fps)
 
             # 启动截图
             get_screenshot().start()
+            
+            # 更新配置显示
+            update_config_display()
             
             status_label.setText("✅ 设置已应用")
             status_label.setStyleSheet("color: green; font-size: 12px;")
@@ -269,7 +302,11 @@ def create_screenshot_config():
     layout.addWidget(fps_group)
     layout.addLayout(button_layout)
     layout.addWidget(monitor_label)
+    layout.addWidget(config_label)
     layout.addWidget(status_label)
+    
+    # 初始化时更新配置显示
+    update_config_display()
     
     # 存储引用
     group.apply_settings = apply_settings
