@@ -1,7 +1,6 @@
 
 
 from data_center.index import get_data_center
-from data_center.models.yolo_model.subscribes.result_subject import send_result_to_target_selector
 
 
 class YoloModelState:
@@ -15,6 +14,7 @@ class YoloModelState:
     @staticmethod
     def init_subscribes():
         """初始化YOLO模型订阅"""
+        from data_center.models.yolo_model.subscribes.result_subject import send_result_to_target_selector
         YoloModelState.get_state().yolo_results.subscribe(send_result_to_target_selector)
     
 

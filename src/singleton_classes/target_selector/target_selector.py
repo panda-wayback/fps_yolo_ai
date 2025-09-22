@@ -6,9 +6,11 @@
 """
 
 from threading import Lock
+from typing import Any, List
 from data_center.models.target_selector.state import TargetSelectorState
 from utils.yolo.yolo_result_utils import select_best_target
-
+# 延迟导入避免循环依赖
+from data_center.models.yolo_model.state import YoloModelState
 class TargetSelector:
     """目标选择器单例类"""
     
@@ -28,12 +30,10 @@ class TargetSelector:
         self.reference_vector = None
         # 修复：移除未定义的类型和变量，添加类型注释说明
     
-    def target_selector(self) :
+    def target_selector(self, yolo_result: List[Any]) :
         """目标选择器主函数"""
-        # 延迟导入避免循环依赖
-        from data_center.models.yolo_model.state import YoloModelState
+
         
-        yolo_result = TargetSelectorState.get_state().yolo_results.get()
         selected_class_ids = YoloModelState.get_state().selected_class_ids.get()
         distance_weight = TargetSelectorState.get_state().distance_weight.get()
         similarity_weight = TargetSelectorState.get_state().similarity_weight.get()

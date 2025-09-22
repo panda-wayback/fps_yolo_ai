@@ -4,7 +4,7 @@
 """
 
 from data_center.index import get_data_center
-from data_center.models.target_selector.subscribes.send_vector_to_pid import send_vector_to_pid
+
 
 class TargetSelectorState:
     """目标选择器订阅统一接口"""
@@ -17,4 +17,7 @@ class TargetSelectorState:
     @staticmethod
     def init_subscribes():
         """初始化目标选择器订阅"""
-        TargetSelectorState.get_state().selected_target_point.subscribe( send_vector_to_pid )
+        from data_center.models.target_selector.subscribes.send_yolo_results import send_yolo_results
+        TargetSelectorState.get_state().yolo_results.subscribe(send_yolo_results)
+
+TargetSelectorState.init_subscribes()
