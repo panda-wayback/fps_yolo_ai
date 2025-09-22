@@ -4,7 +4,6 @@
 """
 
 from typing import Tuple
-from data_center.models.screenshot.state_model import ScreenshotState
 
 def get_screenshot_state_settings(
     mouse_pos: Tuple[int, int],

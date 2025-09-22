@@ -8,6 +8,8 @@ import numpy as np
 from data_center.index import get_data_center
 from ultralytics import YOLO
 
+from data_center.models.target_selector.subject import TargetSelectorSubject
+
 
 
 class YoloSubject:
@@ -18,6 +20,11 @@ class YoloSubject:
         """获取YOLO模型状态"""
         return get_data_center().state.yolo_model_state
     
+    @staticmethod
+    def init_subscribes():
+        """初始化YOLO模型订阅"""
+        YoloSubject.get_state().yolo_results.subscribe(TargetSelectorSubject.send_yolo_results)
+
     @staticmethod
     def send_model_path(model_path: str):
         """发送YOLO模型路径"""
@@ -43,3 +50,5 @@ class YoloSubject:
         """发送选中的类别ID"""
         YoloSubject.get_state().selected_class_ids.set(selected_class_ids)
 
+
+YoloSubject.init_subscribes()

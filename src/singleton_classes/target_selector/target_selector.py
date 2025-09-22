@@ -30,7 +30,7 @@ class TargetSelector:
         self.reference_vector = None
         # 修复：移除未定义的类型和变量，添加类型注释说明
     
-    def target_selector(self, yolo_result):
+    def target_selector(self, yolo_result) :
         """目标选择器主函数"""
         if not yolo_result:
             return None, None, None, None
@@ -40,7 +40,7 @@ class TargetSelector:
         
         # 获取配置
         target_selector_state = get_data_center().state.target_selector_state
-        yolo_state = YoloSubject.get_yolo_model_state()
+        yolo_state = YoloSubject.get_state()
            
         target = select_best_target(
             yolo_result,

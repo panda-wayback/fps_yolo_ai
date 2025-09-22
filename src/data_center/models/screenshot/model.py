@@ -4,7 +4,7 @@ from pydantic import ConfigDict
 from data_center.models.base_state import BaseState, ReactiveVar
 
 
-class ScreenshotState(BaseState):
+class ScreenshotModel(BaseState):
     """截图状态管理类"""
     model_config = ConfigDict(arbitrary_types_allowed=True)
     

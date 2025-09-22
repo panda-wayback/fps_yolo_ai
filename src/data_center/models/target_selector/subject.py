@@ -4,19 +4,32 @@
 """
 
 from typing import Optional, Tuple
-from data_center.models.target_selector.state_model import TargetSelectorState
-from data_center.models.target_selector.subject_model import TargetSelectorSubjectModel
-from data_center.models.target_selector.subjects.config import set_target_selector_config
-from data_center.models.target_selector.subjects.select_target import set_target_select_subject
+from singleton_classes.target_selector.target_selector import get_target_selector
 
 
 class TargetSelectorSubject:
     """目标选择器订阅统一接口"""
+        
+    @staticmethod
+    def get_state():
+        """获取目标选择器状态"""
+        from data_center.index import get_data_center
+        return get_data_center().state.target_selector_state
     
+    @staticmethod
+    def init_subscribes():
+        """初始化目标选择器订阅"""
+        TargetSelectorSubject.get_state().selected_point.subscribe( )
+
     @staticmethod
     def send_yolo_results(yolo_results):
         """发送YOLO检测结果进行目标选择"""
-        TargetSelectorSubjectModel.select_subject.on_next(yolo_results)
+        selected_point, selected_bbox, selected_confidence, selected_class_id  = get_target_selector().target_selector(yolo_results)
+        TargetSelectorSubject.get_state().selected_point.set(selected_point)
+        TargetSelectorSubject.get_state().selected_bbox.set(selected_bbox)
+        TargetSelectorSubject.get_state().selected_confidence.set(selected_confidence)
+        TargetSelectorSubject.get_state().selected_class_id.set(selected_class_id)
+        pass
     
     @staticmethod
     def set_config(
@@ -26,40 +39,15 @@ class TargetSelectorSubject:
         class_weight: Optional[float] = None,
         reference_vector: Optional[Tuple[float, float]] = None
     ):
-        """设置目标选择器配置"""
-        config_data = {}
         if distance_weight is not None:
-            config_data['distance_weight'] = distance_weight
+            TargetSelectorSubject.get_state().distance_weight.set(distance_weight)
         if confidence_weight is not None:
-            config_data['confidence_weight'] = confidence_weight
+            TargetSelectorSubject.get_state().confidence_weight.set(confidence_weight)
         if similarity_weight is not None:
-            config_data['similarity_weight'] = similarity_weight
+            TargetSelectorSubject.get_state().similarity_weight.set(similarity_weight)
         if class_weight is not None:
-            config_data['class_weight'] = class_weight
+            TargetSelectorSubject.get_state().class_weight.set(class_weight)
         if reference_vector is not None:
-            config_data['reference_vector'] = reference_vector
+            TargetSelectorSubject.get_state().reference_vector.set(reference_vector)
         
-        config = TargetSelectorState(**config_data)
-        TargetSelectorSubjectModel.config_subject.on_next(config)
-    
-    @staticmethod
-    def get_state():
-        """获取目标选择器状态"""
-        from data_center.index import get_data_center
-        return get_data_center().state.target_selector_state
 
-def init_config_subject():
-    """初始化目标选择器配置订阅"""
-    TargetSelectorSubjectModel.config_subject.subscribe(set_target_selector_config)
-
-def init_select_subject():
-    """初始化目标选择订阅"""
-    TargetSelectorSubjectModel.select_subject.subscribe(set_target_select_subject)
-
-def init_target_selector_subject_model():
-    """初始化目标选择器所有话题绑定"""
-    init_config_subject()
-    init_select_subject()
-
-
-init_target_selector_subject_model()
