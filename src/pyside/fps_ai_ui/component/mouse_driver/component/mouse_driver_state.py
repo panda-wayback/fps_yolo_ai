@@ -8,16 +8,8 @@
 from PySide6.QtWidgets import QLabel, QProgressBar, QHBoxLayout, QVBoxLayout, QGroupBox
 from PySide6.QtCore import QTimer, Qt
 
-try:
-    from pyside.UI.basic.basic_layout import create_vertical_card
-    from data_center.models.mouse_driver_model.subject import MouseDriverSubject
-except ImportError:
-    # 直接运行时需要添加路径
-    import sys
-    import os
-    sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../'))
-    from pyside.UI.basic.basic_layout import create_vertical_card
-    from data_center.models.mouse_driver_model.subject import MouseDriverSubject
+from data_center.models.mouse_driver_model.subject import MouseDriverSubject
+from data_center.models.mouse_driver_model.state import MouseDriverState
 
 
 class MouseDriverStateWidget(QGroupBox):
@@ -112,10 +104,18 @@ class MouseDriverStateWidget(QGroupBox):
     def update_status(self):
         """更新状态显示"""
         try:
-            state = MouseDriverSubject.get_state()
+            state = MouseDriverState.get_state()
+            
+            # 获取状态值
+            running = state.running.get()
+            fps = state.fps.get()
+            smoothing = state.smoothing.get()
+            max_duration = state.max_duration.get()
+            decay_rate = state.decay_rate.get()
+            vector = state.vector.get()
             
             # 更新运行状态
-            if state.running:
+            if running:
                 self.status_label.setText("运行中")
                 self.status_label.setStyleSheet("color: green; font-weight: bold;")
             else:
@@ -123,8 +123,8 @@ class MouseDriverStateWidget(QGroupBox):
                 self.status_label.setStyleSheet("color: red; font-weight: bold;")
             
             # 更新向量显示
-            vx = state.vx
-            vy = state.vy
+            vx = vector[0] if vector else 0.0
+            vy = vector[1] if vector else 0.0
             
             self.x_label.setText(f"{vx:.2f}")
             self.y_label.setText(f"{vy:.2f}")
@@ -148,10 +148,10 @@ class MouseDriverStateWidget(QGroupBox):
                 self.y_progress.setStyleSheet("")
             
             # 更新配置信息
-            self.fps_label.setText(f"帧率: {state.fps} FPS")
-            self.smoothing_label.setText(f"平滑系数: {state.smoothing:.2f}")
-            self.duration_label.setText(f"最大持续时间: {state.max_duration:.3f} 秒")
-            self.decay_label.setText(f"减速系数: {state.decay_rate:.2f}")
+            self.fps_label.setText(f"帧率: {fps} FPS")
+            self.smoothing_label.setText(f"平滑系数: {smoothing:.2f}")
+            self.duration_label.setText(f"最大持续时间: {max_duration:.3f} 秒")
+            self.decay_label.setText(f"减速系数: {decay_rate:.2f}")
             
             # 更新统计信息
             if abs(vx) > 0.01 or abs(vy) > 0.01:

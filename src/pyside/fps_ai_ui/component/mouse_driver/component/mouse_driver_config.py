@@ -9,18 +9,8 @@ from PySide6.QtWidgets import (QSlider, QLabel, QHBoxLayout, QVBoxLayout,
                                QGroupBox, QSpinBox, QPushButton, QWidget, QCheckBox)
 from PySide6.QtCore import Qt, Signal
 
-try:
-    from pyside.UI.basic.basic_layout import create_vertical_card
-    from data_center.models.mouse_driver_model.subject import MouseDriverSubject
-    from data_center.models.mouse_driver_model.state_model import MouseDriverState
-except ImportError:
-    # 直接运行时需要添加路径
-    import sys
-    import os
-    sys.path.append(os.path.join(os.path.dirname(__file__), '../../../../'))
-    from pyside.UI.basic.basic_layout import create_vertical_card
-    from data_center.models.mouse_driver_model.subject import MouseDriverSubject
-    from data_center.models.mouse_driver_model.state_model import MouseDriverState
+from data_center.models.mouse_driver_model.subject import MouseDriverSubject
+from data_center.models.mouse_driver_model.state import MouseDriverState
 
 
 class ParameterSlider(QWidget):
@@ -165,12 +155,12 @@ class MouseDriverConfigWidget(QGroupBox):
     def load_current_config(self):
         """加载当前配置"""
         try:
-            state = MouseDriverSubject.get_state()
-            self.running_checkbox.setChecked(state.running)
-            self.fps_slider.set_value(state.fps)
-            self.smoothing_slider.set_value(state.smoothing)
-            self.max_duration_slider.set_value(state.max_duration)
-            self.decay_rate_slider.set_value(state.decay_rate)
+            state = MouseDriverState.get_state()
+            self.running_checkbox.setChecked(state.running.get())
+            self.fps_slider.set_value(state.fps.get())
+            self.smoothing_slider.set_value(state.smoothing.get())
+            self.max_duration_slider.set_value(state.max_duration.get())
+            self.decay_rate_slider.set_value(state.decay_rate.get())
         except Exception as e:
             print(f"加载配置失败: {e}")
             
@@ -182,15 +172,13 @@ class MouseDriverConfigWidget(QGroupBox):
     def apply_config(self):
         """应用配置"""
         try:
-            config = MouseDriverState(
+            MouseDriverSubject.send_config(
                 fps=int(self.fps_slider.get_value()),
                 smoothing=self.smoothing_slider.get_value(),
                 running=self.running_checkbox.isChecked(),
                 max_duration=self.max_duration_slider.get_value(),
                 decay_rate=self.decay_rate_slider.get_value()
             )
-            
-            MouseDriverSubject.send_config(config)
             
             self.status_label.setText("配置已保存")
             self.status_label.setStyleSheet("color: green; font-size: 10px;")
