@@ -3,6 +3,7 @@ import time
 
 from data_center.models.screenshot.state import ScreenshotModelState
 from data_center.models.screenshot.subject import ScreenshotSubject
+from utils.logger.logger import log_time
 from utils.screenshot_tool.mss_screenshot import capture_screenshot_bgr
 
 
@@ -60,10 +61,11 @@ class MouseScreenshot:
         while self._running:
             try:
                 image = capture_screenshot_bgr(ScreenshotModelState.get_state().region.get())
-                begin_time = time.time()
-                ScreenshotSubject.send_image(image)
-                end_time = time.time()
-                print(f"图片处理时间 : {(end_time - begin_time)*1000}ms")
+                @log_time
+                def send_image():
+                    ScreenshotSubject.send_image(image)
+                send_image()
+
             
             except Exception as e:
                 print(f"截图错误: {e}")

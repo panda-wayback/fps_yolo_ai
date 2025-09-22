@@ -8,6 +8,7 @@ import numpy as np
 from ultralytics import YOLO
 
 from data_center.models.yolo_model.state import YoloModelState
+from utils.logger.logger import log_time
 
 class YoloSubject:
 
@@ -30,7 +31,10 @@ class YoloSubject:
         """发送YOLO检测图片"""
         if img is None:
             return
-        result = YoloModelState.get_state().model.get()(img, verbose=False)
+        @log_time
+        def yolo_detect():
+            return YoloModelState.get_state().model.get()(img, verbose=False)
+        result = yolo_detect()
         YoloModelState.get_state().yolo_results.set(result)
 
     @staticmethod

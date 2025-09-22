@@ -19,5 +19,6 @@ class TargetSelectorState:
         """初始化目标选择器订阅"""
         from data_center.models.target_selector.subscribes.send_yolo_results import send_yolo_results
         TargetSelectorState.get_state().yolo_results.subscribe(send_yolo_results)
+        pass
 
 TargetSelectorState.init_subscribes()
