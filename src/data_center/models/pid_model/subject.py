@@ -32,4 +32,3 @@ class PIDSubject:
 
 if __name__ == "__main__":
     PIDSubject.send_config(1, 2, 3)
-    print(PIDSubject.get_state())

@@ -59,7 +59,6 @@ class MouseScreenshot:
         """
         while self._running:
             try:
-                print("region", ScreenshotModelState.get_state().region.get())
                 image = capture_screenshot_bgr(ScreenshotModelState.get_state().region.get())
                 begin_time = time.time()
                 ScreenshotSubject.send_image(image)
