@@ -1,9 +1,10 @@
 from rx.subject import BehaviorSubject
 from pydantic import BaseModel, ConfigDict
-from typing import TypeVar, Generic, Callable, Any, get_type_hints, cast
-
+from typing import TypeVar, Generic, Callable, Any
+import copy
 
 T = TypeVar('T')
+
 
 class ReactiveVar(Generic[T]):
     """包装一个可观察的变量"""
@@ -12,8 +13,9 @@ class ReactiveVar(Generic[T]):
         self._subject: BehaviorSubject[T] = BehaviorSubject(initial)
 
     def set(self, value: T) -> None:
-        self._value = value
-        self._subject.on_next(value)
+        if self._value != value:  # 避免重复通知
+            self._value = value
+            self._subject.on_next(value)
 
     def get(self) -> T:
         return self._value
@@ -22,63 +24,47 @@ class ReactiveVar(Generic[T]):
         return self._subject.subscribe(callback)
 
     def __repr__(self) -> str:
-        return f"ReactiveVar({self._value})"
+        return f"ReactiveVar({self._value!r})"
 
+    def __deepcopy__(self, memo):
+        return ReactiveVar(copy.deepcopy(self._value, memo))
 
 
 class BaseState(BaseModel):
+    """自动将字段包装成 ReactiveVar 的状态模型"""
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def __init__(self, **data):
         super().__init__(**data)
-        # 获取类型提示
-        type_hints = get_type_hints(self.__class__)
-        
-        # 遍历字段，把普通值替换成 ReactiveVar
         for name, value in self.__dict__.items():
-            # 获取字段的类型注解
-            field_type = type_hints.get(name, Any)
-            # 创建 ReactiveVar 时保持类型信息
-            reactive_var = ReactiveVar[field_type](value)
-            super().__setattr__(name, reactive_var)
-
-    def __getattribute__(self, name):
-        # 获取原始值
-        value = super().__getattribute__(name)
-        
-        # 如果是 ReactiveVar，尝试进行类型转换
-        if isinstance(value, ReactiveVar):
-            # 获取类型提示
-            type_hints = get_type_hints(self.__class__)
-            field_type = type_hints.get(name, Any)
-            if field_type != Any:
-                # 使用 cast 来帮助类型推断，但避免在类型表达式中使用变量
-                return cast(Any, value)
-        
-        return value
+            if not isinstance(value, ReactiveVar):
+                super().__setattr__(name, ReactiveVar(value))
 
     def __setattr__(self, name, value):
-        current = self.__dict__.get(name, None)
+        current = self.__dict__.get(name)
         if isinstance(current, ReactiveVar):
-            current.set(value)  # 更新并通知
+            current.set(value)  # 更新并触发通知
         else:
             super().__setattr__(name, value)
 
+    def to_dict(self) -> dict:
+        """导出干净的 dict（递归展开 ReactiveVar 和 BaseState）"""
+        result = {}
+        for name, value in self.__dict__.items():
+            if isinstance(value, ReactiveVar):
+                val = value.get()
+                if isinstance(val, BaseState):
+                    result[name] = val.to_dict()
+                else:
+                    result[name] = val
+            elif isinstance(value, BaseState):
+                result[name] = value.to_dict()
+            else:
+                result[name] = value
+        return result
 
-# ---------------- 使用 ----------------
-class PIDModelState(BaseState):
-    kp: ReactiveVar[float] = None
-    ki: ReactiveVar[float | None] = None
-    kd: ReactiveVar[float | None] = None
+    def __deepcopy__(self, memo):
+        """深拷贝：复制值，但生成独立的 ReactiveVar"""
+        data = self.to_dict()
+        return self.__class__(**copy.deepcopy(data, memo))
 
-
-pid = PIDModelState()
-
-# 直接在字段上订阅
-pid.ki.subscribe(lambda v: print(f"[观察者] ki 更新: {v}"))
-
-# 普通赋值
-pid.ki = 0.1
-pid.ki = 0.5
-
-print(pid.ki.set())

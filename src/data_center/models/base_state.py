@@ -2,6 +2,7 @@ from rx.subject import BehaviorSubject
 from pydantic import BaseModel, ConfigDict
 from typing import TypeVar, Generic, Callable, Any
 import copy
+import numpy as np
 
 
 T = TypeVar('T')
@@ -14,9 +15,8 @@ class ReactiveVar(Generic[T]):
 
     def set(self, value: T) -> None:
         # 只有当值真正发生变化时才更新并通知
-        if self._value != value:
-            self._value = value
-            self._subject.on_next(value)
+        self._value = value
+        self._subject.on_next(value)
 
     def get(self) -> T:
         return self._value

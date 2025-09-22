@@ -59,16 +59,16 @@ class MouseScreenshot:
         """
         while self._running:
             try:
-                image = capture_screenshot_bgr(ScreenshotSubject.get_state().region)
+                print("region", ScreenshotModelState.get_state().region.get())
+                image = capture_screenshot_bgr(ScreenshotModelState.get_state().region.get())
                 begin_time = time.time()
                 ScreenshotSubject.send_image(image)
                 end_time = time.time()
-                print(f"截图时间: {(end_time - begin_time)*1000}ms")
+                print(f"图片处理时间 : {(end_time - begin_time)*1000}ms")
             
             except Exception as e:
                 print(f"截图错误: {e}")
-            
-            time.sleep(ScreenshotModelState.get_state().interval)
+            time.sleep(ScreenshotModelState.get_state().interval.get())
 
 _screenshot = MouseScreenshot()
 
@@ -82,3 +82,5 @@ if __name__ == "__main__":
     screenshot.start()
     time.sleep(100)
     pass
+
+

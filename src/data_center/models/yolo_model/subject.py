@@ -28,6 +28,8 @@ class YoloSubject:
     @staticmethod
     def send_detect(img: np.ndarray = None):
         """发送YOLO检测图片"""
+        if img is None:
+            return
         result = YoloModelState.get_state().model.get()(img, verbose=False)
         YoloModelState.get_state().yolo_results.set(result)
 

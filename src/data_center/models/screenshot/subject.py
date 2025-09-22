@@ -33,6 +33,8 @@ class ScreenshotSubject:
 
     @staticmethod
     def send_image(img: np.ndarray):
+        if img is None:
+            return
         """发送图片到订阅"""
         ScreenshotModelState.get_state().screenshot_img.set(img)
     
