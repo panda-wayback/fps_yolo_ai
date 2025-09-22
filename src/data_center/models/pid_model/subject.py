@@ -6,57 +6,49 @@ PID模型相关的统一接口
 # 延迟导入，避免循环导入
 
 
+from data_center.index import get_data_center
 from data_center.models.pid_model.state_model import PIDModelState
-from data_center.models.pid_model.subject_model import PIDSubjectModel
+from singleton_classes.pid_controller.pid_controller import get_pid_controller
+
 
 class PIDSubject:
     """PID模型订阅统一接口"""
-    
+
+    # init subscribes
+    @staticmethod
+    def init_subscribes():
+        PIDSubject.get_state().kp.subscribe(lambda x: print(f"kp: {x}"))
+        PIDSubject.get_state().ki.subscribe(lambda x: print(f"ki: {x}"))
+        PIDSubject.get_state().kd.subscribe(lambda x: print(f"kd: {x}"))
+        PIDSubject.get_state().output.subscribe(lambda x: print(f"output: {x}"))
+        PIDSubject.get_state().error.subscribe(lambda x: print(f"error: {x}"))
+
+        pass
+
+    @staticmethod
+    def get_state()->PIDModelState:
+        """获取状态"""
+        return get_data_center().state.pid_model_state
+
     @staticmethod
     def send_config(kp: float, ki: float, kd: float):
         """使用PID配置"""
-        PIDSubjectModel.config_subject.on_next(PIDModelState(kp=kp, ki=ki, kd=kd))
-    
+        PIDSubject.get_state().kp.set(kp)
+        PIDSubject.get_state().ki.set(ki)
+        PIDSubject.get_state().kd.set(kd)
+        # 设置PID参数
+        get_pid_controller().set_pid_parameters(kp, ki, kd)
+
     @staticmethod
-    def send_update(vector: tuple[float, float], dt=0.02):
+    def send_update(vector: tuple[float, float], dt: float):
         """发送更新"""
-        PIDSubjectModel.update_subject.on_next((vector, dt))
+        output, error = get_pid_controller().get_vector_pid_res(vector, dt)
+        PIDSubject.get_state().output.set(output)
+        PIDSubject.get_state().error.set(error)
+        pass
 
-    @staticmethod
-    def send_output(output: tuple[float, float], error: tuple[float, float]):
-        """发送输出"""
-        PIDSubjectModel.output_subject.on_next((output, error))
+PIDSubject.init_subscribes()
 
-
-
-def init_config_subject():
-    """
-    初始化PID模型状态的BehaviorSubject
-    """
-    from data_center.models.pid_model.subjects.config import set_pid_config
-
-
-    PIDSubjectModel.config_subject.subscribe(set_pid_config)
-
-
-def init_last_output_subject():
-    """
-    初始化last_output的BehaviorSubject
-    """
-    from data_center.models.pid_model.subjects.last_output import call_mouse_driver, set_last_output
-
-    PIDSubjectModel.output_subject.subscribe(set_last_output)
-    PIDSubjectModel.output_subject.subscribe(call_mouse_driver)
-
-def init_pid_update_subject():
-    from data_center.models.pid_model.subjects.pid_update import handle_pid_update
-    PIDSubjectModel.update_subject.subscribe(handle_pid_update)
-
-
-def init_pid_subject_model():
-
-    init_config_subject()
-    init_pid_update_subject()
-    init_last_output_subject()
-
-init_pid_subject_model()
+if __name__ == "__main__":
+    PIDSubject.send_config(1, 2, 3)
+    print(PIDSubject.get_state())

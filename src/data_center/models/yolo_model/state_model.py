@@ -1,17 +1,18 @@
 from typing import Any, List, Optional
 from pydantic import ConfigDict
 import numpy as np
-from data_center.models.base_state import BaseState
+from ultralytics import YOLO
+from data_center.models.base_state import BaseState, ReactiveVar
 
 
 class YoloModelState(BaseState):
     """YOLO模型状态类"""
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-    model: Optional[Any] = None
-    model_path: Optional[str] = None               # 当前加载的模型路径
-    model_class_names: Optional[List[str]] = None  # 模型的所有类别名称
-    model_class_ids: Optional[List[int]] = None    # 模型的所有类别ID
-    selected_class_ids: Optional[List[int]] = None # 当前选择的要识别的类别ID
-    marked_img: Optional[np.ndarray] = None        # 标记过目标的图片
-    yolo_results: Optional[List[Any]] = None       # YOLO模型输出
+
+    model: ReactiveVar[YOLO] = None  
+    model_path: ReactiveVar[str] = None               # 当前加载的模型路径
+    class_names: ReactiveVar[List[str]] = None  # 模型的所有类别名称
+    class_ids: ReactiveVar[List[int]] = None    # 模型的所有类别ID
+    selected_class_ids: ReactiveVar[List[int]] = None # 当前选择的要识别的类别ID
+    marked_img: ReactiveVar[np.ndarray] = None        # 标记过目标的图片
+    yolo_results: ReactiveVar[List[Any]] = None       # YOLO模型输出
 

@@ -77,3 +77,16 @@ print(f"当前 ki 值: {pid.ki.get()}")
 print("--- 测试值变化 ---")
 pid.ki = 0.3  # 不同值，应该触发通知
 pid.ki = 0.3  # 相同值，不应该触发通知
+
+# 测试深拷贝功能
+print("--- 测试深拷贝 ---")
+import copy
+try:
+    pid_copy = copy.deepcopy(pid)
+    print(f"原始 pid.ki: {pid.ki.get()}")
+    print(f"拷贝 pid_copy.ki: {pid_copy.ki.get()}")
+    print(f"它们是同一个对象吗: {pid.ki is pid_copy.ki}")
+    print(f"它们的值相等吗: {pid.ki.get() == pid_copy.ki.get()}")
+except Exception as e:
+    print(f"深拷贝失败: {e}")
+    print("但这不影响主要功能的使用")

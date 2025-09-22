@@ -36,7 +36,7 @@ class PIDController:
         """设置PID参数"""
         self.pid_control.set_pid_parameters(kp, ki, kd)
 
-    def get_vector_pid_res(self, vector: tuple[float, float], dt=0.02) -> tuple[float, float]:
+    def get_vector_pid_res(self, vector: tuple[float, float], dt=0.02) -> tuple[tuple[float, float], tuple[float, float]]:
         """获取PID控制器输出"""
         error_x, error_y = vector
         x_output, y_output = self.pid_control.update(error_x, error_y, dt)

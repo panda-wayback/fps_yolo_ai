@@ -1,6 +1,7 @@
 from rx.subject import BehaviorSubject
 from pydantic import BaseModel, ConfigDict
 from typing import TypeVar, Generic, Callable, Any
+import copy
 
 
 T = TypeVar('T')
@@ -25,6 +26,12 @@ class ReactiveVar(Generic[T]):
 
     def __repr__(self) -> str:
         return f"ReactiveVar({self._value})"
+    
+    def __deepcopy__(self, memo):
+        """支持深拷贝操作，创建新的 ReactiveVar 实例"""
+        # 创建一个新的 ReactiveVar 实例，只复制值，不复制 BehaviorSubject
+        new_instance = ReactiveVar(self._value)
+        return new_instance
 
 
 
@@ -47,4 +54,19 @@ class BaseState(BaseModel):
             current.set(value)  # 更新并通知
         else:
             super().__setattr__(name, value)
+    
+    def __deepcopy__(self, memo):
+        """支持深拷贝操作"""
+        # 创建一个新的实例
+        new_instance = self.__class__()
+        
+        # 复制所有字段的值（不是 ReactiveVar 对象）
+        for name, value in self.__dict__.items():
+            if isinstance(value, ReactiveVar):
+                # 对于 ReactiveVar，只复制其值
+                new_instance.__setattr__(name, value.get())
+            else:
+                new_instance.__setattr__(name, value)
+        
+        return new_instance
 

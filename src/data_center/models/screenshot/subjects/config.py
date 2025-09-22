@@ -3,39 +3,36 @@
 基于PID模型的最佳实践
 """
 
-from data_center.index import get_data_center
+from typing import Tuple
 from data_center.models.screenshot.state_model import ScreenshotState
 
-from utils.screenshot_tool.mss_screenshot import capture_screenshot_bgr
-
-
-def set_screenshot_state_settings(value: ScreenshotState):
+def get_screenshot_state_settings(
+    mouse_pos: Tuple[int, int],
+    region_size: Tuple[int, int],
+    fps: float
+) -> Tuple[Tuple[int, int, int, int], Tuple[int, int], float]:
     """设置截图状态配置"""
     try:
-        state = get_data_center().state.screenshot_state
-        state.merge_state(value)
         
         # 计算截图区域和中心点
-        if value.mouse_pos is not None and value.region_size is not None:
+        if mouse_pos is not None and region_size is not None:
             # 截图区域
-            state.region = (
-                value.mouse_pos[0] - value.region_size[0] // 2,
-                value.mouse_pos[1] - value.region_size[1] // 2,
-                value.region_size[0],
-                value.region_size[1]
+            region = (
+                mouse_pos[0] - region_size[0] // 2,
+                mouse_pos[1] - region_size[1] // 2,
+                region_size[0],
+                region_size[1]
             )
             # 截图图片中心点
-            state.screen_center = (
-                value.mouse_pos[0],
-                value.mouse_pos[1]
+            screen_center = (
+                mouse_pos[0],
+                mouse_pos[1]
             )
             
-            print(f"✅ 截图配置已更新: mouse_pos={value.mouse_pos}, "
-                  f"region_size={value.region_size}, fps={value.fps}")
-            print(f"   计算区域: {state.region}, 中心点: {state.screen_center}")
+            interval = 1.0 / fps
+            return region, screen_center, interval
         else:
-            print(f"✅ 截图配置已更新: mouse_pos={value.mouse_pos}, "
-                  f"region_size={value.region_size}, fps={value.fps}")
+            return None, None, None
             
     except Exception as e:
         print(f"❌ 截图配置更新失败: {e}")
@@ -44,12 +41,4 @@ def set_screenshot_state_settings(value: ScreenshotState):
 
 if __name__ == "__main__":
     # 测试用例
-    from data_center.models.screenshot.subject_model import ScreenshotSubjectModel
-    img = capture_screenshot_bgr()
-    ScreenshotSubjectModel.config_subject.on_next(
-        ScreenshotState(
-            mouse_pos=(100, 200),
-            region_size=(100, 100),
-            fps=30.0
-        )
-    )
+    pass
