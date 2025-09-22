@@ -5,7 +5,6 @@
 
 from typing import Any, List, Optional, Tuple
 from data_center.models.target_selector.state import TargetSelectorState
-from singleton_classes.target_selector.target_selector import get_target_selector
 
 
 class TargetSelectorSubject:
@@ -14,13 +13,9 @@ class TargetSelectorSubject:
 
 
     @staticmethod
-    def send_yolo_results(yolo_results: List[Any]):
+    def send_yolo_results(yolo_results: List[Any] ):
         """发送YOLO检测结果进行目标选择"""
-        selected_point, selected_bbox, selected_confidence, selected_class_id  = get_target_selector().target_selector(yolo_results)
-        TargetSelectorState.get_state().selected_target_point.set(selected_point)
-        TargetSelectorState.get_state().selected_target_bbox.set(selected_bbox)
-        TargetSelectorState.get_state().selected_target_confidence.set(selected_confidence)
-        TargetSelectorState.get_state().selected_target_class_id.set(selected_class_id)
+        TargetSelectorState.get_state().yolo_results.set(yolo_results)
         pass
     
     @staticmethod

@@ -1,7 +1,7 @@
 
 
 from data_center.index import get_data_center
-from data_center.models.yolo_model.subjects.result_subject import send_result_to_target_selector
+from data_center.models.yolo_model.subscribes.result_subject import send_result_to_target_selector
 
 
 class YoloModelState:

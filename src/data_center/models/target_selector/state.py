@@ -4,7 +4,7 @@
 """
 
 from data_center.index import get_data_center
-from data_center.models.target_selector.subjects.send_vector_to_pid import send_vector_to_pid
+from data_center.models.target_selector.subscribes.send_vector_to_pid import send_vector_to_pid
 
 class TargetSelectorState:
     """目标选择器订阅统一接口"""
