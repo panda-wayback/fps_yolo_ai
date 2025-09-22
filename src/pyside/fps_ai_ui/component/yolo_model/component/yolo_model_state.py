@@ -9,7 +9,7 @@ from PySide6.QtWidgets import QLabel
 from PySide6.QtCore import QTimer
 from pyside.UI.basic.basic_layout import create_vertical_card
 
-from data_center.models.yolo_model.subject import YoloSubject
+from data_center.models.yolo_model.state import YoloModelState
 
 
 def create_yolo_model_state():
@@ -48,31 +48,34 @@ def create_yolo_model_state():
     def update_status():
         """更新状态显示"""
         try:
-            yolo_state = YoloSubject.get_yolo_model_state()
+            yolo_state = YoloModelState.get_state()
             
-            if yolo_state.model is not None:
+            if yolo_state.model.get() is not None:
                 # 模型已加载
                 status_label.setText("状态: 已加载")
                 status_label.setStyleSheet("color: green; font-size: 14px; font-weight: bold;")
                 
                 # 显示模型信息
-                model_path = yolo_state.model_path or "未知路径"
-                class_count = len(yolo_state.model_class_names) if yolo_state.model_class_names else 0
+                model_path = yolo_state.model_path.get() or "未知路径"
+                class_names = yolo_state.class_names.get()
+                class_count = len(class_names) if class_names else 0
                 info_text = f"模型: {model_path.split('/')[-1]}\n类别数量: {class_count}"
                 
-                if yolo_state.model_class_names:
-                    info_text += f"\n类别: {', '.join(yolo_state.model_class_names[:3])}"
-                    if len(yolo_state.model_class_names) > 3:
+                if class_names:
+                    info_text += f"\n类别: {', '.join(class_names[:3])}"
+                    if len(class_names) > 3:
                         info_text += "..."
                 
                 info_label.setText(info_text)
                 
                 # 显示检测结果信息
-                if yolo_state.yolo_results:
-                    result_count = len(yolo_state.yolo_results)
+                yolo_results = yolo_state.yolo_results.get()
+                if yolo_results:
+                    result_count = len(yolo_results)
+                    selected_class_ids = yolo_state.selected_class_ids.get()
                     result_text = f"检测结果: {result_count} 个目标"
-                    if yolo_state.selected_class_ids:
-                        result_text += f"\n选中类别: {yolo_state.selected_class_ids}"
+                    if selected_class_ids:
+                        result_text += f"\n选中类别: {selected_class_ids}"
                     result_label.setText(result_text)
                 else:
                     result_label.setText("检测结果: 无")

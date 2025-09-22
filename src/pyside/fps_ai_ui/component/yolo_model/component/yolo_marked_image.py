@@ -11,7 +11,7 @@ from PySide6.QtGui import QPixmap, QImage
 import numpy as np
 from pyside.UI.basic.basic_layout import create_vertical_card
 
-from data_center.models.yolo_model.subject import YoloSubject
+from data_center.models.yolo_model.state import YoloModelState
 
 
 def create_yolo_marked_image():
@@ -64,12 +64,12 @@ def create_yolo_marked_image():
         nonlocal last_image_hash, last_update_time
         
         try:
-            yolo_state = YoloSubject.get_yolo_model_state()
+            yolo_state = YoloModelState.get_state()
             
-            if yolo_state.marked_img is not None:
+            marked_img = yolo_state.marked_img.get()
+            
+            if marked_img is not None:
                 # 有标记图片
-                marked_img = yolo_state.marked_img
-                
                 # 计算图片的哈希值，用于检测变化
                 import hashlib
                 current_hash = hashlib.md5(marked_img.tobytes()).hexdigest()
@@ -100,8 +100,9 @@ def create_yolo_marked_image():
                 
                 # 更新图片信息
                 info_text = f"尺寸: {width}x{height}\n通道: {channels}"
-                if hasattr(yolo_state, 'yolo_results') and yolo_state.yolo_results:
-                    info_text += f"\n检测目标: {len(yolo_state.yolo_results)} 个"
+                yolo_results = yolo_state.yolo_results.get()
+                if yolo_results:
+                    info_text += f"\n检测目标: {len(yolo_results)} 个"
                 info_text += f"\n刷新次数: {last_update_time}"
                 info_label.setText(info_text)
                 

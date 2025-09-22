@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (QCheckBox, QScrollArea, QWidget,
 from PySide6.QtCore import QTimer
 from pyside.UI.basic.basic_layout import create_vertical_card
 
+from data_center.models.yolo_model.state import YoloModelState
 from data_center.models.yolo_model.subject import YoloSubject
 
 
@@ -64,11 +65,14 @@ def create_yolo_classes_selector():
     def update_classes():
         """更新类别列表"""
         try:
-            yolo_state = YoloSubject.get_yolo_model_state()
+            yolo_state = YoloModelState.get_state()
             
-            if yolo_state.model is not None and yolo_state.model_class_names is not None:
+            model = yolo_state.model.get()
+            class_names = yolo_state.class_names.get()
+            
+            if model is not None and class_names is not None:
                 # 模型已加载，显示类别
-                status_label.setText(f"已加载 {len(yolo_state.model_class_names)} 个类别")
+                status_label.setText(f"已加载 {len(class_names)} 个类别")
                 status_label.setStyleSheet("color: green; font-size: 12px;")
                 
                 # 清除旧的复选框
@@ -77,7 +81,7 @@ def create_yolo_classes_selector():
                 checkboxes.clear()
                 
                 # 创建新的复选框
-                for i, class_name in enumerate(yolo_state.model_class_names):
+                for i, class_name in enumerate(class_names):
                     checkbox = QCheckBox(f"{i}: {class_name}")
                     checkbox.setChecked(True)  # 默认全选
                     checkboxes[i] = checkbox
