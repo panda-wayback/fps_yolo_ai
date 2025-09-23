@@ -79,7 +79,7 @@ def setup_logger(
 
 
 # 全局默认日志器
-_default_logger = setup_logger(level=logging.INFO)
+_default_logger = setup_logger(level=logging.WARN)
 
 
 def get_logger(name: str = "app") -> logging.Logger:

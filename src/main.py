@@ -29,6 +29,7 @@ def main():
     init_state()
     load_yolo_model()
     load_screenshot()
+
     pass
 
 
