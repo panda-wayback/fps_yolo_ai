@@ -6,8 +6,9 @@
 
 import time
 import threading
-from pynput.mouse import Controller
 from collections import deque
+# 使用PyDirectInput鼠标控制器替代pynput，专门解决Steam游戏兼容性问题
+from src.utils.move_mouse.pydirectinput_controller import PyDirectInputMouseController
 
 
 class MouseSimulator:
@@ -45,8 +46,8 @@ class MouseSimulator:
         if self._initialized:
             return
             
-        # 创建鼠标控制器实例
-        self.mouse = Controller()
+        # 创建PyDirectInput鼠标控制器实例（替代pynput，专门解决Steam游戏兼容性）
+        self.mouse = PyDirectInputMouseController()
         # 向量执行时间控制
         self.vector_start_time = 0  # 向量开始时间
 
@@ -198,7 +199,9 @@ class MouseSimulator:
         停止移动
         """
         self.running = False
-        self.thread.join()
+        if self.thread is not None:
+            self.thread.join()
+            self.thread = None
     
     # 获取位移的累计值
     def get_displacement_history(self, seconds_back=0.02):
