@@ -5,6 +5,7 @@
 
 from typing import Optional, Tuple
 from data_center.models.mouse_driver_model.state import MouseDriverState
+from singleton_classes.simulation_move_mouse.simulation_move_mouse import get_mouse_simulator
 
 class MouseDriverSubject:
     """鼠标驱动模型订阅统一接口"""
@@ -29,9 +30,13 @@ class MouseDriverSubject:
             MouseDriverState.get_state().max_duration.set(max_duration)
         if decay_rate is not None:
             MouseDriverState.get_state().decay_rate.set(decay_rate)
+        
+        get_mouse_simulator().run()
     
     @staticmethod
     def send_vector(vector: Tuple[float, float]):
         """发送鼠标向量"""
         MouseDriverState.get_state().vector.set(vector)
+
+    
     

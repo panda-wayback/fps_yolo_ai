@@ -96,8 +96,8 @@ class MouseSimulator:
             每个向量最多执行0.1秒
         """
 
-        self.vx = vector[0]
-        self.vy = vector[1]
+        self.vx = -vector[0]
+        self.vy = -vector[1]
         # print(f"✅ 提交新的速度向量: vx={vector[0]}, vy={vector[1]}")
         self.vector_start_time = time.time()  # 记录开始时间
 
@@ -117,16 +117,17 @@ class MouseSimulator:
         error_y = 0  # Y轴残差累积
         
 
-        delay = 1.0 / MouseDriverState.get_state().fps
-        max_duration = MouseDriverState.get_state().max_duration
-        decay_rate = MouseDriverState.get_state().decay_rate
-        smoothing = MouseDriverState.get_state().smoothing
+        delay = 1.0 / MouseDriverState.get_state().fps.get()
+        max_duration = MouseDriverState.get_state().max_duration.get()
+        decay_rate = MouseDriverState.get_state().decay_rate.get()
+        smoothing = MouseDriverState.get_state().smoothing.get()
         
         # 平滑处理用的临时变量
         sx, sy = 0, 0
         
         # 主控制循环
         while MouseDriverState.get_state().running:
+            # print(f"✅ 正在移动鼠标: vx={self.vx}, vy={self.vy}")
             # 检查向量执行时间是否超过最大持续时间
             if time.time() - self.vector_start_time > max_duration:
                 # 平滑减速而不是突然归0

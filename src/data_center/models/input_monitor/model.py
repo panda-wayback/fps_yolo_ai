@@ -11,4 +11,5 @@ class InputMonitorModel(BaseState):
     mouse_right_click_time: ReactiveVar[float] = 0.0 # 鼠标右键点击时间
     keyboard_click_time: ReactiveVar[Dict[str, float]] = {} # 键盘按键时间
 
-    
+    # mouse left 点击后多长时间提交向量
+    mouse_left_click_submit_time: ReactiveVar[float] = 0.1 # 鼠标左键点击后多长时间提交向量
