@@ -38,6 +38,8 @@ class PIDController:
 
     def get_vector_pid_res(self, vector: tuple[float, float], dt=0.02) -> tuple[tuple[float, float], tuple[float, float]]:
         """获取PID控制器输出"""
+        if vector is None:
+            return (0.0, 0.0), (0.0, 0.0)
         error_x, error_y = vector
         x_output, y_output = self.pid_control.update(error_x, error_y, dt)
         print(f"PID控制器输出: x_output={x_output}, y_output={y_output}")   

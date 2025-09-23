@@ -9,7 +9,6 @@ import threading
 from pynput.mouse import Controller
 from collections import deque
 
-# 移除循环导入，使用延迟导入
 
 class MouseSimulator:
     """
@@ -99,7 +98,7 @@ class MouseSimulator:
 
         self.vx = vector[0]
         self.vy = vector[1]
-        print(f"✅ 提交新的速度向量: vx={vector[0]}, vy={vector[1]}")
+        # print(f"✅ 提交新的速度向量: vx={vector[0]}, vy={vector[1]}")
         self.vector_start_time = time.time()  # 记录开始时间
 
     def _driver_loop(self):
@@ -112,24 +111,22 @@ class MouseSimulator:
             3. 使用残差累积确保精确的像素级移动
             4. 只在实际需要移动时才调用鼠标API
         """
-
+        from data_center.models.mouse_driver_model.state import MouseDriverState
         # 残差累积变量，用于处理小数像素移动
         error_x = 0  # X轴残差累积
         error_y = 0  # Y轴残差累积
         
-        # 计算每次循环的延迟时间
-        from data_center.models.mouse_driver_model.subject import MouseDriverSubject
 
-        delay = 1.0 / MouseDriverSubject.get_state().fps
-        max_duration = MouseDriverSubject.get_state().max_duration
-        decay_rate = MouseDriverSubject.get_state().decay_rate
-        smoothing = MouseDriverSubject.get_state().smoothing
+        delay = 1.0 / MouseDriverState.get_state().fps
+        max_duration = MouseDriverState.get_state().max_duration
+        decay_rate = MouseDriverState.get_state().decay_rate
+        smoothing = MouseDriverState.get_state().smoothing
         
         # 平滑处理用的临时变量
         sx, sy = 0, 0
         
         # 主控制循环
-        while MouseDriverSubject.get_state().running:
+        while MouseDriverState.get_state().running:
             # 检查向量执行时间是否超过最大持续时间
             if time.time() - self.vector_start_time > max_duration:
                 # 平滑减速而不是突然归0
