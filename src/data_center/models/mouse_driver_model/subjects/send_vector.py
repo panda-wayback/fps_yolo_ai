@@ -13,9 +13,8 @@ def submit_vector(vector: tuple[float, float]):
     try:
         if not InputMonitorState.get_state().is_submit_vector.get():
             return
-        InputMonitorState.get_state().is_submit_vector.set(True)
         get_mouse_simulator().submit_vector(vector)
-        print(f"✅ 鼠标向量已提交: vx={vector[0]}, vy={vector[1]}")
+        print(f"✅ {time.time()*1000} 鼠标向量已提交: vx={vector[0]}, vy={vector[1]}")
     except Exception as e:
         print(f"❌ 鼠标向量提交失败: {e}")
 

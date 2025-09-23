@@ -10,6 +10,8 @@ from collections import deque
 # 使用PyDirectInput鼠标控制器替代pynput，专门解决Steam游戏兼容性问题
 from pynput.mouse import Controller
 
+from utils.move_mouse.windows_mouse_controller import WindowsMouseController
+
 
 class MouseSimulator:
     """
@@ -45,7 +47,7 @@ class MouseSimulator:
         # 防止重复初始化
         if self._initialized:
             return
-        self.mouse = Controller()
+        self.mouse = WindowsMouseController()
         # 向量执行时间控制
         self.vector_start_time = 0  # 向量开始时间
 
@@ -104,8 +106,8 @@ class MouseSimulator:
             每个向量最多执行0.1秒
         """
 
-        self.vx = -vector[0]
-        self.vy = -vector[1]
+        self.vx = vector[0]
+        self.vy = vector[1]
         # print(f"✅ 提交新的速度向量: vx={vector[0]}, vy={vector[1]}")
         self.vector_start_time = time.time()  # 记录开始时间
 

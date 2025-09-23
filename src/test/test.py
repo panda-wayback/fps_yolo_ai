@@ -60,7 +60,6 @@ keyboard_thread.start()
 # 鼠标监听器线程
 def start_mouse_listener():
     with mouse.Listener(
-            # on_move=on_move,
             # on_click=on_click,
             # on_scroll=on_scroll
             ) as listener:

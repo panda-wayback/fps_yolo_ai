@@ -21,6 +21,3 @@ class YoloModelState:
             send_result_to_target_selector
         )
         pass
-    
-
-YoloModelState.init_subscribes()

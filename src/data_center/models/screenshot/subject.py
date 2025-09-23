@@ -14,14 +14,23 @@ class ScreenshotSubject:
 
     @staticmethod
     def send_config(
-        mouse_pos: Optional[Tuple[int, int]] = (0, 0),
-        region_size: Optional[Tuple[int, int]] = (100, 100),
-        fps: Optional[float] = 1000
+        mouse_pos: Optional[Tuple[int, int]] = None,
+        region_size: Optional[Tuple[int, int]] = None,
+        fps: Optional[float] = None
     ):
-        # 设置截图状态
-        ScreenshotModelState.get_state().mouse_pos.set(mouse_pos)
-        ScreenshotModelState.get_state().region_size.set(region_size)
-        ScreenshotModelState.get_state().fps.set(fps)
+        # 只设置非None的参数
+        if mouse_pos is not None:
+            ScreenshotModelState.get_state().mouse_pos.set(mouse_pos)
+        
+        if region_size is not None:
+            ScreenshotModelState.get_state().region_size.set(region_size)
+        
+        if fps is not None:
+            ScreenshotModelState.get_state().fps.set(fps)
+        
+        mouse_pos = ScreenshotModelState.get_state().mouse_pos.get()
+        region_size = ScreenshotModelState.get_state().region_size.get()
+        fps = ScreenshotModelState.get_state().fps.get()
 
         # 设置截图区域和中心点
         region, screen_center, interval = get_screenshot_state_settings(mouse_pos, region_size, fps)
@@ -32,10 +41,11 @@ class ScreenshotSubject:
         pass
 
     @staticmethod
-    def send_image(img: np.ndarray):
+    def send_image(img: np.ndarray, time: float):
         if img is None:
             return
         """发送图片到订阅"""
+        print(f"✅ {time} 发送图片到订阅")
         ScreenshotModelState.get_state().screenshot_img.set(img)
     
 

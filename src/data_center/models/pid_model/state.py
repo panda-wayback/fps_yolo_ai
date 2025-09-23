@@ -24,8 +24,6 @@ class PIDModelState:
         PIDModelState.get_state().output.subscribe(send_mouse_driver)
         pass
 
-# init subscribes
-PIDModelState.init_subscribes()
     
 if __name__ == "__main__":
     pass

@@ -16,5 +16,4 @@ class InputMonitorState:
         )
         pass
 
-InputMonitorState.init_subscribes()
 

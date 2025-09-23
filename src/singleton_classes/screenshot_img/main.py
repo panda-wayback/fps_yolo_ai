@@ -67,13 +67,14 @@ class MouseScreenshot:
                 image = capture_screenshot()
                 @log_time
                 def send_image():
-                    ScreenshotSubject.send_image(image)
+                    ScreenshotSubject.send_image(image,time.time())
                 send_image()
 
             
             except Exception as e:
                 print(f"截图错误: {e}")
-            time.sleep(ScreenshotModelState.get_state().interval.get())
+            # time.sleep(ScreenshotModelState.get_state().interval.get())
+            time.sleep(1)
 
 _screenshot = MouseScreenshot()
 

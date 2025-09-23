@@ -20,5 +20,3 @@ class MouseDriverState:
             submit_vector
         )
         pass
-
-MouseDriverState.init_subscribes()

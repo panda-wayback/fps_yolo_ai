@@ -11,7 +11,7 @@ class MouseDriverModel(BaseState):
     fps: ReactiveVar[int] = 1000                 # 帧率
     interval: ReactiveVar[float] = 0.001          # 间隔
     running: ReactiveVar[bool] = False           # 运行状态
-    max_duration: ReactiveVar[float] = 0.05      # 单个向量最大执行时间
+    max_duration: ReactiveVar[float] = 0.01      # 单个向量最大执行时间
     decay_rate: ReactiveVar[float] = 0.95        # 减速系数
 
     # 鼠标向量

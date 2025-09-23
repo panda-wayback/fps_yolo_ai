@@ -64,19 +64,18 @@ def create_yolo_marked_image():
         nonlocal last_image_hash, last_update_time
         
         try:
-            yolo_state = YoloModelState.get_state()
+            from utils.image_converter import ImageConverter
             
+            yolo_state = YoloModelState.get_state()
             marked_img = yolo_state.marked_img.get()
             
             if marked_img is not None:
                 # 有标记图片
-                # 计算图片的哈希值，用于检测变化
-                import hashlib
-                current_hash = hashlib.md5(marked_img.tobytes()).hexdigest()
+                # 使用新的转换工具计算图片哈希值
+                current_hash = ImageConverter.get_image_hash(marked_img)
                 
                 # 获取图片信息
-                height, width = marked_img.shape[:2]
-                channels = marked_img.shape[2] if len(marked_img.shape) > 2 else 1
+                img_info = ImageConverter.get_image_info(marked_img)
                 
                 # 检查图片是否发生变化
                 image_changed = current_hash != last_image_hash
@@ -84,7 +83,7 @@ def create_yolo_marked_image():
                 if image_changed:
                     last_image_hash = current_hash
                     last_update_time = 0  # 重置时间
-                    # print(f"🔄 检测到新图片: {width}x{height}, 通道: {channels}")
+                    # print(f"🔄 检测到新图片: {img_info['width']}x{img_info['height']}, 通道: {img_info['channels']}")
                 else:
                     # 图片未变化，增加时间计数
                     last_update_time += 1
@@ -99,7 +98,7 @@ def create_yolo_marked_image():
                 status_label.setStyleSheet("color: green; font-size: 12px;")
                 
                 # 更新图片信息
-                info_text = f"尺寸: {width}x{height}\n通道: {channels}"
+                info_text = f"尺寸: {img_info['width']}x{img_info['height']}\n通道: {img_info['channels']}"
                 yolo_results = yolo_state.yolo_results.get()
                 if yolo_results:
                     info_text += f"\n检测目标: {len(yolo_results)} 个"
@@ -108,38 +107,20 @@ def create_yolo_marked_image():
                 
                 # 只有在图片发生变化时才重新绘制
                 if image_changed:
-                    # 转换numpy数组为QImage
-                    if len(marked_img.shape) == 3:
-                        # 彩色图片
-                        if marked_img.shape[2] == 3:
-                            # RGB
-                            q_image = QImage(marked_img.data, width, height, width * 3, QImage.Format_RGB888)
-                        elif marked_img.shape[2] == 4:
-                            # RGBA
-                            q_image = QImage(marked_img.data, width, height, width * 4, QImage.Format_RGBA8888)
-                        else:
-                            # 其他格式，转换为RGB
-                            if marked_img.dtype != np.uint8:
-                                marked_img = (marked_img * 255).astype(np.uint8)
-                            q_image = QImage(marked_img.data, width, height, width * 3, QImage.Format_RGB888)
-                    else:
-                        # 灰度图片
-                        if marked_img.dtype != np.uint8:
-                            marked_img = (marked_img * 255).astype(np.uint8)
-                        q_image = QImage(marked_img.data, width, height, width, QImage.Format_Grayscale8)
-                    
-                    # 转换为QPixmap并显示
-                    pixmap = QPixmap.fromImage(q_image)
-                    
-                    # 缩放图片以适应显示区域
-                    scaled_pixmap = pixmap.scaled(
-                        image_label.size(), 
-                        Qt.KeepAspectRatio, 
-                        Qt.SmoothTransformation
+                    # 使用新的转换工具转换为Qt格式
+                    target_size = (image_label.size().width(), image_label.size().height())
+                    pixmap = ImageConverter.convert_for_display(
+                        marked_img, 
+                        target_format="qt", 
+                        target_size=target_size, 
+                        keep_aspect_ratio=True
                     )
                     
-                    image_label.setPixmap(scaled_pixmap)
-                    image_label.setText("")  # 清除文本
+                    if pixmap is not None:
+                        image_label.setPixmap(pixmap)
+                        image_label.setText("")  # 清除文本
+                    else:
+                        print("❌ 图片转换失败")
                 
             else:
                 # 没有标记图片
@@ -188,3 +169,4 @@ def get_yolo_marked_image():
         QGroupBox: YOLO标记图片显示组件
     """
     return create_yolo_marked_image()
+

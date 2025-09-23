@@ -17,6 +17,3 @@ class ScreenshotModelState:
         """初始化截图订阅"""
         from data_center.models.screenshot.subjects.screenshot_img import on_screenshot_img
         ScreenshotModelState.get_state().screenshot_img.subscribe(on_screenshot_img)
-
-
-ScreenshotModelState.init_subscribes()

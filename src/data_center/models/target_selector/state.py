@@ -22,5 +22,3 @@ class TargetSelectorState:
         from data_center.models.target_selector.subscribes.send_vector_to_pid import send_vector_to_pid
         TargetSelectorState.get_state().selected_target_point.subscribe(send_vector_to_pid)
         pass
-
-TargetSelectorState.init_subscribes()

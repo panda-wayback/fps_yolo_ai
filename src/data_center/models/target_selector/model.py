@@ -12,7 +12,7 @@ class TargetSelectorModel(BaseState):
     selected_target_class_id: ReactiveVar[int] = None  # 选中目标的类别ID
     
     # 配置参数
-    distance_weight: ReactiveVar[float] = 0.5  # 距离权重
+    distance_weight: ReactiveVar[float] = 0.7  # 距离权重
     confidence_weight: ReactiveVar[float] = 0.5  # 置信度权重
     similarity_weight: ReactiveVar[float] = 0.5  # 相似度权重
     class_weight: ReactiveVar[float] = 0.5  # 类别权重

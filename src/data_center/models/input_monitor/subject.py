@@ -5,6 +5,7 @@ from pynput import mouse, keyboard
 
 import time
 from data_center.models.input_monitor.state import InputMonitorState
+from data_center.models.screenshot.subject import ScreenshotSubject
 
 
 class InputMonitorSubject:
@@ -29,11 +30,15 @@ class InputMonitorSubject:
             # 处理特殊按键（如方向键、功能键等）
             key_name = str(key)
             InputMonitorState.get_state().keyboard_click_name.set(key_name)
+    @staticmethod
+    def on_mouse_move(x, y):
+        ScreenshotSubject.send_config(mouse_pos=(x, y))
+        pass
 
 
 def start_mouse_listener():
     with mouse.Listener(
-        # on_move=on_move,
+        on_move=InputMonitorSubject.on_mouse_move,
         on_click=InputMonitorSubject.monitor_mouse_click,
         # on_scroll=on_scroll
         ) as listener:
