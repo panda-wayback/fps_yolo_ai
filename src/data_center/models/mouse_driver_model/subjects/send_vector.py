@@ -3,12 +3,17 @@
 基于PID模型的最佳实践
 """
 
+import time
+from data_center.models.input_monitor.state import InputMonitorState
 from singleton_classes.simulation_move_mouse.simulation_move_mouse import get_mouse_simulator
 
 
 def submit_vector(vector: tuple[float, float]):
     """执行鼠标模拟器提交向量"""
     try:
+        current_time = time.time()
+        if InputMonitorState.get_state().mouse_left_click_time.get() < current_time - 1.0:
+            return 
         get_mouse_simulator().submit_vector(vector)
         print(f"✅ 鼠标向量已提交: vx={vector[0]}, vy={vector[1]}")
     except Exception as e:

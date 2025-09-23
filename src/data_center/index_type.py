@@ -8,6 +8,7 @@ from data_center.models.pid_model.model import PIDModel
 from data_center.models.yolo_model.model import YoloModel
 from data_center.models.mouse_driver_model.model import MouseDriverModel
 from data_center.models.target_selector.model import TargetSelectorModel
+from data_center.models.input_monitor.model import InputMonitorModel
 
 
 
@@ -28,3 +29,4 @@ class State(BaseModel):
     pid_model_state: Optional[PIDModel] = PIDModel()
     mouse_driver_state: Optional[MouseDriverModel] = MouseDriverModel()
     target_selector_state: Optional[TargetSelectorModel] = TargetSelectorModel()
+    input_monitor_state: Optional[InputMonitorModel] = InputMonitorModel()

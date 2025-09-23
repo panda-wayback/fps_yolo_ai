@@ -4,7 +4,6 @@
 """
 
 from typing import Optional, Tuple
-from data_center.models.mouse_driver_model.model import MouseDriverModel
 from data_center.models.mouse_driver_model.state import MouseDriverState
 
 class MouseDriverSubject:
@@ -36,9 +35,3 @@ class MouseDriverSubject:
         """发送鼠标向量"""
         MouseDriverState.get_state().vector.set(vector)
     
-    @staticmethod
-    def get_state():
-        """获取鼠标驱动状态"""
-        from data_center.index import get_data_center
-        return get_data_center().state.mouse_driver_state
-
