@@ -1,5 +1,5 @@
 
-from typing_extensions import Optional
+from typing import Optional
 from pydantic import BaseModel
 from data_center.models.base_state import BaseState
 
