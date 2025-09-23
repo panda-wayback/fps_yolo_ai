@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QLabel,
 from PySide6.QtCore import Qt
 
 
-def create_basic_window(title="基础窗口", width=400, height=300):
+def create_basic_window(title="基础窗口", width=1200, height=800):
     window = QWidget()
     window.setWindowTitle(title)
     window.resize(width, height)

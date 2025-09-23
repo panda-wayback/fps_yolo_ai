@@ -36,6 +36,7 @@ class YoloSubject:
             return YoloModelState.get_state().model.get()(img, verbose=False)
         result = yolo_detect()
         YoloModelState.get_state().yolo_results.set(result)
+        YoloModelState.get_state().marked_img.set(result[0].plot())
 
     @staticmethod
     def send_selected_class_ids(selected_class_ids: List[int]):

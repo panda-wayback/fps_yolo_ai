@@ -3,7 +3,7 @@
 import sys
 from PySide6.QtWidgets import QApplication, QGroupBox, QWidget, QHBoxLayout
 from pyside.UI.basic.basic_layout import get_vertical_layout
-from pyside.UI.basic.basic_window import create_scrollable_window
+from pyside.UI.basic.basic_window import create_basic_window, create_scrollable_window
 from pyside.UI.basic.multi_widget import add_widgets_to_vertical, add_layouts
 from pyside.fps_ai_ui.component.mouse_driver.index import get_mouse_driver_component
 from pyside.fps_ai_ui.component.screenshot.index import get_screenshot_component
@@ -77,11 +77,11 @@ def prompt_window(window: QWidget):
 
 def main_window():
     app = QApplication(sys.argv)
-    window = create_scrollable_window()
+    window = create_basic_window("FPS AI 控制台", 1200, 800)
 
-    # 将布局设置到内容容器中
+    # 将布局直接设置到窗口中
     content_layout = get_main_layout()
-    window.content_widget.setLayout(content_layout)
+    window.setLayout(content_layout)
 
     prompt_window(window)
     sys.exit(app.exec())
