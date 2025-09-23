@@ -6,6 +6,7 @@ from pyside.UI.basic.basic_layout import get_vertical_layout
 from pyside.UI.basic.basic_window import create_basic_window, create_scrollable_window
 from pyside.UI.basic.multi_widget import add_widgets_to_vertical, add_layouts
 from pyside.fps_ai_ui.component.mouse_driver.index import get_mouse_driver_component
+from pyside.fps_ai_ui.component.pid_controller.index import get_pid_controller_component
 from pyside.fps_ai_ui.component.screenshot.index import get_screenshot_component
 from pyside.fps_ai_ui.component.target_selector.index import get_target_selector_component
 from pyside.fps_ai_ui.component.yolo_model.index import get_yolo_model_component
@@ -16,6 +17,9 @@ from pyside.fps_ai_ui.component.yolo_model.index import get_yolo_model_component
 def yolo_model_component() -> QGroupBox:
     return get_yolo_model_component()
 
+# PID控制器组件
+def pid_controller_component() -> QGroupBox:
+    return get_pid_controller_component()
 
 # 截图组件
 def screenshot_component() -> QGroupBox:
@@ -52,7 +56,9 @@ def get_main_layout():
     
     # 右列布局  
     third_columns_layout = add_widgets_to_vertical(
+        pid_controller_component(),                  # PID控制器组件
         target_selector_component(),                  # 目标选择器组件
+       
     )
     
     # 将列添加到水平布局

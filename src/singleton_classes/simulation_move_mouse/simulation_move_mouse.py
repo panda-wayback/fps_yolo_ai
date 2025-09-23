@@ -56,6 +56,7 @@ class MouseSimulator:
         # 位移历史记录 
         self.displacement_history = deque(maxlen=1000)  # 存储 (timestamp, dx, dy) 的队列
         self.thread = None
+        self.running = True
 
         # 标记为已初始化
         self._initialized = True
@@ -126,7 +127,7 @@ class MouseSimulator:
         sx, sy = 0, 0
         
         # 主控制循环
-        while MouseDriverState.get_state().running:
+        while self.running:
             # print(f"✅ 正在移动鼠标: vx={self.vx}, vy={self.vy}")
             # 检查向量执行时间是否超过最大持续时间
             if time.time() - self.vector_start_time > max_duration:
@@ -184,6 +185,8 @@ class MouseSimulator:
         """
         开始移动
         """
+        from data_center.models.mouse_driver_model.state import MouseDriverState
+        self.running = MouseDriverState.get_state().running.get()
         self.thread = threading.Thread(target=self._driver_loop, daemon=True)
         self.thread.start()
     

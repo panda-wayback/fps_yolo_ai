@@ -13,7 +13,7 @@ class InputMonitorState:
     
     @staticmethod
     def monitor_mouse_click(x, y, button, pressed):
-        print(f"鼠标点击: {button} {pressed}, 时间: {time.time()}")
+        # print(f"鼠标点击: {button} {pressed}, 时间: {time.time()}")
         if pressed:
             if button == mouse.Button.left:
                 InputMonitorState.get_state().mouse_left_click_time.set(time.time())

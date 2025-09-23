@@ -231,11 +231,11 @@ def create_screenshot_config():
     # 重置功能
     def reset_settings():
         """重置为默认设置"""
-        x_spinbox.setValue(960)
-        y_spinbox.setValue(540)
-        width_spinbox.setValue(640)
-        height_spinbox.setValue(480)
-        fps_spinbox.setValue(60)
+        x_spinbox.setValue(756)
+        y_spinbox.setValue(509)
+        width_spinbox.setValue(400)
+        height_spinbox.setValue(320)
+        fps_spinbox.setValue(1000)
         
         status_label.setText("🔄 已重置为默认设置")
         status_label.setStyleSheet("color: orange; font-size: 12px;")
