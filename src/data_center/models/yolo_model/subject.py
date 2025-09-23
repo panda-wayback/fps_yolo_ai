@@ -31,7 +31,7 @@ class YoloSubject:
         """发送YOLO检测图片"""
         if img is None:
             return
-        # @log_time
+        @log_time
         def yolo_detect():
             return YoloModelState.get_state().model.get()(img, verbose=False)
         result = yolo_detect()

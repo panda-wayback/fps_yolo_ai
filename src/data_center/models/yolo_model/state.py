@@ -17,8 +17,8 @@ class YoloModelState:
         """初始化YOLO模型订阅"""
         from data_center.models.yolo_model.subscribes.result_subject import send_result_to_target_selector
         YoloModelState.get_state().yolo_results.subscribe(
-            threaded(send_result_to_target_selector)
-            # send_result_to_target_selector
+            # threaded(send_result_to_target_selector)
+            send_result_to_target_selector
         )
         pass
     
