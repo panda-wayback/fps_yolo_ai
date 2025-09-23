@@ -53,10 +53,18 @@ class MouseSimulator:
         self.vx = 0  # 向量X轴速度
         self.vy = 0  # 向量Y轴速度
 
+        self.fps = 1000
+        self.smoothing = 0.4
+        self.max_duration = 0.05
+        self.decay_rate = 0.95
+        self.delay = 1.0 / self.fps
+
         # 位移历史记录 
         self.displacement_history = deque(maxlen=1000)  # 存储 (timestamp, dx, dy) 的队列
         self.thread = None
         self.running = True
+
+
 
         # 标记为已初始化
         self._initialized = True
@@ -112,16 +120,9 @@ class MouseSimulator:
             3. 使用残差累积确保精确的像素级移动
             4. 只在实际需要移动时才调用鼠标API
         """
-        from data_center.models.mouse_driver_model.state import MouseDriverState
         # 残差累积变量，用于处理小数像素移动
         error_x = 0  # X轴残差累积
         error_y = 0  # Y轴残差累积
-        
-
-        delay = 1.0 / MouseDriverState.get_state().fps.get()
-        max_duration = MouseDriverState.get_state().max_duration.get()
-        decay_rate = MouseDriverState.get_state().decay_rate.get()
-        smoothing = MouseDriverState.get_state().smoothing.get()
         
         # 平滑处理用的临时变量
         sx, sy = 0, 0
@@ -130,10 +131,10 @@ class MouseSimulator:
         while self.running:
             # print(f"✅ 正在移动鼠标: vx={self.vx}, vy={self.vy}")
             # 检查向量执行时间是否超过最大持续时间
-            if time.time() - self.vector_start_time > max_duration:
+            if time.time() - self.vector_start_time > self.max_duration:
                 # 平滑减速而不是突然归0
-                self.vx *= decay_rate
-                self.vy *= decay_rate
+                self.vx *= self.decay_rate
+                self.vy *= self.decay_rate
                 
                 # 当速度很小时，直接设为0避免无限接近0
                 if abs(self.vx) < 0.1:
@@ -143,14 +144,14 @@ class MouseSimulator:
             
             # 步骤1: 根据当前速度计算本次移动量
             # 将速度(像素/秒)转换为单次移动量(像素)
-            target_sx = self.vx * delay
-            target_sy = self.vy * delay
+            target_sx = self.vx * self.delay
+            target_sy = self.vy * self.delay
 
             # 步骤2: 应用指数平滑算法
             # 平滑系数越小，移动越平滑，但响应越慢
             # 正确的指数平滑：新值 = 平滑系数 * 目标值 + (1-平滑系数) * 旧值
-            sx = smoothing * target_sx + (1 - smoothing) * sx
-            sy = smoothing * target_sy + (1 - smoothing) * sy
+            sx = self.smoothing * target_sx + (1 - self.smoothing) * sx
+            sy = self.smoothing * target_sy + (1 - self.smoothing) * sy
 
             # 步骤3: 残差累积处理
             # 将小数部分累积起来，避免丢失精度
@@ -171,7 +172,7 @@ class MouseSimulator:
                 self.record_displacement(move_x, move_y)
 
             # 步骤7: 等待下一个控制周期
-            time.sleep(delay)
+            time.sleep(self.delay)
     # 记录位移
     def record_displacement(self, move_x, move_y):
         """
@@ -185,10 +186,19 @@ class MouseSimulator:
         """
         开始移动
         """
-        from data_center.models.mouse_driver_model.state import MouseDriverState
-        self.running = MouseDriverState.get_state().running.get()
+        if self.running:
+            self.stop()
+            time.sleep(0.1)
+        self.running = True
         self.thread = threading.Thread(target=self._driver_loop, daemon=True)
         self.thread.start()
+    
+    def stop(self):
+        """
+        停止移动
+        """
+        self.running = False
+        self.thread.join()
     
     # 获取位移的累计值
     def get_displacement_history(self, seconds_back=0.02):

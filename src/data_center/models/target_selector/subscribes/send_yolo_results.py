@@ -7,7 +7,6 @@ from singleton_classes.target_selector.target_selector import get_target_selecto
 def send_yolo_results(yolo_results: List[Any]):
     if not yolo_results:
         return
-    print(f"send_yolo_results {len(yolo_results)}")
     selected_target_point, selected_target_bbox, selected_target_confidence, selected_target_class_id  = get_target_selector().target_selector(yolo_results)
     TargetSelectorState.get_state().selected_target_point.set(selected_target_point)
     TargetSelectorState.get_state().selected_target_bbox.set(selected_target_bbox)

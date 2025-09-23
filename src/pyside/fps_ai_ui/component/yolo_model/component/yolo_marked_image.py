@@ -84,7 +84,7 @@ def create_yolo_marked_image():
                 if image_changed:
                     last_image_hash = current_hash
                     last_update_time = 0  # 重置时间
-                    print(f"🔄 检测到新图片: {width}x{height}, 通道: {channels}")
+                    # print(f"🔄 检测到新图片: {width}x{height}, 通道: {channels}")
                 else:
                     # 图片未变化，增加时间计数
                     last_update_time += 1

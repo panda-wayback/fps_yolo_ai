@@ -30,13 +30,24 @@ class MouseDriverSubject:
             MouseDriverState.get_state().max_duration.set(max_duration)
         if decay_rate is not None:
             MouseDriverState.get_state().decay_rate.set(decay_rate)
-        
-        get_mouse_simulator().run()
+        get_mouse_simulator().update_config(
+            fps= MouseDriverState.get_state().fps.get(),
+            smoothing= MouseDriverState.get_state().smoothing.get(),
+            max_duration= MouseDriverState.get_state().max_duration.get(),
+            decay_rate= MouseDriverState.get_state().decay_rate.get()
+        )
     
     @staticmethod
     def send_vector(vector: Tuple[float, float]):
         """发送鼠标向量"""
         MouseDriverState.get_state().vector.set(vector)
 
+    @staticmethod
+    def send_start():
+        """发送开始"""
+        get_mouse_simulator().run()
     
-    
+    @staticmethod
+    def send_stop():
+        """发送停止"""
+        get_mouse_simulator().stop()

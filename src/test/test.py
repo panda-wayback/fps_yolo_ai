@@ -1,5 +1,5 @@
 import threading
-from pynput import mouse
+from pynput import mouse, keyboard
 import time
 
 # 初始化全局变量
@@ -38,6 +38,9 @@ def on_click(x, y, button, pressed):
             last_right_release_time = time.time()
             print(f"Right button released at ({x}, {y}) at {last_right_release_time}")
 
+# 键盘监听器
+def on_press(key):
+    print(f"键盘按键: {key}")
 
 # 获取上次状态时间的函数
 def get_last_event_times():
@@ -45,15 +48,26 @@ def get_last_event_times():
     return int(last_left_click_time*1000),int(last_right_click_time*1000),int(last_left_release_time*1000),int(last_right_release_time*1000)
 
 
+# 键盘监听器线程
+def start_keyboard_listener():
+    with keyboard.Listener(
+            on_press=on_press
+            ) as listener:
+        listener.join()
+# 启动键盘监听器线程
+keyboard_thread = threading.Thread(target=start_keyboard_listener)
+keyboard_thread.start()
 # 鼠标监听器线程
 def start_mouse_listener():
     with mouse.Listener(
             # on_move=on_move,
-            on_click=on_click,
+            # on_click=on_click,
             # on_scroll=on_scroll
             ) as listener:
         listener.join()
 
+
+
 # 启动鼠标监听器线程
-listener_thread = threading.Thread(target=start_mouse_listener)
-listener_thread.start()
+mouse_thread = threading.Thread(target=start_mouse_listener)
+mouse_thread.start()

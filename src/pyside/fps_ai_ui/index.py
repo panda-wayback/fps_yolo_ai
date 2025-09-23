@@ -2,6 +2,7 @@
 
 import sys
 from PySide6.QtWidgets import QApplication, QGroupBox, QWidget, QHBoxLayout
+from data_center.models.input_monitor.subject import InputMonitorSubject
 from pyside.UI.basic.basic_layout import get_vertical_layout
 from pyside.UI.basic.basic_window import create_basic_window, create_scrollable_window
 from pyside.UI.basic.multi_widget import add_widgets_to_vertical, add_layouts
@@ -82,6 +83,7 @@ def prompt_window(window: QWidget):
 
 
 def main_window():
+    InputMonitorSubject.monitor_keyboard_press("p")
     app = QApplication(sys.argv)
     window = create_basic_window("FPS AI 控制台", 1200, 800)
 
