@@ -5,8 +5,6 @@ FPS游戏AI辅助主程序 - 最小示例
 
 import time
 import cv2
-from pynput import keyboard
-from singleton_classes.screenshot_img.main import MouseScreenshot
 
 def init_state():
     from data_center.init_state import init_state
