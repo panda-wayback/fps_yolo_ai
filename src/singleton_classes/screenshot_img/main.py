@@ -1,6 +1,7 @@
 import threading
 import time
 
+from data_center.models.input_monitor.state import InputMonitorState
 from data_center.models.screenshot.state import ScreenshotModelState
 from data_center.models.screenshot.subject import ScreenshotSubject
 from utils.logger.logger import log_time
@@ -60,6 +61,8 @@ class MouseScreenshot:
         """
         while self._running:
             try:
+                if not InputMonitorState.get_state().is_submit_vector.get():
+                    continue
                 @log_time
                 def capture_screenshot():
                     image = capture_screenshot_bgr(ScreenshotModelState.get_state().region.get())

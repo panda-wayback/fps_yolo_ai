@@ -11,8 +11,6 @@ from singleton_classes.simulation_move_mouse.simulation_move_mouse import get_mo
 def submit_vector(vector: tuple[float, float]):
     """执行鼠标模拟器提交向量"""
     try:
-        if not InputMonitorState.get_state().is_submit_vector.get():
-            return
         get_mouse_simulator().submit_vector(vector)
         print(f"✅ {time.time()*1000} 鼠标向量已提交: vx={vector[0]}, vy={vector[1]}")
     except Exception as e:
