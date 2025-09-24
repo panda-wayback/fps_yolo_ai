@@ -14,6 +14,10 @@ class InputMonitorState:
         InputMonitorState.get_state().keyboard_click_name.subscribe(
             listen_keyboard_click
         )
+        from data_center.models.input_monitor.utils.input_utils import listen_mouse_click
+        InputMonitorState.get_state().mouse_left_click_time.subscribe(
+            listen_mouse_click
+        )
         pass
 
 

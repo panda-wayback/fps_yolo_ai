@@ -13,3 +13,12 @@ def listen_keyboard_click(value):
         InputMonitorState.get_state().is_submit_vector.set(False)
         pass
     pass
+
+def listen_mouse_click(value):
+    #print(f"鼠标点击: {value}")
+    pass
+
+
+
+
+
