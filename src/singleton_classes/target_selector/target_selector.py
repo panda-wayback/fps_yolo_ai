@@ -43,26 +43,12 @@ class TargetSelector:
         if not yolo_result:
             return None, None, None, None
            
-        target = select_best_target(
-            yolo_result,
-            reference_vector = self.reference_vector,
-            class_ids=selected_class_ids,
-            distance_weight=distance_weight,
-            similarity_weight=similarity_weight,
-            confidence_weight=confidence_weight,
-            class_weight=class_weight
+        selected_target_point, selected_target_bbox, selected_target_confidence, selected_target_class_id  = select_best_target(
+            yolo_result[0],
         )
+        print(f"✅ selected_target_point  {selected_target_point} 目标选择器")
+        return selected_target_point, selected_target_bbox, selected_target_confidence, selected_target_class_id    
 
-        if target:
-            selected_target_point = target['center']
-            selected_target_bbox = target['bbox']
-            selected_target_confidence = target['confidence']
-            selected_target_class_id = target['class_id']  
-            self.reference_vector = selected_target_point
-            return selected_target_point, selected_target_bbox, selected_target_confidence, selected_target_class_id    
-        else:
-            self.reference_vector = None
-            return None, None, None, None
 
 
 

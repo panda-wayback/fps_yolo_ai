@@ -28,7 +28,7 @@ class PIDControl:
     - 手动时间步长控制
     """
     
-    def __init__(self, kp=5, ki=0, kd=0.05, v_limit=200000.0, ki_distance_threshold=20.0):
+    def __init__(self, kp=10, ki=0, kd=0.05, v_limit=200000.0, ki_distance_threshold=20.0):
         """
         初始化双轴 PID 控制器
         

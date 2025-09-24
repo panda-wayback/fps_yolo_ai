@@ -73,8 +73,8 @@ class MouseScreenshot:
             
             except Exception as e:
                 print(f"截图错误: {e}")
-            # time.sleep(ScreenshotModelState.get_state().interval.get())
-            time.sleep(1)
+            time.sleep(ScreenshotModelState.get_state().interval.get())
+            # time.sleep(1)
 
 _screenshot = MouseScreenshot()
 
