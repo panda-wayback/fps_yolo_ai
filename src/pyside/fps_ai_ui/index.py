@@ -2,14 +2,12 @@
 
 import sys
 from PySide6.QtWidgets import QApplication, QGroupBox, QWidget, QHBoxLayout
-from data_center.models.input_monitor.subject import InputMonitorSubject
 from pyside.UI.basic.basic_layout import get_vertical_layout
-from pyside.UI.basic.basic_window import create_basic_window, create_scrollable_window
+from pyside.UI.basic.basic_window import create_basic_window
 from pyside.UI.basic.multi_widget import add_widgets_to_vertical, add_layouts
 from pyside.fps_ai_ui.component.mouse_driver.index import get_mouse_driver_component
 from pyside.fps_ai_ui.component.pid_controller.index import get_pid_controller_component
 from pyside.fps_ai_ui.component.screenshot.index import get_screenshot_component
-from pyside.fps_ai_ui.component.target_selector.index import get_target_selector_component
 from pyside.fps_ai_ui.component.yolo_model.index import get_yolo_model_component
 
 
@@ -25,10 +23,6 @@ def pid_controller_component() -> QGroupBox:
 # 截图组件
 def screenshot_component() -> QGroupBox:
     return get_screenshot_component()
-
-# 目标选择器组件
-def target_selector_component() -> QGroupBox:
-    return get_target_selector_component()
 
 # 鼠标驱动组件
 def mouse_driver_component() -> QGroupBox:
@@ -58,8 +52,7 @@ def get_main_layout():
     # 右列布局  
     third_columns_layout = add_widgets_to_vertical(
         pid_controller_component(),                  # PID控制器组件
-        target_selector_component(),                  # 目标选择器组件
-       
+
     )
     
     # 将列添加到水平布局
@@ -83,7 +76,6 @@ def prompt_window(window: QWidget):
 
 
 def main_window():
-    InputMonitorSubject.monitor_keyboard_press("p")
     app = QApplication(sys.argv)
     window = create_basic_window("FPS AI 控制台", 1200, 800)
 

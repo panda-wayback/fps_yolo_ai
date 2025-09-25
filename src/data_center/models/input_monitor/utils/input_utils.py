@@ -13,12 +13,12 @@ def listen_keyboard_to_start_screenshot(value):
     from singleton_classes.screenshot_img.main import get_screenshot
     from singleton_classes.simulation_move_mouse.simulation_move_mouse import get_mouse_simulator
     if value == "o":
-        get_screenshot().start()
-        get_mouse_simulator().run()
-        pass 
+        get_screenshot().start() # 开始截图
+        get_mouse_simulator().run() # 开始鼠标模拟
+        pass  
     elif value == "p":
-        get_screenshot().stop()
-        get_mouse_simulator().stop()
+        get_screenshot().stop() # 停止截图
+        get_mouse_simulator().stop() # 停止鼠标模拟
         pass
     pass
 

@@ -3,7 +3,7 @@ YOLO模型相关的统一接口
 基于PID模型的最佳实践
 """
 
-from typing import Optional, List
+from typing import List
 import numpy as np
 from ultralytics import YOLO
 

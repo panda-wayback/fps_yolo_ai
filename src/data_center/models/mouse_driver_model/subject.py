@@ -14,7 +14,6 @@ class MouseDriverSubject:
     def send_config(
         smoothing: Optional[float] = None,
         fps: Optional[int] = None,
-        running: Optional[bool] = None,
         max_duration: Optional[float] = None,
         decay_rate: Optional[float] = None,
     ):
@@ -24,8 +23,6 @@ class MouseDriverSubject:
         if fps is not None:
             MouseDriverState.get_state().fps.set(fps)
             MouseDriverState.get_state().interval.set(1.0 / fps)
-        if running is not None:
-            MouseDriverState.get_state().running.set(running)
         if max_duration is not None:
             MouseDriverState.get_state().max_duration.set(max_duration)
         if decay_rate is not None:

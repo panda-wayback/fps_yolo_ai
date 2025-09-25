@@ -6,10 +6,10 @@
 """
 
 from PySide6.QtWidgets import QLabel, QProgressBar, QHBoxLayout, QVBoxLayout, QGroupBox
-from PySide6.QtCore import QTimer, Qt
+from PySide6.QtCore import QTimer
 
-from data_center.models.mouse_driver_model.subject import MouseDriverSubject
 from data_center.models.mouse_driver_model.state import MouseDriverState
+from singleton_classes.simulation_move_mouse.simulation_move_mouse import get_mouse_simulator
 
 
 class MouseDriverStateWidget(QGroupBox):
@@ -105,9 +105,10 @@ class MouseDriverStateWidget(QGroupBox):
         """更新状态显示"""
         try:
             state = MouseDriverState.get_state()
+            mouse_simulator = get_mouse_simulator()
             
             # 获取状态值
-            running = state.running.get()
+            running = mouse_simulator.is_running
             fps = state.fps.get()
             smoothing = state.smoothing.get()
             max_duration = state.max_duration.get()

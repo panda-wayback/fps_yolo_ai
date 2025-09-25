@@ -6,7 +6,7 @@
 """
 
 from PySide6.QtWidgets import (QSlider, QLabel, QHBoxLayout, QVBoxLayout, 
-                               QGroupBox, QSpinBox, QPushButton, QWidget, QCheckBox)
+                               QGroupBox, QPushButton, QWidget)
 from PySide6.QtCore import Qt, Signal
 
 from data_center.models.mouse_driver_model.subject import MouseDriverSubject
@@ -87,16 +87,6 @@ class MouseDriverConfigWidget(QGroupBox):
         """初始化UI"""
         layout = QVBoxLayout(self)
         
-        # 运行状态控制
-        control_group = QGroupBox("控制")
-        control_layout = QVBoxLayout(control_group)
-        
-        # 运行开关
-        self.running_checkbox = QCheckBox("启用鼠标驱动")
-        self.running_checkbox.stateChanged.connect(self.on_config_changed)
-        control_layout.addWidget(self.running_checkbox)
-        
-        layout.addWidget(control_group)
         
         # 性能参数
         perf_group = QGroupBox("性能参数")
@@ -119,7 +109,7 @@ class MouseDriverConfigWidget(QGroupBox):
         motion_layout = QVBoxLayout(motion_group)
         
         # 最大持续时间
-        self.max_duration_slider = ParameterSlider("最大持续时间", 0.001, 0.1, 0.05, 0.001, " 秒")
+        self.max_duration_slider = ParameterSlider("最大持续时间", 0.001, 3, 0.05, 0.001, " 秒")
         self.max_duration_slider.value_changed.connect(self.on_config_changed)
         motion_layout.addWidget(self.max_duration_slider)
         
@@ -156,7 +146,6 @@ class MouseDriverConfigWidget(QGroupBox):
         """加载当前配置"""
         try:
             state = MouseDriverState.get_state()
-            self.running_checkbox.setChecked(state.running.get())
             self.fps_slider.set_value(state.fps.get())
             self.smoothing_slider.set_value(state.smoothing.get())
             self.max_duration_slider.set_value(state.max_duration.get())
@@ -175,7 +164,6 @@ class MouseDriverConfigWidget(QGroupBox):
             MouseDriverSubject.send_config(
                 fps=int(self.fps_slider.get_value()),
                 smoothing=self.smoothing_slider.get_value(),
-                running=self.running_checkbox.isChecked(),
                 max_duration=self.max_duration_slider.get_value(),
                 decay_rate=self.decay_rate_slider.get_value()
             )
@@ -189,7 +177,6 @@ class MouseDriverConfigWidget(QGroupBox):
             
     def reset_to_defaults(self):
         """重置为默认值"""
-        self.running_checkbox.setChecked(False)
         self.fps_slider.set_value(1000)
         self.smoothing_slider.set_value(0.4)
         self.max_duration_slider.set_value(0.05)
