@@ -61,8 +61,6 @@ class MouseScreenshot:
         """
         while self._running:
             try:
-                if not InputMonitorState.get_state().is_submit_vector.get():
-                    continue
                 @log_time
                 def capture_screenshot():
                     image = capture_screenshot_bgr(ScreenshotModelState.get_state().region.get())
