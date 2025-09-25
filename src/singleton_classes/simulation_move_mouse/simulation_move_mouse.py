@@ -7,8 +7,6 @@
 import time
 import threading
 from collections import deque
-# 使用PyDirectInput鼠标控制器替代pynput，专门解决Steam游戏兼容性问题
-from pynput.mouse import Controller
 
 from utils.move_mouse.windows_mouse_controller import WindowsMouseController
 
