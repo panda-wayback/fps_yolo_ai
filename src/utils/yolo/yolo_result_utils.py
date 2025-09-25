@@ -66,7 +66,7 @@ def select_best_target(result: Results, reference_vector: Tuple[float, float], s
         
         # 计算距离相似度（归一化到0-1）
         max_distance = math.hypot(w/2, h/2)  # 图片对角线长度作为最大距离
-        distance_similarity = math.hypot(target_vector[0] - reference_vector[0], target_vector[1] - reference_vector[1]) / max_distance
+        distance_similarity = math.hypot(target_vector[0] - reference_vector[0], target_vector[1] - reference_vector[1]) #/ max_distance * 2
         
         # 计算角度相似度（已经归一化到0-1）
         angle_similarity = vector_angle_between_degrees(target_vector, reference_vector) / 180

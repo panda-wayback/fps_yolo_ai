@@ -14,6 +14,6 @@ class InputMonitorModel(BaseState):
 
     # mouse left 点击后多长时间提交向量
     mouse_left_click_time: ReactiveVar[float] = 0.0 # 鼠标左键点击时间
-    mouse_left_click_submit_time: ReactiveVar[float] = 0.5 # 鼠标左键点击后多长时间提交向量
+    mouse_left_click_submit_time: ReactiveVar[float] = 10005.0 # 鼠标左键点击后多长时间提交向量
 
     is_submit_vector: ReactiveVar[bool] = True # 是否提交向量

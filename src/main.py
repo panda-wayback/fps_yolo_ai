@@ -6,6 +6,8 @@ FPS游戏AI辅助主程序 - 最小示例
 import time
 import cv2
 
+from singleton_classes.simulation_move_mouse.simulation_move_mouse import get_mouse_simulator
+
 def init_state():
     from data_center.init_state import init_state
     init_state()
@@ -21,6 +23,7 @@ def load_screenshot():
     from singleton_classes.screenshot_img.main import get_screenshot
     screenshot = get_screenshot()
     screenshot.start()
+    # get_mouse_simulator().run()
     pass
 
 def img_show():

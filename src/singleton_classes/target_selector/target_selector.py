@@ -29,20 +29,24 @@ class TargetSelector:
     
     def target_selector(self, yolo_result: List[Any]) :
         """目标选择器主函数"""
+        try:
+            if not yolo_result or len(yolo_result) == 0:
+                print("❌ yolo_result 为空")
+                return None, None, None, None
+            
+            selected_class_ids = YoloModelState.get_state().selected_class_ids.get() # 选中的类别ID列表
+            reference_vector = (get_mouse_simulator().vx, get_mouse_simulator().vy) # 参考向量
+            
 
-        if not yolo_result:
+            selected_target_point, selected_target_bbox, selected_target_confidence, selected_target_class_id  = select_best_target(
+                yolo_result[0], reference_vector, selected_class_ids
+            )
+
+            print(f"✅ selected_target_point  {selected_target_point} 目标选择器")
+            return selected_target_point, selected_target_bbox, selected_target_confidence, selected_target_class_id    
+        except Exception as e:
+            print(f"❌ 目标选择器失败: {e}")
             return None, None, None, None
-        
-        selected_class_ids = YoloModelState.get_state().selected_class_ids.get() # 选中的类别ID列表
-        reference_vector = (get_mouse_simulator().vx, get_mouse_simulator().vy) # 参考向量
-
-        selected_target_point, selected_target_bbox, selected_target_confidence, selected_target_class_id  = select_best_target(
-            yolo_result[0],selected_class_ids,reference_vector
-        )
-
-        print(f"✅ selected_target_point  {selected_target_point} 目标选择器")
-        return selected_target_point, selected_target_bbox, selected_target_confidence, selected_target_class_id    
-
 
 
 
