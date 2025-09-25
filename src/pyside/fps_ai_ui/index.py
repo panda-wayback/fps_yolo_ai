@@ -73,9 +73,15 @@ def prompt_window(window: QWidget):
         window.move(screen.geometry().x(), screen.geometry().y())
     window.show()
 
+def init_state():
+    from data_center.init_state import init_state
+    init_state()
+    pass
 
 
 def main_window():
+    init_state()
+    
     app = QApplication(sys.argv)
     window = create_basic_window("FPS AI 控制台", 1200, 800)
 

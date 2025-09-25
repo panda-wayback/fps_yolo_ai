@@ -61,7 +61,7 @@ class MouseSimulator:
         # 位移历史记录 
         self.displacement_history = deque(maxlen=1000)  # 存储 (timestamp, dx, dy) 的队列
         self.thread = None
-        self.running = True
+        self.is_running = False
 
 
 
@@ -185,10 +185,10 @@ class MouseSimulator:
         """
         开始移动
         """
-        if self.running:
+        if self.is_running:
             self.stop()
             time.sleep(0.1)
-        self.running = True
+        self.is_running = True
         self.thread = threading.Thread(target=self._driver_loop, daemon=True)
         self.thread.start()
     
@@ -196,7 +196,7 @@ class MouseSimulator:
         """
         停止移动
         """
-        self.running = False
+        self.is_running = False
         if self.thread is not None:
             self.thread.join()
             self.thread = None
