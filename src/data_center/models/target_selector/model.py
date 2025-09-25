@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple,Any
+from typing import List, Tuple,Any
 from data_center.models.base_state import BaseState, ReactiveVar
 
 
@@ -11,9 +11,3 @@ class TargetSelectorModel(BaseState):
     selected_target_confidence: ReactiveVar[float] = None  # 选中目标的置信度
     selected_target_class_id: ReactiveVar[int] = None  # 选中目标的类别ID
     
-    # 配置参数
-    distance_weight: ReactiveVar[float] = 0.7  # 距离权重
-    confidence_weight: ReactiveVar[float] = 0.5  # 置信度权重
-    similarity_weight: ReactiveVar[float] = 0.5  # 相似度权重
-    class_weight: ReactiveVar[float] = 0.5  # 类别权重
-    reference_vector: ReactiveVar[Tuple[float, float]] = None  # 参考向量
