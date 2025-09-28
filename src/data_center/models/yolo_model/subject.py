@@ -5,7 +5,7 @@ YOLO模型相关的统一接口
 
 from typing import List
 import numpy as np
-from ultralytics import YOLO
+from ultralytics.models import YOLO
 
 from data_center.models.yolo_model.state import YoloModelState
 from utils.logger.logger import log_time
@@ -33,7 +33,7 @@ class YoloSubject:
             return
         @log_time
         def yolo_detect():
-            return YoloModelState.get_state().model.get()(img, verbose=False)
+            return YoloModelState.get_state().model.get().track(img, verbose=False,persist=True)
         result = yolo_detect()
         YoloModelState.get_state().yolo_results.set(result)
         YoloModelState.get_state().marked_img.set(result[0].plot())

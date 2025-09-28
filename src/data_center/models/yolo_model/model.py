@@ -1,7 +1,6 @@
 from typing import Any, List, Optional
-from pydantic import ConfigDict
 import numpy as np
-from ultralytics import YOLO
+from ultralytics.models import YOLO
 from data_center.models.base_state import BaseState, ReactiveVar
 
 
