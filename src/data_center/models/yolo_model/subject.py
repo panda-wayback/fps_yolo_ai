@@ -31,9 +31,16 @@ class YoloSubject:
         """发送YOLO检测图片"""
         if img is None:
             return
+        
         @log_time
         def yolo_detect():
-            return YoloModelState.get_state().model.get().track(img, verbose=False,persist=True)
+            classes = YoloModelState.get_state().selected_class_ids.get() if YoloModelState.get_state().selected_class_ids.get() else None
+            return YoloModelState.get_state().model.get().track(
+                img, # 图片
+                verbose=False, # 是否打印详细信息
+                persist=True, # 持久化
+                classes = classes, # 选中的类别ID列表
+                )
         result = yolo_detect()
         YoloModelState.get_state().yolo_results.set(result)
         YoloModelState.get_state().marked_img.set(result[0].plot())
