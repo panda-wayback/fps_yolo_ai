@@ -1,6 +1,6 @@
 import threading
+import time
 from pynput import mouse, keyboard
-
 
 class InputMonitor:
     """输入监控单例类"""
@@ -20,52 +20,22 @@ class InputMonitor:
         if self._initialized:
             return
         
-        self.mouse_listener_thread = None
-        self.keyboard_listener_thread = None
-        self.is_running = False
-        self._initialized = True
-    
-    def start_mouse_listener(self):
-        """启动鼠标监听器"""
         from data_center.models.input_monitor.subject import InputMonitorSubject
-        with mouse.Listener(
+        
+        # 创建并启动监听器（一次性）
+        self.mouse_listener = mouse.Listener(
             on_move=InputMonitorSubject.on_mouse_move,
             on_click=InputMonitorSubject.monitor_mouse_click,
-        ) as listener:
-            listener.join()
-    
-    def start_keyboard_listener(self):
-        """启动键盘监听器"""
-        from data_center.models.input_monitor.subject import InputMonitorSubject
-        with keyboard.Listener(
+        )
+        self.mouse_listener.start()
+        
+        self.keyboard_listener = keyboard.Listener(
             on_press=InputMonitorSubject.monitor_keyboard_press
-        ) as listener:
-            listener.join()
-    
-    def start(self):
-        """启动输入监控"""
-        if self.is_running:
-            print("输入监控已经在运行中")
-            return
+        )
+        self.keyboard_listener.start()
         
-        self.is_running = True
-        
-        # 启动鼠标监听器线程
-        self.mouse_listener_thread = threading.Thread(target=self.start_mouse_listener, daemon=True)
-        self.mouse_listener_thread.start()
-        
-        # 启动键盘监听器线程
-        self.keyboard_listener_thread = threading.Thread(target=self.start_keyboard_listener, daemon=True)
-        self.keyboard_listener_thread.start()
-        
+        self._initialized = True
         print("✅ 输入监控已启动")
-    
-    def stop(self):
-        """停止输入监控"""
-        self.is_running = False
-        self.mouse_listener_thread.join(timeout=1.0)
-        self.keyboard_listener_thread.join(timeout=1.0)
-        print("⏹️ 输入监控已停止")
 
 
 def get_input_monitor() -> InputMonitor:
@@ -76,3 +46,8 @@ def get_input_monitor() -> InputMonitor:
         InputMonitor: 输入监控单例实例
     """
     return InputMonitor()
+
+if __name__ == "__main__":
+    # input_monitor = get_input_monitor()
+    # pass
+    time.sleep(1000)

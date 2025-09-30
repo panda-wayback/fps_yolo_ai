@@ -1,6 +1,3 @@
-from typing import Dict, Tuple
-from typing_extensions import Optional
-from pydantic import ConfigDict
 from data_center.models.base_state import BaseState, ReactiveVar
 
 
@@ -10,7 +7,6 @@ class InputMonitorModel(BaseState):
 
     mouse_right_click_time: ReactiveVar[float] = 0.0 # 鼠标右键点击时间
     keyboard_click_name: ReactiveVar[str] = ReactiveVar("") # 键盘按键名称
-
 
     # mouse left 点击后多长时间提交向量
     mouse_left_click_time: ReactiveVar[float] = 0.0 # 鼠标左键点击时间
