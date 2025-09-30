@@ -1,9 +1,7 @@
 
-import threading
-from pynput import mouse
-from pynput import mouse, keyboard
-
 import time
+from pynput import mouse
+
 from data_center.models.input_monitor.state import InputMonitorState
 from data_center.models.screenshot.subject import ScreenshotSubject
 
@@ -30,30 +28,13 @@ class InputMonitorSubject:
             # 处理特殊按键（如方向键、功能键等）
             key_name = str(key)
             InputMonitorState.get_state().keyboard_click_name.set(key_name)
+            
     @staticmethod
     def on_mouse_move(x, y):
         ScreenshotSubject.send_config(mouse_pos=(x, y))
         pass
 
-
-def start_mouse_listener():
-    with mouse.Listener(
-        on_move=InputMonitorSubject.on_mouse_move,
-        on_click=InputMonitorSubject.monitor_mouse_click,
-        # on_scroll=on_scroll
-        ) as listener:
-        listener.join()
-
-def start_keyboard_listener():
-    with keyboard.Listener(
-        on_press=InputMonitorSubject.monitor_keyboard_press
-        ) as listener:
-        listener.join()
-
-# 启动鼠标监听器线程
-mouse_listener_thread = threading.Thread(target=start_mouse_listener)
-mouse_listener_thread.start()
-
-# 启动键盘监听器线程
-keyboard_listener_thread = threading.Thread(target=start_keyboard_listener)
-keyboard_listener_thread.start()
+    @staticmethod
+    def start_input_monitor_listener():
+        from singleton_classes.input_monitor.main import get_input_monitor
+        get_input_monitor().start()
