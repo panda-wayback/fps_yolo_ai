@@ -1,25 +1,13 @@
-import threading
 import time
 from pynput import mouse, keyboard
+from utils.singleton import singleton
 
+
+@singleton
 class InputMonitor:
     """输入监控单例类"""
     
-    _instance = None
-    _lock = threading.Lock()
-    
-    def __new__(cls):
-        if cls._instance is None:
-            with cls._lock:
-                if cls._instance is None:
-                    cls._instance = super().__new__(cls)
-                    cls._instance._initialized = False
-        return cls._instance
-    
     def __init__(self):
-        if self._initialized:
-            return
-        
         from data_center.models.input_monitor.subject import InputMonitorSubject
         
         # 创建并启动监听器（一次性）
@@ -34,7 +22,6 @@ class InputMonitor:
         )
         self.keyboard_listener.start()
         
-        self._initialized = True
         print("✅ 输入监控已启动")
 
 

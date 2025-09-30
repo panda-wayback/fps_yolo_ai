@@ -1,36 +1,24 @@
 import threading
 import time
 
-from data_center.models.input_monitor.state import InputMonitorState
 from data_center.models.screenshot.state import ScreenshotModelState
 from data_center.models.screenshot.subject import ScreenshotSubject
 from utils.logger.logger import log_time
 from utils.screenshot_tool.mss_screenshot import capture_screenshot_bgr
+from utils.singleton import singleton
 
 
+@singleton
 class MouseScreenshot:
     """
     鼠标区域截图单例类
     内部线程不断截图，外部获取最新截图
     """
-    _instance = None
-    _lock = threading.Lock()
-    
-    def __new__(cls):
-        if cls._instance is None:
-            with cls._lock:
-                if cls._instance is None:
-                    cls._instance = super(MouseScreenshot, cls).__new__(cls)
-                    cls._instance._initialized = False
-        return cls._instance
     
     def __init__(self):
-        if self._initialized:
-            return
         # 线程控制
         self._thread = None
         self._running = False
-        self._initialized = True
     
         
     def start(self):

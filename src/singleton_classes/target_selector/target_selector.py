@@ -5,24 +5,16 @@
 从DataCenter获取数据并处理目标选择
 """
 
-from threading import Lock
 from typing import Any, List
 from data_center.models.yolo_model.state import YoloModelState
 from singleton_classes.simulation_move_mouse.simulation_move_mouse import get_mouse_simulator
 from utils.yolo.yolo_result_utils import select_best_target
+from utils.singleton import singleton
+
+
+@singleton
 class TargetSelector:
     """目标选择器单例类"""
-    
-    _instance = None
-    _lock = Lock()
-    
-    def __new__(cls):
-        if cls._instance is None:
-            with cls._lock:
-                if cls._instance is None:
-                    cls._instance = super().__new__(cls)
-                    cls._instance._initialized = False
-        return cls._instance
     
     def __init__(self):
         pass

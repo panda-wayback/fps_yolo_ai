@@ -9,26 +9,16 @@ import threading
 from collections import deque
 
 from utils.move_mouse.windows_mouse_controller import WindowsMouseController
+from utils.singleton import singleton
 
 
+@singleton
 class MouseSimulator:
     """
     鼠标模拟器单例类
     通过多线程实现高频率的鼠标移动控制，支持平滑移动和残差累积
     使用单例模式确保全局只有一个鼠标控制实例
     """
-    
-    _instance = None
-    _lock = threading.Lock()
-    
-    def __new__(cls):
-        """单例模式实现"""
-        if cls._instance is None:
-            with cls._lock:
-                if cls._instance is None:
-                    cls._instance = super().__new__(cls)
-                    cls._instance._initialized = False
-        return cls._instance
     
     def __init__(self, fps=1000, smoothing=0.4):
         """
@@ -42,9 +32,6 @@ class MouseSimulator:
             在单例模式中，参数只在第一次创建实例时生效
             后续调用时参数会被忽略，返回已存在的实例
         """
-        # 防止重复初始化
-        if self._initialized:
-            return
         self.mouse = WindowsMouseController()
         # 向量执行时间控制
         self.vector_start_time = 0  # 向量开始时间
@@ -62,11 +49,6 @@ class MouseSimulator:
         self.displacement_history = deque(maxlen=1000)  # 存储 (timestamp, dx, dy) 的队列
         self.thread = None
         self.is_running = False
-
-
-
-        # 标记为已初始化
-        self._initialized = True
     
     # 修改配置
     def update_config(self, 

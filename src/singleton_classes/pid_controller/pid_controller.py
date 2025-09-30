@@ -4,29 +4,16 @@
 """
 PID控制器单例类
 """
-from threading import Lock
 from utils.pid.pid import PIDControl
+from utils.singleton import singleton
 
+
+@singleton
 class PIDController:
     """PID控制器单例类"""
     
-    _instance = None
-    _lock = Lock()
-    
-    def __new__(cls):
-        if cls._instance is None:
-            with cls._lock:
-                if cls._instance is None:
-                    cls._instance = super().__new__(cls)
-                    cls._instance._initialized = False
-        return cls._instance
-    
     def __init__(self):
-        if self._initialized:
-            return
         self.pid_control = PIDControl()
-
-        self._initialized = True
     
     def set_pid_parameters(self, 
         kp: float,
