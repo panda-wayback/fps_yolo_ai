@@ -5,7 +5,7 @@ YOLO检测结果话题处理
 
 from typing import List, Any
 
-from utils.logger.logger import get_logger, log_time
+from utils.logger.logger import log_time
 from data_center.models.target_selector.subject import TargetSelectorSubject
 
 
