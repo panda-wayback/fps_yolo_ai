@@ -1,7 +1,7 @@
 
 
 from data_center.index import get_data_center
-from utils.thread.utils import threaded
+from utils.thread.main import threaded
 
 
 class YoloModelState:

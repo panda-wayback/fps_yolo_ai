@@ -1,6 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 import atexit
-from utils.singleton import singleton
+from utils.singleton.main import singleton
 
 @singleton
 class ThreadPoolManager:

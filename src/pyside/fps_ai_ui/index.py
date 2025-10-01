@@ -65,13 +65,17 @@ def get_main_layout():
 
 
 def prompt_window(window: QWidget):
-    """将窗口移动到指定屏幕"""
-    app = QApplication.instance()  # 获取现有的 QApplication 实例
-    screens = app.screens()
-    if len(screens) > 1:
-        screen = screens[1]  # 使用第二个屏幕
-        window.move(screen.geometry().x(), screen.geometry().y())
-    window.show()
+    try:
+        """将窗口移动到指定屏幕"""
+        app = QApplication.instance()  # 获取现有的 QApplication 实例
+        screens = app.screens()
+        if len(screens) > 1:
+            screen = screens[1]  # 使用第二个屏幕
+            window.move(screen.geometry().x(), screen.geometry().y())
+        window.show()
+       
+    except Exception as e:
+        print(f"❌ 将窗口移动到指定屏幕失败: {e}")
 
 def init_state():
     from data_center.init_state import init_state
@@ -80,16 +84,27 @@ def init_state():
 
 
 def main_window():
-    init_state()
-    
+    print("🔧 步骤1: 创建 Qt 应用...")
     app = QApplication(sys.argv)
-    window = create_basic_window("FPS AI 控制台", 1200, 800)
+    print("✅ Qt 应用创建成功")
+    
+    print("🔧 步骤2: 创建窗口...")
+    window = create_basic_window("FPS AI 控制台", 600, 400)
+    print("✅ 窗口创建成功")
 
-    # 将布局直接设置到窗口中
+    print("🔧 步骤3: 创建布局...")
     content_layout = get_main_layout()
     window.setLayout(content_layout)
+    print("✅ 布局设置成功")
 
+    print("🔧 步骤4: 初始化状态...")
+    init_state()
+    print("✅ 初始化状态成功")
+
+    print("🔧 步骤5: 显示窗口...")
     prompt_window(window)
+    print("✅ 窗口显示成功，进入事件循环")
+    
     sys.exit(app.exec())
 
 
