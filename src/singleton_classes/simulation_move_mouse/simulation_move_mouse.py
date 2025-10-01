@@ -9,7 +9,7 @@ import threading
 from collections import deque
 
 from utils.move_mouse.windows_mouse_controller import WindowsMouseController
-from utils.singleton import singleton
+from utils.singleton.main import singleton
 
 
 @singleton

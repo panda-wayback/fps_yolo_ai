@@ -5,7 +5,7 @@
 PID控制器单例类
 """
 from utils.pid.pid import PIDControl
-from utils.singleton import singleton
+from utils.singleton.main import singleton
 
 
 @singleton

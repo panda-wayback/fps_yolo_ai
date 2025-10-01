@@ -9,7 +9,7 @@ from typing import Any, List
 from data_center.models.yolo_model.state import YoloModelState
 from singleton_classes.simulation_move_mouse.simulation_move_mouse import get_mouse_simulator
 from utils.yolo.yolo_result_utils import select_best_target
-from utils.singleton import singleton
+from utils.singleton.main import singleton
 
 
 @singleton

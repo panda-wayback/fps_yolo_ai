@@ -5,7 +5,7 @@ from data_center.models.screenshot.state import ScreenshotModelState
 from data_center.models.screenshot.subject import ScreenshotSubject
 from utils.logger.logger import log_time
 from utils.screenshot_tool.mss_screenshot import capture_screenshot_bgr
-from utils.singleton import singleton
+from utils.singleton.main import singleton
 
 
 @singleton

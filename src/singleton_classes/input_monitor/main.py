@@ -1,6 +1,6 @@
 import time
 from pynput import mouse, keyboard
-from utils.singleton import singleton
+from utils.singleton.main import singleton
 
 
 @singleton
@@ -35,6 +35,6 @@ def get_input_monitor() -> InputMonitor:
     return InputMonitor()
 
 if __name__ == "__main__":
-    # input_monitor = get_input_monitor()
+    input_monitor = get_input_monitor()
     # pass
     time.sleep(1000)
