@@ -55,7 +55,7 @@ def create_screenshot_config():
     fps_time_layout.addWidget(QLabel("FPS:"))
     fps_spinbox = QSpinBox()
     fps_spinbox.setRange(1, 1000)
-    fps_spinbox.setValue(60)  # 默认60FPS
+    fps_spinbox.setValue(1000)  # 默认1000FPS
     fps_time_layout.addWidget(fps_spinbox)
     fps_layout.addLayout(fps_time_layout)
     
