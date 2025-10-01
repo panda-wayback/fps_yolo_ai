@@ -34,7 +34,7 @@ class YoloSubject:
         
         @log_time
         def yolo_detect():
-            classes = YoloModelState.get_state().selected_class_ids.get() if YoloModelState.get_state().selected_class_ids.get() else None
+            classes = YoloModelState.get_state().selected_class_ids.get()
             return YoloModelState.get_state().model.get().track(
                 img, # 图片
                 verbose=False, # 是否打印详细信息
