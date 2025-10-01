@@ -4,3 +4,8 @@
 
 install:
 	pip install -e .
+
+# cloc . --exclude-dir=pyside --include-ext=py
+
+count:
+	cd src && cloc . --exclude-dir=pyside --include-ext=py
