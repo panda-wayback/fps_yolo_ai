@@ -1,7 +1,7 @@
 import time
 import threading
 import ctypes
-from typing import Dict, Set
+from typing import Dict
 from utils.singleton.main import singleton
 from utils.move_mouse.windows_mouse_api import get_cursor_pos
 

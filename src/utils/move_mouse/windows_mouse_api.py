@@ -1,5 +1,5 @@
 import ctypes
-from ctypes import wintypes, Structure, Union
+from ctypes import wintypes
 import win32api
 import win32con
 import sys
