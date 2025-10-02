@@ -45,7 +45,7 @@ class ScreenshotSubject:
         if img is None:
             return
         """发送图片到订阅"""
-        print(f"✅ {time} 发送图片到订阅")
+        # print(f"✅ {time} 发送图片到订阅")
         ScreenshotModelState.get_state().screenshot_img.set(img)
     
 

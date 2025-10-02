@@ -24,7 +24,9 @@ class PIDSubject:
     @staticmethod
     def send_update(vector: tuple[float, float], dt: float = 0.02):
         """发送更新"""
+        print(f"✅ {vector}  {dt}  PIDModel")
         output, error = get_pid_controller().get_vector_pid_res(vector, dt)
+        print(f"✅ {vector}  {output}  {error}  PIDModel")
         PIDModelState.get_state().output.set(output)
         PIDModelState.get_state().error.set(error)
         pass

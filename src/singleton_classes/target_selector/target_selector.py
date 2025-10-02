@@ -5,9 +5,9 @@
 从DataCenter获取数据并处理目标选择
 """
 
-from typing import Any, List
-from data_center.models.yolo_model.state import YoloModelState
-from singleton_classes.simulation_move_mouse.simulation_move_mouse import get_mouse_simulator
+from typing import Any, List, Optional, Tuple
+
+from ultralytics.engine.results import Boxes
 from utils.yolo.yolo_result_utils import select_best_target
 from utils.singleton.main import singleton
 
@@ -17,28 +17,29 @@ class TargetSelector:
     """目标选择器单例类"""
     
     def __init__(self):
+
+        self.selected_target_id = None
         pass
     
-    def target_selector(self, yolo_result: List[Any]) :
+    def target_selector(self, yolo_result: List[Any]) -> Optional[Tuple[Tuple[float, float], Boxes]]:
         """目标选择器主函数"""
+       
         try:
             if not yolo_result or len(yolo_result) == 0:
                 print("❌ yolo_result 为空")
                 return None, None, None, None
-            
-            selected_class_ids = YoloModelState.get_state().selected_class_ids.get() # 选中的类别ID列表
-            reference_vector = (get_mouse_simulator().vx, get_mouse_simulator().vy) # 参考向量
-            
 
-            selected_target_point, selected_target_bbox, selected_target_confidence, selected_target_class_id  = select_best_target(
-                yolo_result[0], reference_vector, selected_class_ids
-            )
+            # 选择最佳目标
+            vector_point, best_box = select_best_target(yolo_result[0], self.selected_target_id)
 
-            print(f"✅ selected_target_point  {selected_target_point} 目标选择器")
-            return selected_target_point, selected_target_bbox, selected_target_confidence, selected_target_class_id    
+            self.selected_target_id = int(best_box.id.item())
+
+
+            print(f"✅ 目标选择器 {vector_point}  {self.selected_target_id} ")
+            return vector_point, best_box    
         except Exception as e:
             print(f"❌ 目标选择器失败: {e}")
-            return None, None, None, None
+            return None, None
 
 
 

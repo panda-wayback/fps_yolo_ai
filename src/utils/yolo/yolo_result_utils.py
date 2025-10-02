@@ -2,8 +2,7 @@ from typing import List, Optional, Tuple
 import math
 from ultralytics.engine.results import Boxes, Results
 
-
-def select_best_target_bf(result: Results) -> Optional[Boxes]:
+def select_best_by_center_target(result: Results) -> Optional[Boxes]:
     """
     选择离图片中心最近的目标框
     
@@ -31,7 +30,7 @@ def select_best_target_bf(result: Results) -> Optional[Boxes]:
 
 
 
-def select_best_target(result: Results, selected_class_ids: Optional[List[int]] = None) -> Optional[Tuple[Tuple[float, float], Tuple[float, float, float, float], float, int]]:
+def select_best_target(result: Results, selected_target_id: Optional[int] = None) -> Optional[Tuple[Tuple[float, float], Boxes]]:
     """
     选择与参考向量最相似的目标，返回中心点、边界框、置信度、类别ID
 
@@ -46,13 +45,7 @@ def select_best_target(result: Results, selected_class_ids: Optional[List[int]] 
     boxes = result.boxes
     if boxes is None or len(boxes) == 0:
         return None, None, None, None
-
-    # 过滤类别
-    if selected_class_ids:
-        boxes = [box for box in boxes if int(box.cls.item()) in selected_class_ids]
-        if not boxes:
-            return None, None, None, None
-
+    
     h, w = result.orig_shape
     center_x, center_y = w / 2, h / 2
 
@@ -60,9 +53,17 @@ def select_best_target(result: Results, selected_class_ids: Optional[List[int]] 
         x1, y1, x2, y2 = box.xyxy[0].tolist()
         bx, by = (x1 + x2) / 2, (y1 + y2) / 2
         return math.hypot(bx - center_x, by - center_y)
-
+    
+    def get_box_by_id(boxes: Boxes, id: int):
+        ids = boxes.id.cpu().numpy().astype(int).tolist()
+        if id in ids:
+            idx = ids.index(id)
+            return boxes[idx]
+        return None
+    
     # 找到最近的 box
-    best_box: Boxes = min(boxes, key=distance_to_center)
+    best_box: Boxes = get_box_by_id(boxes, selected_target_id) or min(boxes, key=distance_to_center)
+
 
     # 解析信息
     x1, y1, x2, y2 = best_box.xyxy[0].tolist()
@@ -70,7 +71,6 @@ def select_best_target(result: Results, selected_class_ids: Optional[List[int]] 
     # 计算目标中心点到图片中心的向量
     vector_x = cx - center_x
     vector_y = cy - center_y
-    conf = float(best_box.conf.item())
-    cls_id = int(best_box.cls.item())
 
-    return ( (vector_x, vector_y), (x1, y1, x2, y2), conf, cls_id )
+
+    return ( (vector_x, vector_y), best_box )
