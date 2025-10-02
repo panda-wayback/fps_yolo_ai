@@ -10,6 +10,8 @@ simple-pid>=1.0.4
 ultralytics>=8.0.0
 torch>=1.9.0
 torchvision>=0.10.0
+onnx>=1.19.0          # ONNX 模型支持
+onnxruntime>=1.23.0   # ONNX Runtime 推理引擎（CPU）
 
 # PySide6 GUI 框架
 PySide6>=6.0.0

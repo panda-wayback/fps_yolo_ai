@@ -54,7 +54,7 @@ class YoloSubject:
 if __name__ == "__main__":
     # 测试用例
     from data_center.models.yolo_model.subject import YoloSubject
-    YoloSubject.send_model_path("runs/aimlab_fast/weights/best.pt")
+    YoloSubject.send_model_path("CFV8S_640_SELL.onnx")
     print(YoloModelState.get_state().model.get().names)
     YoloSubject.send_detect(np.zeros((300, 400, 3), dtype=np.uint8))
     YoloSubject.send_selected_class_ids([0])

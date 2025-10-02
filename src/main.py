@@ -14,7 +14,8 @@ def init_state():
 
 def load_yolo_model():
     from data_center.models.yolo_model.subject import YoloSubject
-    YoloSubject.send_model_path("aimlabs.pt")
+    # 支持 .pt, .onnx, .engine 格式
+    YoloSubject.send_model_path("CFV8S_640_SELL.onnx")
     pass
 
 def load_screenshot():

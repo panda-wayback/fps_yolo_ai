@@ -16,6 +16,7 @@ class InputMonitorSubject:
                 InputMonitorState.get_state().mouse_left_click_time.set(time.time())
             elif button == "right":
                 InputMonitorState.get_state().mouse_right_click_time.set(time.time())
+                InputMonitorState.get_state().mouse_left_click_time.set(time.time())
     
     # 监听键盘按键
     @staticmethod
