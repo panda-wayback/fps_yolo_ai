@@ -10,7 +10,7 @@ class MouseDriverModel(BaseState):
     smoothing: ReactiveVar[float] = 0.4          # 平滑系数
     fps: ReactiveVar[int] = 1000                 # 帧率
     interval: ReactiveVar[float] = 0.001          # 间隔
-    max_duration: ReactiveVar[float] = 0.01      # 单个向量最大执行时间
+    max_duration: ReactiveVar[float] = 0.1      # 单个向量最大执行时间
     decay_rate: ReactiveVar[float] = 0.95        # 减速系数
 
     # 鼠标向量
