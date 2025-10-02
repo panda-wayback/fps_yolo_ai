@@ -4,9 +4,9 @@
 
 
 def listen_keyboard_to_start_screenshot(value):
-    print(f"键盘按键: {value}")
     from singleton_classes.screenshot_img.main import get_screenshot
     from singleton_classes.simulation_move_mouse.simulation_move_mouse import get_mouse_simulator
+    value = str(value).lower()
     if value == "o":
         get_screenshot().start() # 开始截图
         get_mouse_simulator().run() # 开始鼠标模拟

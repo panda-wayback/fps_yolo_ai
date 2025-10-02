@@ -1,42 +1,36 @@
 import ctypes
 from ctypes import wintypes, Structure, Union
+import win32api
+import win32con
+import sys
 
-# 定义结构体
-class MOUSEINPUT(Structure):
-    _fields_ = [
-        ("dx", wintypes.LONG),        # 相对移动X
-        ("dy", wintypes.LONG),        # 相对移动Y  
-        ("mouseData", wintypes.DWORD),
-        ("dwFlags", wintypes.DWORD),  # 事件标志
-        ("time", wintypes.DWORD),
-        ("dwExtraInfo", ctypes.POINTER(ctypes.c_ulong))
-    ]
 
-class INPUT(Structure):
-    class _INPUT(Union):
-        _fields_ = [("mi", MOUSEINPUT)]
-    _fields_ = [
-        ("type", wintypes.DWORD),
-        ("_input", _INPUT)
-    ]
+def is_admin():
+    """检查是否以管理员权限运行"""
+    try:
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    except:
+        return False
 
-# 常量
-INPUT_MOUSE = 0
-MOUSEEVENTF_MOVE = 0x0001
 
-def relative_move_sendinput(dx, dy):
-    """使用 SendInput 进行相对移动（推荐）"""
-    mouse_input = MOUSEINPUT()
-    mouse_input.dx = dx
-    mouse_input.dy = dy
-    mouse_input.dwFlags = MOUSEEVENTF_MOVE
+def run_as_admin():
+    """请求以管理员权限重新运行当前脚本"""
+    if not is_admin():
+        print("⚠️ 当前没有管理员权限，正在请求提升权限...")
+        # 重新以管理员权限运行
+        ctypes.windll.shell32.ShellExecuteW(
+            None, "runas", sys.executable, " ".join(sys.argv), None, 1
+        )
+
+# ==================== 鼠标相对移动 ====================
+def relative_move(dx, dy):
+    """
+    使用 win32api.mouse_event 进行相对移动
     
-    input_struct = INPUT()
-    input_struct.type = INPUT_MOUSE
-    input_struct._input.mi = mouse_input
-    
-    # 发送输入
-    ctypes.windll.user32.SendInput(1, ctypes.byref(input_struct), ctypes.sizeof(INPUT))
+    这是最底层的 Windows API，游戏兼容性最好
+    需要管理员权限才能控制游戏
+    """
+    win32api.mouse_event(win32con.MOUSEEVENTF_MOVE, dx, dy, 0, 0)
 
 
 def get_cursor_pos():
@@ -47,20 +41,3 @@ def get_cursor_pos():
     point = POINT()
     ctypes.windll.user32.GetCursorPos(ctypes.byref(point))
     return (point.x, point.y)
-
-if __name__ == '__main__':
-    mouse_pos = get_cursor_pos()
-    print(mouse_pos)
-
-
-
-# 在需要的地方调用
-# mouse_pos = get_cursor_pos()
-# # 持续移动5秒，每次移动1个像素
-# import time
-
-# time.sleep(5)
-# start_time = time.time()
-# while time.time() - start_time < 5:
-#     relative_move_sendinput(1, 0)  # 每次向右移动1个像素
-#     time.sleep(0.01)  # 控制移动速度，1ms一次（可根据需要调整）

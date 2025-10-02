@@ -179,7 +179,7 @@ class PIDConfigWidget(QGroupBox):
             kd = self.kd_slider.get_value()
             
             # 应用PID参数
-            PIDSubject.set_pid_parameters(kp, ki, kd)
+            PIDSubject.send_config(kp, ki, kd)
             
             self._update_status("设置已应用")
         except Exception as e:
