@@ -2,8 +2,6 @@
 鼠标向量话题处理
 基于PID模型的最佳实践
 """
-
-import time
 from data_center.models.input_monitor.state import InputMonitorState
 from singleton_classes.simulation_move_mouse.simulation_move_mouse import get_mouse_simulator
 
