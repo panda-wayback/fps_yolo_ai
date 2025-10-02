@@ -39,6 +39,23 @@ def relative_move_sendinput(dx, dy):
     ctypes.windll.user32.SendInput(1, ctypes.byref(input_struct), ctypes.sizeof(INPUT))
 
 
+def get_cursor_pos():
+    """获取当前鼠标位置"""
+    class POINT(ctypes.Structure):
+        _fields_ = [("x", wintypes.LONG), ("y", wintypes.LONG)]
+    
+    point = POINT()
+    ctypes.windll.user32.GetCursorPos(ctypes.byref(point))
+    return (point.x, point.y)
+
+if __name__ == '__main__':
+    mouse_pos = get_cursor_pos()
+    print(mouse_pos)
+
+
+
+# 在需要的地方调用
+# mouse_pos = get_cursor_pos()
 # # 持续移动5秒，每次移动1个像素
 # import time
 

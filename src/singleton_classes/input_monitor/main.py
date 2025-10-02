@@ -21,7 +21,6 @@ class InputMonitor:
             on_press=InputMonitorSubject.monitor_keyboard_press
         )
         self.keyboard_listener.start()
-        
         print("✅ 输入监控已启动")
 
 

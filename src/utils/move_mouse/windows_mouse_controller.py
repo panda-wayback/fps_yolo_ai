@@ -7,3 +7,4 @@ class WindowsMouseController:
     
     def move(self, dx: int, dy: int):
         relative_move_sendinput(dx, dy)
+

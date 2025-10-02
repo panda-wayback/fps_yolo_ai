@@ -21,6 +21,7 @@ class InputMonitorSubject:
     @staticmethod
     def monitor_keyboard_press(key):
         """监控键盘按键"""
+        print(f"键盘按键: {key}")
         try:
             # 获取按键名称
             key_name = key.char if hasattr(key, 'char') and key.char else str(key)
@@ -33,5 +34,6 @@ class InputMonitorSubject:
     # 监听鼠标移动
     @staticmethod
     def on_mouse_move(x, y):
+        print(f"鼠标移动: {x}, {y}")
         ScreenshotSubject.send_config(mouse_pos=(x, y))
         pass
