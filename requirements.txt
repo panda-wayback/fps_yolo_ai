@@ -18,7 +18,7 @@ PySide6>=6.0.0
 
 # 游戏输入控制
 pydirectinput>=1.0.4
-pywin32>=306  # Windows API 底层访问（最佳游戏兼容性）
+pywin32>=306; platform_system=="Windows"  # Windows API 底层访问（最佳游戏兼容性，仅 Windows）
 
 # 数据处理
 pydantic>=2.0.0

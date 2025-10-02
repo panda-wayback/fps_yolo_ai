@@ -16,7 +16,7 @@ class YoloSubject:
     def send_model_path(model_path: str):
         """发送YOLO模型路径"""
         YoloModelState.get_state().model_path.set(model_path)
-        model = YOLO(model_path)
+        model = YOLO(model_path, task='detect')  # 明确指定任务类型为检测
         YoloModelState.get_state().model.set(model)
 
         # 设置模型类别信息
