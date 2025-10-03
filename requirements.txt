@@ -22,6 +22,7 @@ pywin32>=306; platform_system=="Windows"  # Windows API 底层访问（最佳游
 
 # 数据处理
 pydantic>=2.0.0
+filterpy>=1.4.5  # 卡尔曼滤波
 
 # 图像处理
 Pillow>=8.0.0

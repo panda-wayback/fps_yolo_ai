@@ -1,3 +1,4 @@
+from typing import Optional, Tuple
 import numpy as np
 from filterpy.kalman import KalmanFilter
 import time
@@ -39,7 +40,7 @@ def make_kf(dt=1/120.0, q_pos=1.0, q_vel=10.0, r_meas=4.0, history_time=0.5):
 # 使用示例（每帧调用）
 kf = make_kf(dt=1/120.0, history_time=0.5)  # 只保留0.5秒历史
 
-def frame_step(mouse_delta_pixels, detection, dt=1/120.0, lead_time=0.2):
+def frame_step(mouse_delta_pixels: Tuple[float, float], detection: Optional[Tuple[float, float]] = None, dt: float = 1/50.0, lead_time: float = 0.4):
     """
     每帧调用卡尔曼滤波，自动清除超过0.5秒的历史
     
@@ -78,6 +79,7 @@ def frame_step(mouse_delta_pixels, detection, dt=1/120.0, lead_time=0.2):
     v = kf.x[2:4]
     predicted_point = p + v * lead_time
     
-    return predicted_point, p, v
+    # return predicted_point, p, v
+    return predicted_point
 
 # 返回值： predicted_point（前瞻位置），p（当前估计相对位置），v（估计速度）
