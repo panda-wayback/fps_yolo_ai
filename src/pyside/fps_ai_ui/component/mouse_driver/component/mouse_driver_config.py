@@ -109,7 +109,7 @@ class MouseDriverConfigWidget(QGroupBox):
         motion_layout = QVBoxLayout(motion_group)
         
         # 最大持续时间
-        self.max_duration_slider = ParameterSlider("最大持续时间", 0.001, 3, 0.05, 0.001, " 秒")
+        self.max_duration_slider = ParameterSlider("最大持续时间", 0.001, 0.2, 0.05, 0.001, " 秒")
         self.max_duration_slider.value_changed.connect(self.on_config_changed)
         motion_layout.addWidget(self.max_duration_slider)
         

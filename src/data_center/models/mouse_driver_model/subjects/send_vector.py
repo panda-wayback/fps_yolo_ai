@@ -13,7 +13,7 @@ def submit_vector(vector: tuple[float, float]):
         current_time = time.time()
         max_submit_time = InputMonitorState.get_state().mouse_left_click_submit_time.get()  + InputMonitorState.get_state().mouse_left_click_time.get()
         print(f"current_time: {current_time}, max_submit_time: {max_submit_time}  {current_time > max_submit_time}")
-        if current_time > max_submit_time:
+        if current_time > max_submit_time or not InputMonitorState.get_state().is_submit_vector.get():
             return
         get_mouse_simulator().submit_vector(vector)
     except Exception as e:

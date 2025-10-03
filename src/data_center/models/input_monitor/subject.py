@@ -9,14 +9,17 @@ class InputMonitorSubject:
     @staticmethod
     # 监听鼠标点击
     def monitor_mouse_click(x, y, button, pressed):
-        # print(f"鼠标点击: {button} {pressed}, 时间: {time.time()}")
+        print(f"鼠标点击: {button} {pressed}, 时间: {time.time()}")
         if pressed:
+            InputMonitorState.get_state().is_submit_vector.set(True)
             # button 现在是字符串类型: "left" 或 "right"
             if button == "left":
                 InputMonitorState.get_state().mouse_left_click_time.set(time.time())
             elif button == "right":
                 InputMonitorState.get_state().mouse_right_click_time.set(time.time())
                 InputMonitorState.get_state().mouse_left_click_time.set(time.time())
+        else:
+            InputMonitorState.get_state().is_submit_vector.set(False)
     
     # 监听键盘按键
     @staticmethod
