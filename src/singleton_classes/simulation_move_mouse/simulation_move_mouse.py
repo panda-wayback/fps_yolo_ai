@@ -7,6 +7,7 @@
 import time
 import threading
 from collections import deque
+from typing import Tuple
 
 from utils.move_mouse.windows_mouse_controller import WindowsMouseController
 from utils.singleton.main import singleton
@@ -185,7 +186,7 @@ class MouseSimulator:
             self.thread = None
     
     # 获取位移的累计值
-    def get_displacement_history(self, seconds_back=0.02):
+    def get_displacement_history(self, seconds_back=0.02) -> Tuple[float, float]:
         """
         获取位移的累计值
         """
@@ -200,7 +201,7 @@ class MouseSimulator:
                 total_dx += dx
                 total_dy += dy
         
-        return total_dx, total_dy
+        return (total_dx, total_dy)
 
 
 mouse_simulator = MouseSimulator()
