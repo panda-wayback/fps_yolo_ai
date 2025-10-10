@@ -6,7 +6,7 @@
 import time
 import threading
 
-from utils.controllers.adrc.ladrc import LADRCPresets
+from utils.controllers.adrc.ladrc import LADRCController, LADRCPresets
 
 class BallMovement:
     """
@@ -94,19 +94,24 @@ class BallMovement:
 def test1():
     ball1 = BallMovement()
     ball1.start()
-    ball1_speed = 1000
+    ball1_speed = 1200
     ball2 = BallMovement()
     ball2.start()
-    controller = LADRCPresets.balanced()
-    dt = 0.01
+    controller = LADRCController(
+        w_cl = 60,
+        k_eso= 2.5,
+    )
+    dt = 0.020
     start_time = time.time()
     test_duration = 0.6  # 监控10秒
     count = 0
+    # ball1.submit_vector(ball1_speed)
+    # time.sleep(dt)
     while time.time() - start_time < test_duration:
-        count += 1
+        count += dt
         error = ball1.current - ball2.current
         output = controller.compute(error)
-        print(f"{count} | ball1.current: {ball1.current:.1f} | ball2.current: {ball2.current:.1f} | error: {error:.1f} | output: {output:.1f}")
+        print(f"{count:.2f} | ball1.current: {ball1.current:.1f} | ball2.current: {ball2.current:.1f} | error: {error:.1f} | output: {output:.1f}")
         ball2.submit_vector(output)
         ball1.submit_vector(ball1_speed)
         # 控制器以100Hz运行
