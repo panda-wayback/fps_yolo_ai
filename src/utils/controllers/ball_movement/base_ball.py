@@ -99,9 +99,9 @@ def test1():
     ball2.start()
     controller = LADRCController(
         w_cl = 60,
-        k_eso= 2.5,
+        k_eso= 2.55,
     )
-    dt = 0.020
+    dt = 0.045
     start_time = time.time()
     test_duration = 0.6  # 监控10秒
     count = 0
