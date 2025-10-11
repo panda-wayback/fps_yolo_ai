@@ -6,7 +6,7 @@
 import time
 import threading
 
-from utils.controllers.adrc.ladrc import LADRCController, LADRCPresets
+from utils.controllers.adrc.ladrc import LADRCController
 
 class BallMovement:
     """
