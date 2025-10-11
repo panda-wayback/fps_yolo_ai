@@ -29,11 +29,17 @@ def capture_screenshot(region: Optional[Tuple[int, int, int, int]] = None) -> np
     # 使用全局的mss对象，避免重复创建
     if region is None:
         # 如果没有指定区域，截取整个屏幕
-        monitor = _sct.monitors[0]  # monitors[0]是所有显示器的组合，monitors[1]是主显示器
+        monitor = _sct.monitors[1]  # monitors[0]是所有显示器的组合，monitors[1]是主显示器
     else:
         # # 使用指定的区域
         # left, top, width, height = region
-        monitor = region
+        left, top, width, height = region
+        monitor = {
+            "top": top,
+            "left": left,
+            "width": width,
+            "height": height
+        }
     # 执行截图
     screenshot = _sct.grab(monitor)
     
@@ -42,8 +48,7 @@ def capture_screenshot(region: Optional[Tuple[int, int, int, int]] = None) -> np
 
 
 
-def capture_screenshot_bgr(region: Optional[Tuple[int, int, int, int]] = 
-    (0, 0, 20, 20 )
+def capture_screenshot_bgr(region: Optional[Tuple[int, int, int, int]] = None
         ) -> np.ndarray:
     """
     使用MSS库进行屏幕截图，返回BGR格式的numpy数组
