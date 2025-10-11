@@ -47,24 +47,25 @@ class MouseScreenshot:
         """
         截图循环
         """
+        @log_time
+        def capture_screenshot():
+            image = capture_screenshot_bgr(
+                region=ScreenshotModelState.get_state().region.get()
+                # region = (0, 0, 200, 200)
+            )
+            return image
+        
+        @log_time
+        def send_image():
+            ScreenshotSubject.send_image(image,time.time())
         while self._running:
             try:
-                last_time = time.time()
-                image = capture_screenshot_bgr(
-                    # region=ScreenshotModelState.get_state().region.get()
-                    region = (0, 0, 200, 200)
-                )
-                print(f"截图耗时: {(time.time() - last_time)*1000:.2f} ms")
-                @log_time
-                def send_image():
-                    ScreenshotSubject.send_image(image,time.time())
-                send_image()
 
-            
+                image = capture_screenshot()
+                send_image()
             except Exception as e:
                 print(f"截图错误: {e}")
             time.sleep(ScreenshotModelState.get_state().interval.get())
-            # time.sleep(1)
 
 _screenshot = MouseScreenshot()
 

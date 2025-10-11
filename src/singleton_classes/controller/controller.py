@@ -8,7 +8,6 @@ from typing import Optional, Tuple
 from utils.controllers.adrc.ladrc import LADRCController
 from utils.singleton.main import singleton
 
-
 @singleton
 class Controller:
     """PID控制器单例类"""
@@ -30,11 +29,12 @@ class Controller:
         self.x_controller.set_config(order, sample_time, b0, w_cl, k_eso, output_limits, rate_limits)
         self.y_controller.set_config(order, sample_time, b0, w_cl, k_eso, output_limits, rate_limits)
 
-    def get_vector_pid_res(self, vector: tuple[float, float], dt=0.02) -> tuple[tuple[float, float], tuple[float, float]]:
+    def compute(self, vector: tuple[float, float], dt=0.02) -> tuple[tuple[float, float], tuple[float, float]]:
         """获取PID控制器输出"""
         try:
             error_x, error_y = vector
-            x_output, y_output = self.pid_control.update(error_x, error_y, dt)
+            x_output = self.x_controller.compute(error_x)
+            y_output = self.y_controller.compute(error_y)
             return (x_output, y_output), (error_x, error_y)
         except Exception as e:
             print(f"获取PID控制器输出失败: {e}")

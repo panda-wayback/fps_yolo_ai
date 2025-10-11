@@ -3,7 +3,6 @@ from typing import List, Any
 from data_center.models.target_selector.state import TargetSelectorState
 from singleton_classes.target_selector.target_selector import get_target_selector
 
-
 def send_yolo_results(yolo_results: List[Any]):
     if not yolo_results:
         return

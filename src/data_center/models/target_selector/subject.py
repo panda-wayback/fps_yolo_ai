@@ -3,7 +3,7 @@
 基于PID模型的最佳实践
 """
 
-from typing import Any, List, Optional, Tuple
+from typing import Any, List
 from data_center.models.target_selector.state import TargetSelectorState
 
 class TargetSelectorSubject:
