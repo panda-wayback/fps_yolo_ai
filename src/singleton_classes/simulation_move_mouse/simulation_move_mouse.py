@@ -117,7 +117,6 @@ class MouseSimulator:
         
         # 主控制循环
         while self.is_running:
-            print(f"✅ 正在移动鼠标: vx={self.vx}, vy={self.vy}")
             # print(f"✅ 正在移动鼠标: vx={self.vx}, vy={self.vy}")
             # 检查向量执行时间是否超过最大持续时间
             if time.time() - self.vector_start_time > self.max_duration:

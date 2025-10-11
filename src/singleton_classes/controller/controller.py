@@ -4,6 +4,7 @@
 """
 PID控制器单例类
 """
+import time
 from typing import Optional, Tuple
 from utils.controllers.adrc.ladrc import LADRCController
 from utils.singleton.main import singleton
@@ -15,6 +16,8 @@ class Controller:
     def __init__(self):
         self.x_controller = LADRCController()
         self.y_controller = LADRCController()
+        self.target_id = 0
+        self.reset_time = time.time()
         
     
     def set_config(self, 
@@ -57,16 +60,31 @@ class Controller:
             rate_limits=rate_limits
         )
 
-    def compute(self, vector: tuple[float, float], dt=0.02) -> tuple[tuple[float, float], tuple[float, float]]:
+    def compute(self, vector: tuple[float, float]) -> tuple[float, float]:
         """获取PID控制器输出"""
         try:
-            error_x, error_y = vector
-            x_output = self.x_controller.compute(error_x)
-            y_output = self.y_controller.compute(error_y)
-            return (x_output, y_output), (error_x, error_y)
+            x_output = self.x_controller.compute(vector[0])
+            y_output = self.y_controller.compute(vector[1])
+            return (x_output, y_output)
         except Exception as e:
             print(f"获取PID控制器输出失败: {e}")
-            return (0.0, 0.0), (0.0, 0.0)
+            return (0.0, 0.0)
+        
+    def reset(self):
+        """重置控制器"""
+        self.x_controller.reset()
+        self.y_controller.reset()
+        
+    def update_target_id(self, target_id: int):
+        """更新目标ID"""
+        
+        if self.target_id == target_id and time.time() - self.reset_time < 0.5:
+            return
+
+        print(f"✅ 更新目标ID: {target_id}")
+        self.reset_time = time.time()
+        self.target_id = target_id
+        self.reset()
 
 # 全局单例实例
 _controller = Controller()

@@ -37,5 +37,4 @@ class InputMonitorSubject:
     @staticmethod
     def on_mouse_move(x, y):
         ScreenshotSubject.send_config(mouse_pos=(x, y))
-        print(f"鼠标移动: {x}, {y}")
         pass

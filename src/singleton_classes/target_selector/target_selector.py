@@ -21,13 +21,13 @@ class TargetSelector:
         self.selected_target_id = None
         pass
     
-    def target_selector(self, yolo_result: List[Any]) -> Optional[Tuple[Tuple[float, float], Boxes]]:
+    def target_selector(self, yolo_result: List[Any]) -> Optional[Tuple[Tuple[float, float], Boxes, int]]:
         """目标选择器主函数"""
        
         try:
             if not yolo_result or len(yolo_result) == 0:
                 print("❌ yolo_result 为空")
-                return None, None, None, None
+                return None, None, None
 
             # 选择最佳目标
             vector_point, best_box = select_best_target(yolo_result[0], self.selected_target_id)
@@ -36,10 +36,10 @@ class TargetSelector:
 
 
             print(f"✅ 目标选择器 {vector_point}  {self.selected_target_id} ")
-            return vector_point, best_box    
+            return vector_point, best_box, self.selected_target_id    
         except Exception as e:
             print(f"❌ 目标选择器失败: {e}")
-            return None, None
+            return None, None, None
 
 
 

@@ -26,13 +26,19 @@ class ControllerSubject:
         get_controller().set_config(order=order, sample_time=sample_time, b0=b0, w_cl=w_cl, k_eso=k_eso, output_limits=output_limits, rate_limits=rate_limits)
 
     @staticmethod
-    def compute(vector: tuple[float, float], dt: float = 0.02):
+    def compute(vector: tuple[float, float]):
         """发送更新"""
-        output, error = get_controller().compute(vector, dt)
-        get_logger().info(f"✅ {vector}  {output}  {error}  ControllerModel")
+        output = get_controller().compute(vector)
+        get_logger().info(f"✅ {vector}  {output}  ControllerModel")
         ControllerModelState.get_state().output.set(output)
-        ControllerModelState.get_state().error.set(error)
+        ControllerModelState.get_state().error.set(vector)
         pass
+
+    @staticmethod
+    def update_target_id(target_id: int):
+        """更新目标ID"""
+        get_controller().update_target_id(target_id)
+
 
 
 if __name__ == "__main__":

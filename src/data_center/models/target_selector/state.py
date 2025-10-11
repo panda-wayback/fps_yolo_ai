@@ -20,8 +20,10 @@ class TargetSelectorState:
         from data_center.models.target_selector.subscribes.send_yolo_results import send_yolo_results
         TargetSelectorState.get_state().yolo_results.subscribe(send_yolo_results)
         
-        from data_center.models.controller_model.subject import   ControllerSubject
-        ControllerSubject.compute(TargetSelectorState.get_state().selected_target_point.get())
+        from data_center.models.controller_model.subject import  ControllerSubject
+        TargetSelectorState.get_state().selected_target_point.subscribe(ControllerSubject.compute)
 
+        from data_center.models.controller_model.subject import  ControllerSubject
+        TargetSelectorState.get_state().selected_target_id.subscribe(ControllerSubject.update_target_id)
 
         pass

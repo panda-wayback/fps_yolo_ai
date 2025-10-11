@@ -56,10 +56,10 @@ class LADRCController:
         self,
         order: int = 1,
         sample_time: float = 0.01,
-        b0: float = 1.0,
-        w_cl: float = 60.0,
+        b0: float = 0.5,
+        w_cl: float = 10.0,
         k_eso: float = 2.5,
-        output_limits: Optional[Tuple[float, float]] = None,
+        output_limits: Optional[Tuple[float, float]] = (-2000, 2000),
         rate_limits: Optional[Tuple[float, float]] = None
     ):
         """
@@ -100,16 +100,21 @@ class LADRCController:
             k_eso: float, default=2.5
                 观测器带宽倍数
                 观测器带宽 = k_eso × w_cl
-                决定扰动估计的速度
+                决定扰动估计的速度（不是主要响应速度！）
+                
+                ⚠️ 重要提示：
+                - 如果跟踪太慢、追不上目标 → 应该增大 w_cl，而不是 k_eso！
+                - k_eso 只影响对扰动的反应速度
+                
                 调整建议：
-                - 跟踪扰动太慢 → 增大 (如 3.0-3.5)
+                - 对扰动反应慢 → 增大 (如 3.0-3.5)
                 - 对噪声敏感、抖动 → 减小 (如 2.0)
                 - 推荐范围: 2.0-3.0
                 - ⚠️ 不要超过 4.0
             
-            output_limits: Optional[Tuple[float, float]], default=None
+            output_limits: Optional[Tuple[float, float]], default=(-4000, 4000)
                 输出幅值限制 (min, max)
-                例如: (-1000, 1000)
+                默认限制在 -4000 到 4000 之间
             
             rate_limits: Optional[Tuple[float, float]], default=None
                 输出变化率限制 (min_rate, max_rate)
@@ -129,6 +134,8 @@ class LADRCController:
         self.b0 = b0
         self.w_cl = w_cl
         self.k_eso = k_eso
+        self.output_limits = output_limits
+        self.rate_limits = rate_limits
         
         # 转换限制格式
         m_lim = output_limits if output_limits else (None, None)
@@ -189,8 +196,8 @@ class LADRCController:
         - 系统重启
         """
         # 重新创建控制器实例
-        m_lim = self.controller.m_lim
-        r_lim = self.controller.r_lim
+        m_lim = self.output_limits if self.output_limits else (None, None)
+        r_lim = self.rate_limits if self.rate_limits else (None, None)
         
         self.controller = FeedbackTF(
             order=self.order,
@@ -247,6 +254,12 @@ class LADRCController:
         if rate_limits is not ...:
             self.rate_limits = rate_limits
         
+        # 重新计算理论稳定时间
+        if self.order == 1:
+            self.settling_time = 4.0 / self.w_cl
+        else:
+            self.settling_time = 6.0 / self.w_cl
+        
         # 重置控制器，应用新配置
         self.reset()
 
@@ -267,8 +280,8 @@ class LADRCController:
             "k_eso": self.k_eso,
             "observer_bandwidth": self.k_eso * self.w_cl,
             "settling_time": self.settling_time,
-            "output_limits": self.controller.m_lim,
-            "rate_limits": self.controller.r_lim,
+            "output_limits": self.output_limits,
+            "rate_limits": self.rate_limits,
         }
     
     def print_info(self):
@@ -365,6 +378,46 @@ class LADRCPresets:
             w_cl=60.0,
             k_eso=2.5
         )
+
+
+# ============================================================================
+# 调试指南 - 参数调整策略
+# ============================================================================
+
+"""
+🔧 LADRC 参数调试指南
+
+【问题 1】跟踪太慢，一直追不上目标
+    症状：误差一直很大，响应迟钝
+    解决：✅ 增大 w_cl (如 60 → 80 → 100)
+         ❌ 不要增大 k_eso（这不会提高响应速度！）
+    
+【问题 2】震荡、不稳定、来回抖动
+    症状：围绕目标震荡，无法稳定
+    解决：✅ 减小 w_cl (如 60 → 50 → 40)
+         ✅ 减小 k_eso (如 2.5 → 2.0)
+    
+【问题 3】误差能减小但消除得很慢
+    症状：能跟上，但总有残余误差
+    解决：✅ 减小 b0 (如 1.0 → 0.8 → 0.6)
+         说明系统增益估计偏大
+    
+【问题 4】对扰动反应慢（如突然的外力）
+    症状：基本跟踪正常，但遇到扰动反应慢
+    解决：✅ 增大 k_eso (如 2.5 → 3.0)
+    
+【问题 5】输出经常达到限幅
+    症状：控制输出总是达到 ±4000 上限
+    解决：✅ 增大 output_limits
+         或 ✅ 减小 w_cl（降低需求）
+         或 ✅ 增大 b0（控制器认为系统增益太小）
+
+推荐调试顺序：
+1. 先调 w_cl，找到合适的响应速度
+2. 再调 b0，确保误差能消除
+3. 最后微调 k_eso，优化抗扰性能
+4. k_eso 通常保持 2.0-3.0 即可
+"""
 
 
 # ============================================================================

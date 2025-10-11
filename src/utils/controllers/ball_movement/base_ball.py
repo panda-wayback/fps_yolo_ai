@@ -21,7 +21,7 @@ class BallMovement:
         
         self.fps = 1000
         self.smoothing = 0.8
-        self.max_duration = 0.1
+        self.max_duration = 0.2
         self.delay = 1.0 / self.fps
         
         
@@ -98,15 +98,16 @@ def test1():
     ball2 = BallMovement()
     ball2.start()
     controller = LADRCController(
-        w_cl = 60,
+        w_cl = 10,
         k_eso= 2.50,
     )
     dt = 0.045
+   
+    count = 0
+    ball1.submit_vector(ball1_speed)
+    time.sleep(1)
     start_time = time.time()
     test_duration = 0.6  # 监控10秒
-    count = 0
-    # ball1.submit_vector(ball1_speed)
-    # time.sleep(dt)
     while time.time() - start_time < test_duration:
         count += dt
         error = ball1.current - ball2.current

@@ -10,4 +10,4 @@ class TargetSelectorModel(BaseState):
     # 目标信息
     selected_target_point: ReactiveVar[Tuple[float, float]] = (0.0, 0.0)  # 选中目标的中心点 (x, y)
     selected_target_bbox: ReactiveVar[Boxes] = None  # 选中目标的边界框 (x1, y1, x2, y2)
-    
+    selected_target_id: ReactiveVar[int] = 0  # 选中目标的ID

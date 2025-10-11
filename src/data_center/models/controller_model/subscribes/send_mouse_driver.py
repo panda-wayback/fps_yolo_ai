@@ -7,6 +7,7 @@ def send_mouse_driver(vector: Tuple[float, float]):
     """发送鼠标驱动"""
     try:
         MouseDriverSubject.send_vector(vector)
+        print(f"✅ 发送鼠标驱动: {vector}")
     except Exception as e:
         print(f"❌ 发送鼠标驱动失败: {e}")
     pass
