@@ -15,19 +15,47 @@ class Controller:
     def __init__(self):
         self.x_controller = LADRCController()
         self.y_controller = LADRCController()
+        
     
     def set_config(self, 
-        order: int = 1, 
-        sample_time: float = 0.01, 
-        b0: float = 1.0, 
-        w_cl: float = 60.0, 
-        k_eso: float = 2.5,
-        output_limits: Optional[Tuple[float, float]] = None,
-        rate_limits: Optional[Tuple[float, float]] = None):
+        order: Optional[int] = None, 
+        sample_time: Optional[float] = None, 
+        b0: Optional[float] = None, 
+        w_cl: Optional[float] = None, 
+        k_eso: Optional[float] = None,
+        output_limits: Optional[Tuple[float, float]] = ...,  # 使用...作为哨兵值
+        rate_limits: Optional[Tuple[float, float]] = ...):   # 使用...作为哨兵值
+        """
+        设置ADRC控制器参数 - 只修改传入的非None参数，未传入的参数保持原值
         
-        """设置ADRC控制器参数"""
-        self.x_controller.set_config(order, sample_time, b0, w_cl, k_eso, output_limits, rate_limits)
-        self.y_controller.set_config(order, sample_time, b0, w_cl, k_eso, output_limits, rate_limits)
+        Args:
+            order: 控制器阶数 (1 或 2)，不传则保持原值
+            sample_time: 采样时间（秒），不传则保持原值
+            b0: 控制增益，不传则保持原值
+            w_cl: 控制器带宽，不传则保持原值
+            k_eso: ESO增益，不传则保持原值
+            output_limits: 输出限幅 (min, max)，不传则保持原值
+            rate_limits: 变化率限幅 (min, max)，不传则保持原值
+        """
+        # 使用关键字参数传递给子控制器（只传递非None的值）
+        self.x_controller.set_config(
+            order=order,
+            sample_time=sample_time,
+            b0=b0,
+            w_cl=w_cl,
+            k_eso=k_eso,
+            output_limits=output_limits,
+            rate_limits=rate_limits
+        )
+        self.y_controller.set_config(
+            order=order,
+            sample_time=sample_time,
+            b0=b0,
+            w_cl=w_cl,
+            k_eso=k_eso,
+            output_limits=output_limits,
+            rate_limits=rate_limits
+        )
 
     def compute(self, vector: tuple[float, float], dt=0.02) -> tuple[tuple[float, float], tuple[float, float]]:
         """获取PID控制器输出"""

@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-PID控制器配置组件
-设置PID控制器的各种参数
+ADRC控制器配置组件
+设置ADRC（自抗扰）控制器的各种参数
 """
 
 from PySide6.QtWidgets import (QSlider, QLabel, QHBoxLayout, QVBoxLayout, 
-                               QGroupBox, QPushButton, QWidget)
+                               QGroupBox, QPushButton, QWidget, QComboBox)
 from PySide6.QtCore import Qt, Signal
 
-from data_center.models.pid_model.subject import PIDSubject
-from data_center.models.pid_model.state import PIDModelState
+from data_center.models.controller_model.subject import ControllerSubject
+from data_center.models.controller_model.state import ControllerModelState
 
 
 class ParameterSlider(QWidget):
@@ -76,13 +76,13 @@ class ParameterSlider(QWidget):
     value_changed = Signal(float)
 
 
-class PIDConfigWidget(QGroupBox):
-    """PID控制器配置组件"""
+class ADRCConfigWidget(QGroupBox):
+    """ADRC控制器配置组件"""
     
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setTitle("PID参数配置")
-        self.setMinimumWidth(300)
+        self.setTitle("ADRC参数配置")
+        self.setMinimumWidth(350)
         self.init_ui()
         self.load_current_values()
         
@@ -90,25 +90,38 @@ class PIDConfigWidget(QGroupBox):
         """初始化UI"""
         layout = QVBoxLayout(self)
         
-        # Kp参数
-        self.kp_slider = ParameterSlider("Kp", 0.0, 10.0, 1.0, 0.01, "")
-        self.kp_slider.value_changed.connect(self._on_kp_changed)
-        layout.addWidget(self.kp_slider)
+        # 控制器阶数 (order) - 使用下拉框
+        order_layout = QHBoxLayout()
+        order_label = QLabel("控制器阶数:")
+        order_label.setMinimumWidth(80)
+        order_layout.addWidget(order_label)
         
-        # Ki参数
-        self.ki_slider = ParameterSlider("Ki", 0.0, 5.0, 0.1, 0.001, "")
-        self.ki_slider.value_changed.connect(self._on_ki_changed)
-        layout.addWidget(self.ki_slider)
+        self.order_combo = QComboBox()
+        self.order_combo.addItems(["1阶", "2阶"])
+        self.order_combo.setCurrentIndex(0)  # 默认1阶
+        self.order_combo.currentIndexChanged.connect(self._on_order_changed)
+        order_layout.addWidget(self.order_combo)
+        layout.addLayout(order_layout)
         
-        # Kd参数
-        self.kd_slider = ParameterSlider("Kd", 0.0, 5.0, 0.1, 0.001, "")
-        self.kd_slider.value_changed.connect(self._on_kd_changed)
-        layout.addWidget(self.kd_slider)
+        # 采样时间 (sample_time)
+        self.sample_time_slider = ParameterSlider("采样时间", 0.001, 0.1, 0.01, 0.001, "s")
+        self.sample_time_slider.value_changed.connect(self._on_sample_time_changed)
+        layout.addWidget(self.sample_time_slider)
         
-        # 采样时间
-        self.dt_slider = ParameterSlider("采样时间", 0.001, 0.1, 0.02, 0.001, "s")
-        self.dt_slider.value_changed.connect(self._on_dt_changed)
-        layout.addWidget(self.dt_slider)
+        # 控制增益 (b0)
+        self.b0_slider = ParameterSlider("控制增益 b0", 0.1, 10.0, 1.0, 0.1, "")
+        self.b0_slider.value_changed.connect(self._on_b0_changed)
+        layout.addWidget(self.b0_slider)
+        
+        # 控制器带宽 (w_cl)
+        self.w_cl_slider = ParameterSlider("控制器带宽", 10.0, 200.0, 60.0, 1.0, "")
+        self.w_cl_slider.value_changed.connect(self._on_w_cl_changed)
+        layout.addWidget(self.w_cl_slider)
+        
+        # ESO增益 (k_eso)
+        self.k_eso_slider = ParameterSlider("ESO增益", 1.0, 10.0, 2.5, 0.1, "")
+        self.k_eso_slider.value_changed.connect(self._on_k_eso_changed)
+        layout.addWidget(self.k_eso_slider)
         
         # 分隔线
         from PySide6.QtWidgets import QFrame
@@ -143,21 +156,26 @@ class PIDConfigWidget(QGroupBox):
         self.status_label.setStyleSheet("color: green; font-weight: bold;")
         layout.addWidget(self.status_label)
         
-    def _on_kp_changed(self, value: float):
-        """Kp参数改变"""
-        self._update_status(f"Kp: {value:.3f}")
-        
-    def _on_ki_changed(self, value: float):
-        """Ki参数改变"""
-        self._update_status(f"Ki: {value:.3f}")
-        
-    def _on_kd_changed(self, value: float):
-        """Kd参数改变"""
-        self._update_status(f"Kd: {value:.3f}")
-        
-    def _on_dt_changed(self, value: float):
+    def _on_order_changed(self, index: int):
+        """控制器阶数改变"""
+        order = index + 1  # 0->1阶, 1->2阶
+        self._update_status(f"阶数: {order}阶")
+    
+    def _on_sample_time_changed(self, value: float):
         """采样时间改变"""
         self._update_status(f"采样时间: {value:.3f}s")
+        
+    def _on_b0_changed(self, value: float):
+        """控制增益改变"""
+        self._update_status(f"b0: {value:.3f}")
+        
+    def _on_w_cl_changed(self, value: float):
+        """控制器带宽改变"""
+        self._update_status(f"w_cl: {value:.1f}")
+        
+    def _on_k_eso_changed(self, value: float):
+        """ESO增益改变"""
+        self._update_status(f"k_eso: {value:.2f}")
         
     def _update_status(self, message: str):
         """更新状态显示"""
@@ -165,25 +183,41 @@ class PIDConfigWidget(QGroupBox):
         
     def reset_to_defaults(self):
         """重置为默认值"""
-        self.kp_slider.set_value(1.0)
-        self.ki_slider.set_value(0.1)
-        self.kd_slider.set_value(0.1)
-        self.dt_slider.set_value(0.02)
+        self.order_combo.setCurrentIndex(0)  # 1阶
+        self.sample_time_slider.set_value(0.01)
+        self.b0_slider.set_value(1.0)
+        self.w_cl_slider.set_value(60.0)
+        self.k_eso_slider.set_value(2.5)
         self._update_status("已重置为默认值")
         
     def apply_settings(self):
         """应用设置"""
         try:
-            kp = self.kp_slider.get_value()
-            ki = self.ki_slider.get_value()
-            kd = self.kd_slider.get_value()
+            # 获取当前参数值
+            order = self.order_combo.currentIndex() + 1  # 0->1阶, 1->2阶
+            sample_time = self.sample_time_slider.get_value()
+            b0 = self.b0_slider.get_value()
+            w_cl = self.w_cl_slider.get_value()
+            k_eso = self.k_eso_slider.get_value()
             
-            # 应用PID参数
-            PIDSubject.send_config(kp, ki, kd)
+            # 暂时不设置限幅（使用None）
+            output_limits = None
+            rate_limits = None
             
-            self._update_status("设置已应用")
+            # 应用ADRC参数
+            ControllerSubject.send_config(
+                order=order,
+                sample_time=sample_time,
+                b0=b0,
+                w_cl=w_cl,
+                k_eso=k_eso,
+                output_limits=output_limits,
+                rate_limits=rate_limits
+            )
+            
+            self._update_status("✅ 设置已应用")
         except Exception as e:
-            self._update_status(f"应用失败: {str(e)}")
+            self._update_status(f"❌ 应用失败: {str(e)}")
             
     def save_settings(self):
         """保存设置"""
@@ -196,25 +230,37 @@ class PIDConfigWidget(QGroupBox):
     def load_current_values(self):
         """加载当前值"""
         try:
-            state = PIDModelState.get_state()
-            kp = state.kp.get()
-            ki = state.ki.get()
-            kd = state.kd.get()
-            dt = state.dt.get()
+            # 从状态管理中加载当前ADRC参数
+            state = ControllerModelState.get_state()
+            order = state.order.get()
+            sample_time = state.sample_time.get()
+            b0 = state.b0.get()
+            w_cl = state.w_cl.get()
+            k_eso = state.k_eso.get()
             
-            if kp is not None:
-                self.kp_slider.set_value(kp)
-            if ki is not None:
-                self.ki_slider.set_value(ki)
-            if kd is not None:
-                self.kd_slider.set_value(kd)
-            if dt is not None:
-                self.dt_slider.set_value(dt)
+            # 更新UI组件
+            if order is not None:
+                self.order_combo.setCurrentIndex(order - 1)  # 1阶->0, 2阶->1
+            if sample_time is not None:
+                self.sample_time_slider.set_value(sample_time)
+            if b0 is not None:
+                self.b0_slider.set_value(b0)
+            if w_cl is not None:
+                self.w_cl_slider.set_value(w_cl)
+            if k_eso is not None:
+                self.k_eso_slider.set_value(k_eso)
                 
+            self._update_status("✅ 已加载当前参数")
         except Exception as e:
             print(f"加载当前值失败: {e}")
+            self._update_status(f"⚠️ 加载失败: {str(e)}")
 
 
 def create_pid_config():
-    """创建PID配置组件"""
-    return PIDConfigWidget()
+    """创建ADRC配置组件（保持函数名以兼容现有代码）"""
+    return ADRCConfigWidget()
+
+
+def create_adrc_config():
+    """创建ADRC配置组件"""
+    return ADRCConfigWidget()

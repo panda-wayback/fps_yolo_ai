@@ -6,9 +6,7 @@ from data_center.models.mouse_driver_model.subject import MouseDriverSubject
 def send_mouse_driver(vector: Tuple[float, float]):
     """发送鼠标驱动"""
     try:
-        print(f"✅ 发送鼠标驱动 {vector} ")
-        new_vector = (vector[0], -vector[1])
-        MouseDriverSubject.send_vector(new_vector)
+        MouseDriverSubject.send_vector(vector)
     except Exception as e:
         print(f"❌ 发送鼠标驱动失败: {e}")
     pass

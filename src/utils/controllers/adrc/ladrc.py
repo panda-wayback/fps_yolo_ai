@@ -203,24 +203,51 @@ class LADRCController:
         )
 
     def set_config(self, 
-        order: int = 1, 
-        sample_time: float = 0.01, 
-        b0: float = 1.0, 
-        w_cl: float = 60.0, 
-        k_eso: float = 2.5,
-        output_limits: Optional[Tuple[float, float]] = None,
-        rate_limits: Optional[Tuple[float, float]] = None):
+        order: Optional[int] = None, 
+        sample_time: Optional[float] = None, 
+        b0: Optional[float] = None, 
+        w_cl: Optional[float] = None, 
+        k_eso: Optional[float] = None,
+        output_limits: Optional[Tuple[float, float]] = ...,  # 使用...作为哨兵值
+        rate_limits: Optional[Tuple[float, float]] = ...):   # 使用...作为哨兵值
         """
-        设置控制器参数
+        设置控制器参数 - 只修改传入的参数，未传入的参数保持原值
+        
+        Args:
+            order: 控制器阶数 (1 或 2)，不传则保持原值
+            sample_time: 采样时间（秒），不传则保持原值
+            b0: 控制增益，不传则保持原值
+            w_cl: 控制器带宽，不传则保持原值
+            k_eso: ESO增益，不传则保持原值
+            output_limits: 输出限幅 (min, max)，不传则保持原值
+            rate_limits: 变化率限幅 (min, max)，不传则保持原值
+        
+        Example:
+            # 只修改 w_cl，其他参数保持不变
+            controller.set_config(w_cl=80.0)
+            
+            # 修改多个参数
+            controller.set_config(w_cl=80.0, k_eso=3.0, output_limits=(-100, 100))
         """
-        self.order = order
-        self.sample_time = sample_time
-        self.b0 = b0
-        self.w_cl = w_cl
-        self.k_eso = k_eso
-        self.output_limits = output_limits
-        self.rate_limits = rate_limits
-        # 重置控制器
+        # 只更新传入的参数
+        if order is not None:
+            self.order = order
+        if sample_time is not None:
+            self.sample_time = sample_time
+        if b0 is not None:
+            self.b0 = b0
+        if w_cl is not None:
+            self.w_cl = w_cl
+        if k_eso is not None:
+            self.k_eso = k_eso
+        
+        # 对于可以为None的参数，使用...作为哨兵值
+        if output_limits is not ...:
+            self.output_limits = output_limits
+        if rate_limits is not ...:
+            self.rate_limits = rate_limits
+        
+        # 重置控制器，应用新配置
         self.reset()
 
     def get_info(self) -> dict:
