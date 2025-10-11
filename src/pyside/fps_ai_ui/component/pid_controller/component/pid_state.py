@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-PID控制器状态显示组件
-显示PID控制器的实时状态和输出
+ADRC控制器状态显示组件
+显示ADRC（自抗扰）控制器的实时状态和输出
 """
 
 from PySide6.QtWidgets import (QLabel, QVBoxLayout, QHBoxLayout, QGroupBox, 
@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (QLabel, QVBoxLayout, QHBoxLayout, QGroupBox,
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QFont
 
-from data_center.models.pid_model.state import PIDModelState
+from data_center.models.controller_model.state import ControllerModelState
 
 
 class StatusDisplayWidget(QWidget):
@@ -44,13 +44,13 @@ class StatusDisplayWidget(QWidget):
         self.value_label.setText(f"{value:.3f}")
 
 
-class PIDStateWidget(QGroupBox):
-    """PID状态显示组件"""
+class ADRCStateWidget(QGroupBox):
+    """ADRC状态显示组件"""
     
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setTitle("PID状态监控")
-        self.setMinimumWidth(250)
+        self.setTitle("ADRC状态监控")
+        self.setMinimumWidth(300)
         self.init_ui()
         self.setup_timer()
         
@@ -62,41 +62,50 @@ class PIDStateWidget(QGroupBox):
         params_group = QGroupBox("当前参数")
         params_layout = QVBoxLayout(params_group)
         
-        # Kp显示
-        kp_layout = QHBoxLayout()
-        kp_layout.addWidget(QLabel("Kp:"))
-        self.kp_label = QLabel("0.000")
-        self.kp_label.setStyleSheet("font-weight: bold; color: #2E8B57;")
-        kp_layout.addWidget(self.kp_label)
-        kp_layout.addStretch()
-        params_layout.addLayout(kp_layout)
+        # 控制器阶数 (order)
+        order_layout = QHBoxLayout()
+        order_layout.addWidget(QLabel("阶数:"))
+        self.order_label = QLabel("1阶")
+        self.order_label.setStyleSheet("font-weight: bold; color: #2E8B57;")
+        order_layout.addWidget(self.order_label)
+        order_layout.addStretch()
+        params_layout.addLayout(order_layout)
         
-        # Ki显示
-        ki_layout = QHBoxLayout()
-        ki_layout.addWidget(QLabel("Ki:"))
-        self.ki_label = QLabel("0.000")
-        self.ki_label.setStyleSheet("font-weight: bold; color: #2E8B57;")
-        ki_layout.addWidget(self.ki_label)
-        ki_layout.addStretch()
-        params_layout.addLayout(ki_layout)
+        # 采样时间 (sample_time)
+        sample_time_layout = QHBoxLayout()
+        sample_time_layout.addWidget(QLabel("采样时间:"))
+        self.sample_time_label = QLabel("0.010s")
+        self.sample_time_label.setStyleSheet("font-weight: bold; color: #2E8B57;")
+        sample_time_layout.addWidget(self.sample_time_label)
+        sample_time_layout.addStretch()
+        params_layout.addLayout(sample_time_layout)
         
-        # Kd显示
-        kd_layout = QHBoxLayout()
-        kd_layout.addWidget(QLabel("Kd:"))
-        self.kd_label = QLabel("0.000")
-        self.kd_label.setStyleSheet("font-weight: bold; color: #2E8B57;")
-        kd_layout.addWidget(self.kd_label)
-        kd_layout.addStretch()
-        params_layout.addLayout(kd_layout)
+        # 控制增益 (b0)
+        b0_layout = QHBoxLayout()
+        b0_layout.addWidget(QLabel("控制增益 b0:"))
+        self.b0_label = QLabel("1.000")
+        self.b0_label.setStyleSheet("font-weight: bold; color: #2E8B57;")
+        b0_layout.addWidget(self.b0_label)
+        b0_layout.addStretch()
+        params_layout.addLayout(b0_layout)
         
-        # 采样时间显示
-        dt_layout = QHBoxLayout()
-        dt_layout.addWidget(QLabel("采样时间:"))
-        self.dt_label = QLabel("0.000s")
-        self.dt_label.setStyleSheet("font-weight: bold; color: #2E8B57;")
-        dt_layout.addWidget(self.dt_label)
-        dt_layout.addStretch()
-        params_layout.addLayout(dt_layout)
+        # 控制器带宽 (w_cl)
+        w_cl_layout = QHBoxLayout()
+        w_cl_layout.addWidget(QLabel("控制器带宽:"))
+        self.w_cl_label = QLabel("60.0")
+        self.w_cl_label.setStyleSheet("font-weight: bold; color: #2E8B57;")
+        w_cl_layout.addWidget(self.w_cl_label)
+        w_cl_layout.addStretch()
+        params_layout.addLayout(w_cl_layout)
+        
+        # ESO增益 (k_eso)
+        k_eso_layout = QHBoxLayout()
+        k_eso_layout.addWidget(QLabel("ESO增益:"))
+        self.k_eso_label = QLabel("2.5")
+        self.k_eso_label.setStyleSheet("font-weight: bold; color: #2E8B57;")
+        k_eso_layout.addWidget(self.k_eso_label)
+        k_eso_layout.addStretch()
+        params_layout.addLayout(k_eso_layout)
         
         layout.addWidget(params_group)
         
@@ -205,22 +214,26 @@ class PIDStateWidget(QGroupBox):
     def update_display(self):
         """更新显示"""
         try:
-            state = PIDModelState.get_state()
+            # 从 ControllerModelState 获取状态
+            state = ControllerModelState.get_state()
             
-            # 更新参数显示
-            kp = state.kp.get()
-            ki = state.ki.get()
-            kd = state.kd.get()
-            dt = state.dt.get()
+            # 更新ADRC参数显示
+            order = state.order.get()
+            sample_time = state.sample_time.get()
+            b0 = state.b0.get()
+            w_cl = state.w_cl.get()
+            k_eso = state.k_eso.get()
             
-            if kp is not None:
-                self.kp_label.setText(f"{kp:.3f}")
-            if ki is not None:
-                self.ki_label.setText(f"{ki:.3f}")
-            if kd is not None:
-                self.kd_label.setText(f"{kd:.3f}")
-            if dt is not None:
-                self.dt_label.setText(f"{dt:.3f}s")
+            if order is not None:
+                self.order_label.setText(f"{order}阶")
+            if sample_time is not None:
+                self.sample_time_label.setText(f"{sample_time:.3f}s")
+            if b0 is not None:
+                self.b0_label.setText(f"{b0:.3f}")
+            if w_cl is not None:
+                self.w_cl_label.setText(f"{w_cl:.1f}")
+            if k_eso is not None:
+                self.k_eso_label.setText(f"{k_eso:.2f}")
             
             # 更新输出显示
             output = state.output.get()
@@ -229,14 +242,23 @@ class PIDStateWidget(QGroupBox):
                 self.x_output_display.update_value(x_output)
                 self.y_output_display.update_value(y_output)
             
-            # 更新控制状态
-            is_enabled = state.is_enabled.get()
-            if is_enabled:
-                self.enabled_label.setText("状态: 已启用")
-                self.enabled_label.setStyleSheet("color: green; font-weight: bold; background-color: #E8F5E8; border: 1px solid #32CD32; border-radius: 5px; padding: 5px;")
+            # 更新控制状态（检查是否有 is_enabled 字段）
+            if hasattr(state, 'is_enabled'):
+                is_enabled = state.is_enabled.get()
+                if is_enabled:
+                    self.enabled_label.setText("状态: 已启用")
+                    self.enabled_label.setStyleSheet("color: green; font-weight: bold; background-color: #E8F5E8; border: 1px solid #32CD32; border-radius: 5px; padding: 5px;")
+                else:
+                    self.enabled_label.setText("状态: 未启用")
+                    self.enabled_label.setStyleSheet("color: red; font-weight: bold; background-color: #FFE4E1; border: 1px solid #FF6B6B; border-radius: 5px; padding: 5px;")
             else:
-                self.enabled_label.setText("状态: 未启用")
-                self.enabled_label.setStyleSheet("color: red; font-weight: bold; background-color: #FFE4E1; border: 1px solid #FF6B6B; border-radius: 5px; padding: 5px;")
+                # 如果没有 is_enabled 字段，根据输出判断
+                if output is not None:
+                    self.enabled_label.setText("状态: 运行中")
+                    self.enabled_label.setStyleSheet("color: green; font-weight: bold; background-color: #E8F5E8; border: 1px solid #32CD32; border-radius: 5px; padding: 5px;")
+                else:
+                    self.enabled_label.setText("状态: 待机")
+                    self.enabled_label.setStyleSheet("color: orange; font-weight: bold; background-color: #FFF8E1; border: 1px solid #FFA500; border-radius: 5px; padding: 5px;")
             
             # 更新输出强度条
             if output is not None and len(output) >= 2:
@@ -268,5 +290,10 @@ class PIDStateWidget(QGroupBox):
 
 
 def create_pid_state():
-    """创建PID状态显示组件"""
-    return PIDStateWidget()
+    """创建ADRC状态显示组件（保持函数名以兼容现有代码）"""
+    return ADRCStateWidget()
+
+
+def create_adrc_state():
+    """创建ADRC状态显示组件"""
+    return ADRCStateWidget()

@@ -8,8 +8,8 @@ import time
 import threading
 from collections import deque
 from typing import Tuple
+from pynput.mouse import Controller
 
-from utils.move_mouse.windows_mouse_controller import WindowsMouseController
 from utils.singleton.main import singleton
 
 
@@ -33,7 +33,13 @@ class MouseSimulator:
             在单例模式中，参数只在第一次创建实例时生效
             后续调用时参数会被忽略，返回已存在的实例
         """
-        self.mouse = WindowsMouseController()
+        import platform
+        if platform.system() == "Windows":
+
+            from utils.move_mouse.windows_mouse_controller import WindowsMouseController
+            self.mouse = WindowsMouseController()
+        else:
+            self.mouse = Controller()
         # 向量执行时间控制
         self.vector_start_time = 0  # 向量开始时间
 
