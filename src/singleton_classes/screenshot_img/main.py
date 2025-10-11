@@ -50,7 +50,8 @@ class MouseScreenshot:
         @log_time
         def capture_screenshot():
             image = capture_screenshot_bgr(
-                region=ScreenshotModelState.get_state().region.get()
+                # region=ScreenshotModelState.get_state().region.get()
+                region=(0,0,320,240)
             )
             return image
         
@@ -76,7 +77,7 @@ if __name__ == "__main__":
     # YoloSubject.send_model_path("runs/aimlab_fast/weights/best.pt")
     screenshot = get_screenshot()
     screenshot.start()
-    time.sleep(100)
+    time.sleep(2)
     pass
 
 

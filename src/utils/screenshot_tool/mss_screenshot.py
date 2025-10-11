@@ -2,10 +2,17 @@ import mss
 import numpy as np
 from typing import Tuple, Optional
 import cv2
+import threading
 
-# 创建全局的mss对象，复用以提高性能
-# 避免每次截图都创建/销毁对象，提升连续截图速度
-_sct = mss.mss()
+# 使用线程局部存储，为每个线程创建独立的mss对象
+# 这样可以避免线程安全问题，同时保持性能优化
+_thread_local = threading.local()
+
+def _get_sct():
+    """获取当前线程的mss对象，如果不存在则创建"""
+    if not hasattr(_thread_local, 'sct'):
+        _thread_local.sct = mss.mss()
+    return _thread_local.sct
 
 
 def capture_screenshot(region: Optional[Tuple[int, int, int, int]] = None) -> np.ndarray:
@@ -26,10 +33,12 @@ def capture_screenshot(region: Optional[Tuple[int, int, int, int]] = None) -> np
         # 截取指定区域 (x=100, y=100, width=800, height=600)
         screenshot = capture_screenshot((100, 100, 800, 600))
     """
-    # 使用全局的mss对象，避免重复创建
+    # 获取当前线程的mss对象
+    sct = _get_sct()
+    
     if region is None:
         # 如果没有指定区域，截取整个屏幕
-        monitor = _sct.monitors[1]  # monitors[0]是所有显示器的组合，monitors[1]是主显示器
+        monitor = sct.monitors[1]  # monitors[0]是所有显示器的组合，monitors[1]是主显示器
     else:
         # # 使用指定的区域
         # left, top, width, height = region
@@ -41,7 +50,7 @@ def capture_screenshot(region: Optional[Tuple[int, int, int, int]] = None) -> np
             "height": height
         }
     # 执行截图
-    screenshot = _sct.grab(monitor)
+    screenshot = sct.grab(monitor)
     
     return screenshot
 
@@ -63,7 +72,7 @@ def capture_screenshot_bgr(region: Optional[Tuple[int, int, int, int]] = None
 
     screenshot = capture_screenshot(region)
 
-        # 将PIL图像转换为numpy数组
+    # 将PIL图像转换为numpy数组
     # MSS返回的是BGRA格式，我们需要转换为BGR
     img_array = np.array(screenshot)
     img_array = cv2.cvtColor(img_array, cv2.COLOR_BGRA2BGR)
@@ -118,8 +127,9 @@ def get_screen_size() -> Tuple[int, int]:
     Returns:
         Tuple[int, int]: (width, height)
     """
-    # 使用全局mss对象
-    monitor = _sct.monitors[1]  # 主显示器
+    # 获取当前线程的mss对象
+    sct = _get_sct()
+    monitor = sct.monitors[1]  # 主显示器
     return monitor["width"], monitor["height"]
 
 
@@ -130,8 +140,9 @@ def get_all_monitors() -> list:
     Returns:
         list: 所有显示器的信息列表
     """
-    # 使用全局mss对象
-    return _sct.monitors
+    # 获取当前线程的mss对象
+    sct = _get_sct()
+    return sct.monitors
 
 
 if __name__ == "__main__":
@@ -152,11 +163,14 @@ if __name__ == "__main__":
     
     # 性能测试 - 连续截图100次
     print("\n【性能测试】连续截图100次...")
-    test_region = (100, 100, 200, 200)
+    test_region = (100, 100, 320, 240)
     
     start_time = time.time()
     for i in range(100):
+        target_time = time.time()
         screenshot = capture_screenshot_bgr(test_region)
+        print(f"时间: {time.time() - target_time:.3f}s")
+        time.sleep(0.001)
     elapsed = time.time() - start_time
     
     print(f"耗时: {elapsed:.3f}秒")
@@ -164,4 +178,4 @@ if __name__ == "__main__":
     print(f"理论最大FPS: {100/elapsed:.1f}")
     print(f"截图尺寸: {screenshot.shape}")
     
-    print("\n✅ 使用全局_sct对象，避免重复创建，性能已优化！")
+    print("\n✅ 使用线程局部存储，既保证线程安全又保持高性能！")
