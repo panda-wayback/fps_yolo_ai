@@ -201,7 +201,28 @@ class LADRCController:
             m_lim=m_lim,
             r_lim=r_lim
         )
-    
+
+    def set_config(self, 
+        order: int = 1, 
+        sample_time: float = 0.01, 
+        b0: float = 1.0, 
+        w_cl: float = 60.0, 
+        k_eso: float = 2.5,
+        output_limits: Optional[Tuple[float, float]] = None,
+        rate_limits: Optional[Tuple[float, float]] = None):
+        """
+        设置控制器参数
+        """
+        self.order = order
+        self.sample_time = sample_time
+        self.b0 = b0
+        self.w_cl = w_cl
+        self.k_eso = k_eso
+        self.output_limits = output_limits
+        self.rate_limits = rate_limits
+        # 重置控制器
+        self.reset()
+
     def get_info(self) -> dict:
         """
         获取控制器信息

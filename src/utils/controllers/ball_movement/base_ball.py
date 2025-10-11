@@ -99,7 +99,7 @@ def test1():
     ball2.start()
     controller = LADRCController(
         w_cl = 60,
-        k_eso= 2.55,
+        k_eso= 2.50,
     )
     dt = 0.045
     start_time = time.time()

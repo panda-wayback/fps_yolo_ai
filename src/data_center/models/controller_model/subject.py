@@ -6,19 +6,18 @@ PID模型相关的统一接口
 # 延迟导入，避免循环导入
 
 
-from data_center.models.pid_model.state import PIDModelState
-from singleton_classes.pid_controller.pid_controller import get_pid_controller
-from utils.kalman.kaerman_fps import frame_step
+from data_center.models.controller_model.state import ControllerModelState  
+from singleton_classes.controller.pid_controller import get_pid_controller
 
 
-class PIDSubject:
+class ControllerSubject:
     
     @staticmethod
     def send_config(kp: float, ki: float, kd: float):
         """使用PID配置"""
-        PIDModelState.get_state().kp.set(kp)
-        PIDModelState.get_state().ki.set(ki)
-        PIDModelState.get_state().kd.set(kd)
+        ControllerModelState.get_state().kp.set(kp)
+        ControllerModelState.get_state().ki.set(ki)
+        ControllerModelState.get_state().kd.set(kd)
         # 设置PID参数
         get_pid_controller().set_pid_parameters(kp, ki, kd)
 
@@ -28,10 +27,10 @@ class PIDSubject:
         print(f"✅ {vector}  {dt}  PIDModel")
         output, error = get_pid_controller().get_vector_pid_res(vector, dt)
         print(f"✅ {vector}  {output}  {error}  PIDModel")
-        PIDModelState.get_state().output.set(output)
-        PIDModelState.get_state().error.set(error)
+        ControllerModelState.get_state().output.set(output)
+        ControllerModelState.get_state().error.set(error)
         pass
 
 
 if __name__ == "__main__":
-    PIDSubject.send_config(1, 2, 3)
+    ControllerSubject.send_config(1, 2, 3)

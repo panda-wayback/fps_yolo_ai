@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from data_center.models.base_state import BaseState
 
 from data_center.models.screenshot.model import ScreenshotModel
-from data_center.models.pid_model.model import PIDModel
+from data_center.models.controller_model.model import ControllerModel
 from data_center.models.yolo_model.model import YoloModel
 from data_center.models.mouse_driver_model.model import MouseDriverModel
 from data_center.models.target_selector.model import TargetSelectorModel
@@ -26,7 +26,7 @@ class State(BaseModel):
     order: Optional[Order] = Order()
     yolo_model_state: Optional[YoloModel] = YoloModel()
     screenshot_state: Optional[ScreenshotModel] = ScreenshotModel()
-    pid_model_state: Optional[PIDModel] = PIDModel()
+    controller_model_state: Optional[ControllerModel] = ControllerModel()
     mouse_driver_state: Optional[MouseDriverModel] = MouseDriverModel()
     target_selector_state: Optional[TargetSelectorModel] = TargetSelectorModel()
     input_monitor_state: Optional[InputMonitorModel] = InputMonitorModel()

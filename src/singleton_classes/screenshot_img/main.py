@@ -49,11 +49,12 @@ class MouseScreenshot:
         """
         while self._running:
             try:
-                @log_time
-                def capture_screenshot():
-                    image = capture_screenshot_bgr(ScreenshotModelState.get_state().region.get())
-                    return image
-                image = capture_screenshot()
+                last_time = time.time()
+                image = capture_screenshot_bgr(
+                    # region=ScreenshotModelState.get_state().region.get()
+                    region = (0, 0, 200, 200)
+                )
+                print(f"截图耗时: {(time.time() - last_time)*1000:.2f} ms")
                 @log_time
                 def send_image():
                     ScreenshotSubject.send_image(image,time.time())
@@ -71,8 +72,8 @@ def get_screenshot():
     return _screenshot
 
 if __name__ == "__main__":
-    from data_center.models.yolo_model.subject import YoloSubject
-    YoloSubject.send_model_path("runs/aimlab_fast/weights/best.pt")
+    # from data_center.models.yolo_model.subject import YoloSubject
+    # YoloSubject.send_model_path("runs/aimlab_fast/weights/best.pt")
     screenshot = get_screenshot()
     screenshot.start()
     time.sleep(100)

@@ -3,6 +3,10 @@ import numpy as np
 from typing import Tuple, Optional
 import cv2
 
+# 创建全局的mss对象，复用以提高性能
+# 避免每次截图都创建/销毁对象，提升连续截图速度
+_sct = mss.mss()
+
 
 def capture_screenshot(region: Optional[Tuple[int, int, int, int]] = None) -> np.ndarray:
     """
@@ -22,27 +26,25 @@ def capture_screenshot(region: Optional[Tuple[int, int, int, int]] = None) -> np
         # 截取指定区域 (x=100, y=100, width=800, height=600)
         screenshot = capture_screenshot((100, 100, 800, 600))
     """
-    with mss.mss() as sct:
-        if region is None:
-            # 如果没有指定区域，截取整个屏幕
-            monitor = sct.monitors[1]  # monitors[0]是所有显示器的组合，monitors[1]是主显示器
-        else:
-            # 使用指定的区域
-            left, top, width, height = region
-            monitor = {
-                "top": top,
-                "left": left,
-                "width": width,
-                "height": height
-            }
-        
-        # 执行截图
-        screenshot = sct.grab(monitor)
-        
-        return screenshot
+    # 使用全局的mss对象，避免重复创建
+    if region is None:
+        # 如果没有指定区域，截取整个屏幕
+        monitor = _sct.monitors[0]  # monitors[0]是所有显示器的组合，monitors[1]是主显示器
+    else:
+        # # 使用指定的区域
+        # left, top, width, height = region
+        monitor = region
+    # 执行截图
+    screenshot = _sct.grab(monitor)
+    
+    return screenshot
 
 
-def capture_screenshot_bgr(region: Optional[Tuple[int, int, int, int]] = None) -> np.ndarray:
+
+
+def capture_screenshot_bgr(region: Optional[Tuple[int, int, int, int]] = 
+    (0, 0, 20, 20 )
+        ) -> np.ndarray:
     """
     使用MSS库进行屏幕截图，返回BGR格式的numpy数组
     
@@ -59,10 +61,7 @@ def capture_screenshot_bgr(region: Optional[Tuple[int, int, int, int]] = None) -
         # 将PIL图像转换为numpy数组
     # MSS返回的是BGRA格式，我们需要转换为BGR
     img_array = np.array(screenshot)
-    
-    # 移除alpha通道，只保留BGR
-    if img_array.shape[2] == 4:  # 如果有alpha通道
-        img_array = img_array[:, :, :3]  # 只取前3个通道(BGR)
+    img_array = cv2.cvtColor(img_array, cv2.COLOR_BGRA2BGR)
     
     return img_array
     # return capture_screenshot(region)
@@ -114,9 +113,9 @@ def get_screen_size() -> Tuple[int, int]:
     Returns:
         Tuple[int, int]: (width, height)
     """
-    with mss.mss() as sct:
-        monitor = sct.monitors[1]  # 主显示器
-        return monitor["width"], monitor["height"]
+    # 使用全局mss对象
+    monitor = _sct.monitors[1]  # 主显示器
+    return monitor["width"], monitor["height"]
 
 
 def get_all_monitors() -> list:
@@ -126,13 +125,17 @@ def get_all_monitors() -> list:
     Returns:
         list: 所有显示器的信息列表
     """
-    with mss.mss() as sct:
-        return sct.monitors
+    # 使用全局mss对象
+    return _sct.monitors
 
 
 if __name__ == "__main__":
+    import time
+    
     # 测试代码
+    print("="*50)
     print("测试截图功能...")
+    print("="*50)
     
     # 获取屏幕尺寸
     width, height = get_screen_size()
@@ -141,28 +144,19 @@ if __name__ == "__main__":
     # 获取所有显示器信息
     monitors = get_all_monitors()
     print(f"显示器数量: {len(monitors)}")
-    for i, monitor in enumerate(monitors):
-        print(f"显示器 {i}: {monitor}")
     
-    # 截取整个屏幕
-    print("截取整个屏幕...")
-    full_screenshot = capture_screenshot()
-    print(f"截图尺寸: {full_screenshot.shape}")
+    # 性能测试 - 连续截图100次
+    print("\n【性能测试】连续截图100次...")
+    test_region = (100, 100, 200, 200)
     
-    # 截取指定区域 (屏幕中心的一个小区域)
-    center_x, center_y = width // 2, height // 2
-    region_width, region_height = 400, 300
-    left = center_x - region_width // 2
-    top = center_y - region_height // 2
+    start_time = time.time()
+    for i in range(100):
+        screenshot = capture_screenshot_bgr(test_region)
+    elapsed = time.time() - start_time
     
-    print(f"截取区域: ({left}, {top}, {region_width}, {region_height})")
-    region_screenshot = capture_screenshot((left, top, region_width, region_height))
-    print(f"区域截图尺寸: {region_screenshot.shape}")
+    print(f"耗时: {elapsed:.3f}秒")
+    print(f"平均每帧: {elapsed/100*1000:.2f}ms")
+    print(f"理论最大FPS: {100/elapsed:.1f}")
+    print(f"截图尺寸: {screenshot.shape}")
     
-    # 保存截图
-    print("保存截图...")
-    success1 = save_screenshot("full_screenshot.png")
-    success2 = save_screenshot("region_screenshot.png", (left, top, region_width, region_height))
-    
-    print(f"全屏截图保存: {'成功' if success1 else '失败'}")
-    print(f"区域截图保存: {'成功' if success2 else '失败'}")
+    print("\n✅ 使用全局_sct对象，避免重复创建，性能已优化！")

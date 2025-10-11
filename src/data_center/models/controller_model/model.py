@@ -1,7 +1,7 @@
 from data_center.models.base_state import BaseState, ReactiveVar
 
 
-class PIDModel(BaseState):
+class ControllerModel(BaseState):
     """
     PID模型状态类，管理PID相关参数和状态
     """
