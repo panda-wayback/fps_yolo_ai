@@ -25,6 +25,7 @@ _auto_attack_lock = threading.Lock()
 
 
 def auto_attack(selected_target_point: Tuple[float, float]):
+    return
     """
     自动攻击函数
     

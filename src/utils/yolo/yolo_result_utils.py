@@ -47,7 +47,7 @@ def select_best_target(result: Results, selected_target_id: Optional[int] = None
         return None, None, None, None
     
     h, w = result.orig_shape
-    center_x, center_y = w / 2, h / 2
+    center_x, center_y = w / 2, h / 2 + 23
 
     def distance_to_center(box: Boxes):
         x1, y1, x2, y2 = box.xyxy[0].tolist()
@@ -69,7 +69,7 @@ def select_best_target(result: Results, selected_target_id: Optional[int] = None
     x1, y1, x2, y2 = best_box.xyxy[0].tolist()
     # 瞄准点：X轴居中，Y轴为上四分之一位置（瞄准头部）
     cx = (x1 + x2) / 2  # X轴：保持水平居中
-    cy = (y1+y2) / 2 - abs(y2 - y1)/2 * 0.8 - 25  # Y轴：从顶部往下1/4处（上四分之一）
+    cy = (y1+y2) / 2 - abs(y2 - y1)/2 * 0.7  # Y轴：从顶部往下1/4处（上四分之一）
     # 计算目标瞄准点到图片中心的向量
     vector_x = cx - center_x
     vector_y = cy - center_y
