@@ -1,3 +1,4 @@
+import math
 import time
 from typing import Tuple
 
@@ -16,7 +17,11 @@ def compute_mouse_driver(vector: Tuple[float, float]):
     if current_time > max_submit_time and not InputMonitorState.get_state().is_submit_vector.get():
         return
 
+    distance = math.hypot(vector[0], vector[1])
+    if distance < 10:
+        return
     """计算鼠标驱动"""
+
     output = get_controller().compute(vector)
     get_logger().info(f"✅ {vector}  {output}  ControllerModel")
     ControllerModelState.get_state().output.set(output)

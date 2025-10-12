@@ -4,6 +4,7 @@
 """
 
 from data_center.index import get_data_center
+from utils.thread.main import threaded
 
 
 class TargetSelectorState:
@@ -20,8 +21,13 @@ class TargetSelectorState:
         from data_center.models.target_selector.subscribes.send_yolo_results import send_yolo_results
         TargetSelectorState.get_state().yolo_results.subscribe(send_yolo_results)
         
+        from data_center.models.target_selector.subscribes.auto_attack import auto_attack, auto_track
+        TargetSelectorState.get_state().selected_target_point.subscribe(threaded(auto_attack))
+        TargetSelectorState.get_state().selected_target_point.subscribe(threaded(auto_track))
+
         from data_center.models.controller_model.subject import  ControllerSubject
         TargetSelectorState.get_state().selected_target_point.subscribe(ControllerSubject.compute)
+
 
         from data_center.models.controller_model.subject import  ControllerSubject
         TargetSelectorState.get_state().selected_target_id.subscribe(ControllerSubject.update_target_id)

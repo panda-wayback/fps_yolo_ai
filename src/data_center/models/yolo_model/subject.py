@@ -5,6 +5,7 @@ YOLO模型相关的统一接口
 
 from typing import List
 import numpy as np
+import cv2
 from ultralytics.models import YOLO
 
 from data_center.models.yolo_model.state import YoloModelState
@@ -56,7 +57,23 @@ class YoloSubject:
                 )
         result = yolo_detect()
         YoloModelState.get_state().yolo_results.set(result)
-        YoloModelState.get_state().marked_img.set(result[0].plot())
+        
+        # 绘制标记图像
+        marked_img = result[0].plot()
+        
+        # 在中心点画一个标记点
+        h, w = marked_img.shape[:2]
+        center_x, center_y = w // 2, h // 2
+        
+        # 标记点参数
+        point_radius = 5  # 点的半径
+        point_color = (0, 255, 0)  # 绿色 (BGR)
+        point_thickness = -1  # -1 表示实心圆
+        
+        # 画中心点
+        cv2.circle(marked_img, (center_x, center_y), point_radius, point_color, point_thickness)
+        
+        YoloModelState.get_state().marked_img.set(marked_img)
 
     @staticmethod
     def send_selected_class_ids(selected_class_ids: List[int]):
