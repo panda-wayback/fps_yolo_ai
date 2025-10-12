@@ -9,6 +9,7 @@ from ultralytics.models import YOLO
 
 from data_center.models.yolo_model.state import YoloModelState
 from utils.logger.logger import log_time
+from utils.yolo.utils import get_device
 
 class YoloSubject:
 
@@ -17,7 +18,15 @@ class YoloSubject:
         """发送YOLO模型路径"""
         YoloModelState.get_state().model_path.set(model_path)
         model = YOLO(model_path, task='detect')  # 明确指定任务类型为检测
+        # GPU 优化（建议启用以提升性能）
+        try:
+            device = get_device()
+            model.to(device)
+            print(f"✅ 模型已加载到: {device}")
+        except Exception as e:
+            print(f"⚠️ GPU加载失败，使用CPU: {e}")
         YoloModelState.get_state().model.set(model)
+
 
         # 设置模型类别信息
         class_names = list(model.names.values())
@@ -36,10 +45,14 @@ class YoloSubject:
         def yolo_detect():
             classes = YoloModelState.get_state().selected_class_ids.get()
             return YoloModelState.get_state().model.get().track(
-                img, # 图片
-                verbose=False, # 是否打印详细信息
-                persist=True, # 持久化
-                classes = classes, # 选中的类别ID列表
+                img,                    # 图片
+                verbose=False,          # 是否打印详细信息
+                persist=True,           # 持久化追踪
+                classes=classes,        # 选中的类别ID列表
+                half=True,              # 使用FP16半精度（快2倍，需GPU支持）
+                conf=0.5,               # 置信度阈值（提高可减少检测数量）
+                max_det=5,             # 最大检测数量（减少可加速）
+                agnostic_nms=False,     # 类别无关NMS（False更快）
                 )
         result = yolo_detect()
         YoloModelState.get_state().yolo_results.set(result)

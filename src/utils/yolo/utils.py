@@ -9,3 +9,6 @@ def get_device() -> str:
         return 'cuda'
     else:
         return 'cpu'
+
+if __name__ == "__main__":
+    print(get_device())

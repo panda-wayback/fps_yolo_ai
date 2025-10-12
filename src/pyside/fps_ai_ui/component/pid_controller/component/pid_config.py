@@ -236,17 +236,17 @@ class ADRCConfigWidget(QGroupBox):
         layout.addWidget(self.sample_time_slider)
         
         # 控制增益 (b0)
-        self.b0_slider = ParameterSlider("控制增益 b0", 0.1, 10.0, 1.0, 0.1, "")
+        self.b0_slider = ParameterSlider("控制增益 b0", 0.1, 3.0, 1.0, 0.01, "")
         self.b0_slider.value_changed.connect(self._on_b0_changed)
         layout.addWidget(self.b0_slider)
         
         # 控制器带宽 (w_cl)
-        self.w_cl_slider = ParameterSlider("控制器带宽", 10.0, 200.0, 60.0, 1.0, "")
+        self.w_cl_slider = ParameterSlider("控制器带宽", 0.0, 200.0, 10.0, 0.1, "")
         self.w_cl_slider.value_changed.connect(self._on_w_cl_changed)
         layout.addWidget(self.w_cl_slider)
         
         # ESO增益 (k_eso)
-        self.k_eso_slider = ParameterSlider("ESO增益", 1.0, 10.0, 2.5, 0.1, "")
+        self.k_eso_slider = ParameterSlider("ESO增益", 0.0, 10.0, 2.5, 0.1, "")
         self.k_eso_slider.value_changed.connect(self._on_k_eso_changed)
         layout.addWidget(self.k_eso_slider)
         
@@ -263,12 +263,12 @@ class ADRCConfigWidget(QGroupBox):
         layout.addWidget(limit_label)
         
         # 输出限幅 (output_limits)
-        self.output_limits_slider = RangeSlider("输出限幅", -10000, 10000, -4000, 4000, 100, "")
+        self.output_limits_slider = RangeSlider("输出限幅", -2000, 2000, -1000, 1000, 10, "")
         self.output_limits_slider.value_changed.connect(self._on_output_limits_changed)
         layout.addWidget(self.output_limits_slider)
         
         # 变化率限幅 (rate_limits)
-        self.rate_limits_slider = RangeSlider("变化率限幅", -5000, 5000, -1000, 1000, 50, "")
+        self.rate_limits_slider = RangeSlider("变化率限幅", -5000, 5000, -1000, 1000, 10, "")
         self.rate_limits_slider.value_changed.connect(self._on_rate_limits_changed)
         layout.addWidget(self.rate_limits_slider)
         

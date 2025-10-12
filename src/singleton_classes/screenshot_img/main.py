@@ -51,7 +51,6 @@ class MouseScreenshot:
         def capture_screenshot():
             image = capture_screenshot_bgr(
                 region=ScreenshotModelState.get_state().region.get()
-                # region=(0,0,320,240)
             )
             return image
         

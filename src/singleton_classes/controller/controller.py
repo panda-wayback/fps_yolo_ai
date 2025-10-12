@@ -78,7 +78,7 @@ class Controller:
     def update_target_id(self, target_id: int):
         """更新目标ID"""
         
-        if self.target_id == target_id and time.time() - self.reset_time < 0.5:
+        if self.target_id == target_id and time.time() - self.reset_time < 0.35:
             return
 
         print(f"✅ 更新目标ID: {target_id}")
