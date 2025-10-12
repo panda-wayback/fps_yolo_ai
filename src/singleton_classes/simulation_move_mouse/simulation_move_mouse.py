@@ -69,6 +69,7 @@ class MouseSimulator:
         """
         if fps is not None:
             self.fps = fps
+            self.delay = 1.0 / self.fps
         if smoothing is not None:
             self.smoothing = smoothing
         if max_duration is not None:
@@ -135,14 +136,6 @@ class MouseSimulator:
             target_sx = self.vx * self.delay
             target_sy = self.vy * self.delay
 
-            # # 步骤2: 应用指数平滑算法
-            # # 平滑系数越小，移动越平滑，但响应越慢
-            # # 正确的指数平滑：新值 = 平滑系数 * 目标值 + (1-平滑系数) * 旧值
-            # sx = self.smoothing * target_sx + (1 - self.smoothing) * sx
-            # sy = self.smoothing * target_sy + (1 - self.smoothing) * sy
-
-            # 步骤3: 残差累积处理
-            # 将小数部分累积起来，避免丢失精度
             error_x += target_sx
             error_y += target_sy
             
@@ -161,7 +154,7 @@ class MouseSimulator:
                 self.record_displacement(move_x, move_y)
 
             # 步骤7: 等待下一个控制周期
-            time.sleep(self.delay/10)
+            time.sleep(0.0001)
     # 记录位移
     def record_displacement(self, move_x, move_y):
         """

@@ -1,11 +1,14 @@
 import threading
 import time
 
+from data_center.models.auto_attack_model.state import AutoAttackModelState
+from data_center.models.input_monitor.state import InputMonitorState
 from data_center.models.screenshot.state import ScreenshotModelState
 from data_center.models.screenshot.subject import ScreenshotSubject
 from utils.logger.logger import log_time
 from utils.screenshot_tool.mss_screenshot import capture_screenshot_bgr
 from utils.singleton.main import singleton
+import numpy as np
 
 
 @singleton
@@ -55,13 +58,13 @@ class MouseScreenshot:
             return image
         
         @log_time
-        def send_image():
+        def send_image(image: np.ndarray):
             ScreenshotSubject.send_image(image,time.time())
+
         while self._running:
             try:
-
                 image = capture_screenshot()
-                send_image()
+                send_image(image)
             except Exception as e:
                 print(f"截图错误: {e}")
             time.sleep(ScreenshotModelState.get_state().interval.get())

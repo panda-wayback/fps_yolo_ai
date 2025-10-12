@@ -2,6 +2,7 @@ import math
 import time
 from typing import Tuple
 
+from data_center.models.auto_attack_model.state import AutoAttackModelState
 from data_center.models.controller_model.state import ControllerModelState
 from data_center.models.input_monitor.state import InputMonitorState
 from data_center.models.mouse_driver_model.subject import MouseDriverSubject
@@ -10,18 +11,17 @@ from utils.logger.logger import get_logger
 
 
 def compute_mouse_driver(vector: Tuple[float, float]):
+    left_click_submit_time = InputMonitorState.get_state().mouse_left_click_submit_time.get()
+    mouse_left_click_submit_time = InputMonitorState.get_state().mouse_left_click_time.get()
+    print(f"is_track: {AutoAttackModelState.get_state().is_track.get()}")
+    print(f"左键提交时间: {left_click_submit_time}")
+    print(f"鼠标左键点击时间: {mouse_left_click_submit_time} {left_click_submit_time + mouse_left_click_submit_time}  {time.time()}")
+    print(f"时间: {left_click_submit_time + mouse_left_click_submit_time > time.time()}")
 
-    current_time = time.time()
-    max_submit_time = InputMonitorState.get_state().mouse_left_click_submit_time.get()  + InputMonitorState.get_state().mouse_left_click_time.get()
-    print(f"current_time: {current_time}, max_submit_time: {max_submit_time}  {current_time > max_submit_time} {InputMonitorState.get_state().is_submit_vector.get()}")
-    if current_time > max_submit_time and not InputMonitorState.get_state().is_submit_vector.get():
+    if AutoAttackModelState.get_state().is_track.get() is False \
+        and (left_click_submit_time + mouse_left_click_submit_time > time.time()) is False:
         return
-
-    distance = math.hypot(vector[0], vector[1])
-    if distance < 10:
-        return
-    """计算鼠标驱动"""
-
+    
     output = get_controller().compute(vector)
     get_logger().info(f"✅ {vector}  {output}  ControllerModel")
     ControllerModelState.get_state().output.set(output)

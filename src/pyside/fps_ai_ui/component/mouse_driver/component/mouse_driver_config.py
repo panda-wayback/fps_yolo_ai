@@ -93,12 +93,12 @@ class MouseDriverConfigWidget(QGroupBox):
         perf_layout = QVBoxLayout(perf_group)
         
         # FPS设置
-        self.fps_slider = ParameterSlider("帧率", 10, 800, 180, 1, " FPS")
+        self.fps_slider = ParameterSlider("帧率", 10, 1000, 500, 1, " FPS")
         self.fps_slider.value_changed.connect(self.on_config_changed)
         perf_layout.addWidget(self.fps_slider)
         
         # 平滑系数
-        self.smoothing_slider = ParameterSlider("平滑系数", 0.0, 1.0, 0.4, 0.01)
+        self.smoothing_slider = ParameterSlider("平滑系数", 0.0, 1.0, 0.4, 0.001)
         self.smoothing_slider.value_changed.connect(self.on_config_changed)
         perf_layout.addWidget(self.smoothing_slider)
         
@@ -109,12 +109,12 @@ class MouseDriverConfigWidget(QGroupBox):
         motion_layout = QVBoxLayout(motion_group)
         
         # 最大持续时间
-        self.max_duration_slider = ParameterSlider("最大持续时间", 0.001, 0.2, 0.08, 0.001, " 秒")
+        self.max_duration_slider = ParameterSlider("最大持续时间", 0.001, 0.1, 0.03, 0.0001, " 秒")
         self.max_duration_slider.value_changed.connect(self.on_config_changed)
         motion_layout.addWidget(self.max_duration_slider)
         
         # 减速系数
-        self.decay_rate_slider = ParameterSlider("减速系数", 0.5, 1.0, 1.0, 0.01)
+        self.decay_rate_slider = ParameterSlider("减速系数", 0.5, 1.0, 0.95, 0.001)
         self.decay_rate_slider.value_changed.connect(self.on_config_changed)
         motion_layout.addWidget(self.decay_rate_slider)
         

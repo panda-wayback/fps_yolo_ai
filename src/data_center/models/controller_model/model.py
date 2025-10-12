@@ -7,10 +7,10 @@ class ControllerModel(BaseState):
     """
     # ADRC控制器参数（默认值与 LADRCController 保持一致）
     order: ReactiveVar[int] = 1  # 控制器阶数 (1或2)
-    sample_time: ReactiveVar[float] = 0.017  # 采样时间（秒）
-    b0: ReactiveVar[float] = 1.46 # 控制增益
-    w_cl: ReactiveVar[float] = 15.2  # 控制器带宽 (rad/s)
-    k_eso: ReactiveVar[float] = 0.75  # ESO（扩张状态观测器）增益
+    sample_time: ReactiveVar[float] = 0.013  # 采样时间（秒）
+    b0: ReactiveVar[float] = 1.077 # 控制增益
+    w_cl: ReactiveVar[float] = 13.2  # 控制器带宽 (rad/s)
+    k_eso: ReactiveVar[float] = 1.413  # ESO（扩张状态观测器）增益
     output_limits: ReactiveVar[tuple[float, float]] = (-1200, 1200)  # 输出限幅 (min, max)
     rate_limits: ReactiveVar[tuple[float, float]] = (-1000, 1000)  # 变化率限幅 (min, max)
 

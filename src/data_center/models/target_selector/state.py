@@ -4,6 +4,7 @@
 """
 
 from data_center.index import get_data_center
+from data_center.models.auto_attack_model.subject import AutoAttackSubject
 from utils.thread.main import threaded
 
 
@@ -20,13 +21,12 @@ class TargetSelectorState:
         """初始化目标选择器订阅"""
         from data_center.models.target_selector.subscribes.send_yolo_results import send_yolo_results
         TargetSelectorState.get_state().yolo_results.subscribe(send_yolo_results)
-        
-        from data_center.models.target_selector.subscribes.auto_attack import auto_attack, auto_track
-        TargetSelectorState.get_state().selected_target_point.subscribe(threaded(auto_attack))
-        TargetSelectorState.get_state().selected_target_point.subscribe(threaded(auto_track))
 
         from data_center.models.controller_model.subject import  ControllerSubject
         TargetSelectorState.get_state().selected_target_point.subscribe(ControllerSubject.compute)
+        TargetSelectorState.get_state().selected_target_point.subscribe(
+            threaded(AutoAttackSubject.update_track_point)
+        )
 
 
         from data_center.models.controller_model.subject import  ControllerSubject

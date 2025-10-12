@@ -236,17 +236,17 @@ class ADRCConfigWidget(QGroupBox):
         layout.addWidget(self.sample_time_slider)
         
         # 控制增益 (b0)
-        self.b0_slider = ParameterSlider("控制增益 b0", 0.1, 3.0, 1.0, 0.01, "")
+        self.b0_slider = ParameterSlider("控制增益 b0", 0.1, 3.0, 1.0, 0.001, "")
         self.b0_slider.value_changed.connect(self._on_b0_changed)
         layout.addWidget(self.b0_slider)
         
         # 控制器带宽 (w_cl)
-        self.w_cl_slider = ParameterSlider("控制器带宽", 0.0, 200.0, 10.0, 0.1, "")
+        self.w_cl_slider = ParameterSlider("控制器带宽", 0.0, 50.0, 15.0, 0.001, "")
         self.w_cl_slider.value_changed.connect(self._on_w_cl_changed)
         layout.addWidget(self.w_cl_slider)
         
         # ESO增益 (k_eso)
-        self.k_eso_slider = ParameterSlider("ESO增益", 0.0, 10.0, 2.5, 0.1, "")
+        self.k_eso_slider = ParameterSlider("ESO增益", 0.0, 10.0, 2.5, 0.001, "")
         self.k_eso_slider.value_changed.connect(self._on_k_eso_changed)
         layout.addWidget(self.k_eso_slider)
         

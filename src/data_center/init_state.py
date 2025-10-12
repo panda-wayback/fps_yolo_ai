@@ -5,13 +5,14 @@ def init_state():
     from data_center.models.mouse_driver_model.state import MouseDriverState
     from data_center.models.controller_model.state import ControllerModelState
     from data_center.models.target_selector.state import TargetSelectorState
+    from data_center.models.auto_attack_model.state import AutoAttackModelState
     InputMonitorState.init_subscribes()
     ScreenshotModelState.init_subscribes()
     YoloModelState.init_subscribes()
     MouseDriverState.init_subscribes()
     ControllerModelState.init_subscribes()
     TargetSelectorState.init_subscribes()
-    
+    AutoAttackModelState.init_subscribes()
     pass
 
 if __name__ == "__main__":

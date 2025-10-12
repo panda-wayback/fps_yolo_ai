@@ -9,6 +9,7 @@ from data_center.models.yolo_model.model import YoloModel
 from data_center.models.mouse_driver_model.model import MouseDriverModel
 from data_center.models.target_selector.model import TargetSelectorModel
 from data_center.models.input_monitor.model import InputMonitorModel
+from data_center.models.auto_attack_model.model import AutoAttackModel
 
 
 
@@ -30,3 +31,4 @@ class State(BaseModel):
     mouse_driver_state: Optional[MouseDriverModel] = MouseDriverModel()
     target_selector_state: Optional[TargetSelectorModel] = TargetSelectorModel()
     input_monitor_state: Optional[InputMonitorModel] = InputMonitorModel()
+    auto_attack_model_state: Optional[AutoAttackModel] = AutoAttackModel()
