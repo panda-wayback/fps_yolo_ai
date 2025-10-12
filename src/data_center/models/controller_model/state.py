@@ -22,6 +22,8 @@ class ControllerModelState:
     def init_subscribes():
         from data_center.models.controller_model.subscribes.send_mouse_driver import send_mouse_driver
         ControllerModelState.get_state().output.subscribe(send_mouse_driver)
+        from data_center.models.controller_model.subscribes.send_mouse_driver import compute_mouse_driver
+        ControllerModelState.get_state().error.subscribe(compute_mouse_driver)
         pass
 
     

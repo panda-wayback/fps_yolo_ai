@@ -93,7 +93,7 @@ class MouseDriverConfigWidget(QGroupBox):
         perf_layout = QVBoxLayout(perf_group)
         
         # FPS设置
-        self.fps_slider = ParameterSlider("帧率", 10, 2000, 1000, 10, " FPS")
+        self.fps_slider = ParameterSlider("帧率", 10, 800, 180, 1, " FPS")
         self.fps_slider.value_changed.connect(self.on_config_changed)
         perf_layout.addWidget(self.fps_slider)
         

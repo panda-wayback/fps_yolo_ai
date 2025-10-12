@@ -10,6 +10,12 @@ from PySide6.QtWidgets import (QSpinBox, QLabel, QHBoxLayout,
 from pyside.UI.basic.basic_layout import create_vertical_card
 
 from data_center.models.screenshot.subject import ScreenshotSubject
+from data_center.models.screenshot.state import ScreenshotModelState
+from data_center.models.screenshot.model import (
+    ScreenshotModel, 
+    DEFAULT_REGION_SIZE, 
+    DEFAULT_FPS
+)
 from singleton_classes.screenshot_img.main import get_screenshot
 
 
@@ -24,6 +30,16 @@ def create_screenshot_config():
     group = create_vertical_card("截图设置")
     layout = group._layout
     
+    # 从状态实例读取当前值（或使用默认常量）
+    try:
+        state = ScreenshotModelState.get_state()
+        default_width, default_height = state.region_size.get()
+        default_fps = int(state.fps.get())
+    except:
+        # 如果状态未初始化，使用模型默认常量
+        default_width, default_height = DEFAULT_REGION_SIZE
+        default_fps = DEFAULT_FPS
+    
     # 截图区域设置
     region_group = QGroupBox("截图区域")
     region_layout = QVBoxLayout(region_group)
@@ -33,7 +49,7 @@ def create_screenshot_config():
     width_layout.addWidget(QLabel("宽度:"))
     width_spinbox = QSpinBox()
     width_spinbox.setRange(50, 2000)
-    width_spinbox.setValue(640)  # 默认宽度
+    width_spinbox.setValue(default_width)  # 从模型读取默认宽度
     width_layout.addWidget(width_spinbox)
     region_layout.addLayout(width_layout)
     
@@ -42,7 +58,7 @@ def create_screenshot_config():
     height_layout.addWidget(QLabel("高度:"))
     height_spinbox = QSpinBox()
     height_spinbox.setRange(50, 2000)
-    height_spinbox.setValue(480)  # 默认高度
+    height_spinbox.setValue(default_height)  # 从模型读取默认高度
     height_layout.addWidget(height_spinbox)
     region_layout.addLayout(height_layout)
     
@@ -55,13 +71,30 @@ def create_screenshot_config():
     fps_time_layout.addWidget(QLabel("FPS:"))
     fps_spinbox = QSpinBox()
     fps_spinbox.setRange(1, 1000)
-    fps_spinbox.setValue(1000)  # 默认1000FPS
+    fps_spinbox.setValue(int(default_fps))  # 从模型读取默认FPS
     fps_time_layout.addWidget(fps_spinbox)
     fps_layout.addLayout(fps_time_layout)
+    
+    # 按钮区域
+    button_layout = QHBoxLayout()
+    
+    # 重置按钮
+    reset_btn = QPushButton("重置")
     
     # 应用设置按钮
     apply_btn = QPushButton("应用设置")
     
+    button_layout.addWidget(reset_btn)
+    button_layout.addWidget(apply_btn)
+    
+    
+    # 重置功能（使用模型默认常量）
+    def reset_to_defaults():
+        """重置为默认值（使用 ScreenshotModel 定义的常量）"""
+        width_spinbox.setValue(DEFAULT_REGION_SIZE[0])  # 默认宽度
+        height_spinbox.setValue(DEFAULT_REGION_SIZE[1])  # 默认高度
+        fps_spinbox.setValue(DEFAULT_FPS)                # 默认FPS
+        print("✅ 已重置为默认值")
     
     # 应用设置功能
     def apply_settings():
@@ -80,13 +113,14 @@ def create_screenshot_config():
     
     
     # 连接按钮事件
+    reset_btn.clicked.connect(reset_to_defaults)
     apply_btn.clicked.connect(apply_settings)
     
     
     # 添加到布局
     layout.addWidget(region_group)
     layout.addWidget(fps_group)
-    layout.addWidget(apply_btn)
+    layout.addLayout(button_layout)
     
     return group
 

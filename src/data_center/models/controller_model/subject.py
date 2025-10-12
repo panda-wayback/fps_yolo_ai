@@ -6,6 +6,7 @@ PID模型相关的统一接口
 # 延迟导入，避免循环导入
 
 
+import time
 from data_center.models.controller_model.state import ControllerModelState  
 from singleton_classes.controller.controller import get_controller
 from utils.logger.logger import get_logger
@@ -28,9 +29,6 @@ class ControllerSubject:
     @staticmethod
     def compute(vector: tuple[float, float]):
         """发送更新"""
-        output = get_controller().compute(vector)
-        get_logger().info(f"✅ {vector}  {output}  ControllerModel")
-        ControllerModelState.get_state().output.set(output)
         ControllerModelState.get_state().error.set(vector)
         pass
 

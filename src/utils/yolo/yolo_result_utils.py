@@ -67,8 +67,10 @@ def select_best_target(result: Results, selected_target_id: Optional[int] = None
 
     # 解析信息
     x1, y1, x2, y2 = best_box.xyxy[0].tolist()
-    cx, cy = (x1 + x2) / 2, (y1 + y2) / 2
-    # 计算目标中心点到图片中心的向量
+    # 瞄准点：X轴居中，Y轴为上四分之一位置（瞄准头部）
+    cx = (x1 + x2) / 2  # X轴：保持水平居中
+    cy = (y1+y2) / 2 - abs(y2 - y1)/2 * 0.5 - 20  # Y轴：从顶部往下1/4处（上四分之一）
+    # 计算目标瞄准点到图片中心的向量
     vector_x = cx - center_x
     vector_y = cy - center_y
 

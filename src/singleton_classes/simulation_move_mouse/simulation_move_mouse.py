@@ -121,8 +121,8 @@ class MouseSimulator:
             # 检查向量执行时间是否超过最大持续时间
             if time.time() - self.vector_start_time > self.max_duration:
                 # 平滑减速而不是突然归0
-                self.vx *= self.decay_rate
-                self.vy *= self.decay_rate
+                self.vx = 0
+                self.vy = 0
                 
                 # 当速度很小时，直接设为0避免无限接近0
                 if abs(self.vx) < 0.1:
@@ -156,11 +156,12 @@ class MouseSimulator:
 
             # 步骤6: 执行鼠标移动（只在需要时移动）
             if move_x != 0 or move_y != 0:
+                print(f"✅ 移动鼠标: move_x={move_x}, move_y={move_y}  speed={self.vx}, {self.vy}")
                 self.mouse.move(move_x, move_y)
                 self.record_displacement(move_x, move_y)
 
             # 步骤7: 等待下一个控制周期
-            time.sleep(self.delay)
+            time.sleep(self.delay/10)
     # 记录位移
     def record_displacement(self, move_x, move_y):
         """
