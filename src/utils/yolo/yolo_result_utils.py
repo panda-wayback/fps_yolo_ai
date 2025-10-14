@@ -30,13 +30,14 @@ def select_best_by_center_target(result: Results) -> Optional[Boxes]:
 
 
 
-def select_best_target(result: Results, selected_target_id: Optional[int] = None) -> Optional[Tuple[Tuple[float, float], Boxes]]:
+def select_best_target(result: Results,crosshair_offset_vector: Tuple[float, float], selected_target_id: Optional[int] = None) -> Optional[Tuple[Tuple[float, float], Boxes]]:
     """
     选择与参考向量最相似的目标，返回中心点、边界框、置信度、类别ID
 
     Args:
         result: YOLO 单张图片的结果 (Results 对象)
         selected_class_ids: 选中的类别ID列表，为空时全选
+        crosshair_offset_vector: 准星位置距离中心的偏移量
 
     Returns:
         (selected_target_point, selected_target_bbox, selected_target_confidence, selected_target_class_id)
@@ -47,7 +48,7 @@ def select_best_target(result: Results, selected_target_id: Optional[int] = None
         return None, None, None, None
     
     h, w = result.orig_shape
-    center_x, center_y = w / 2, h / 2 + 23
+    center_x, center_y = crosshair_offset_vector[0]+ w / 2, crosshair_offset_vector[1]+ h / 2
 
     def distance_to_center(box: Boxes):
         x1, y1, x2, y2 = box.xyxy[0].tolist()

@@ -1,4 +1,4 @@
-from typing import Any, List, Optional
+from typing import Any, List, Tuple
 import numpy as np
 from ultralytics.models import YOLO
 from data_center.models.base_state import BaseState, ReactiveVar
@@ -14,4 +14,7 @@ class YoloModel(BaseState):
     selected_class_ids: ReactiveVar[List[int]] = [] # 当前选择的要识别的类别ID
     marked_img: ReactiveVar[np.ndarray] = None        # 标记过目标的图片
     yolo_results: ReactiveVar[List[Any]] = None       # YOLO模型输出
+
+    # 准星位置
+    crosshair_offset_vector: ReactiveVar[Tuple[float, float]] = (0.0, 0.0)
 

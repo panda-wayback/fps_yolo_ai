@@ -21,7 +21,7 @@ class TargetSelector:
         self.selected_target_id = None
         pass
     
-    def target_selector(self, yolo_result: List[Any]) -> Optional[Tuple[Tuple[float, float], Boxes, int]]:
+    def target_selector(self, yolo_result: List[Any], crosshair_offset_vector: Tuple[float, float]) -> Optional[Tuple[Tuple[float, float], Boxes, int]]:
         """目标选择器主函数"""
        
         try:
@@ -30,7 +30,7 @@ class TargetSelector:
                 return None, None, None
 
             # 选择最佳目标
-            vector_point, best_box = select_best_target(yolo_result[0], self.selected_target_id)
+            vector_point, best_box = select_best_target(yolo_result[0], crosshair_offset_vector, self.selected_target_id)
 
             self.selected_target_id = int(best_box.id.item())
 

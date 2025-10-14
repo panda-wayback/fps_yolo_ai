@@ -57,13 +57,14 @@ class YoloSubject:
                 )
         result = yolo_detect()
         YoloModelState.get_state().yolo_results.set(result)
+        crosshair_offset_vector = YoloModelState.get_state().crosshair_offset_vector.get()
         
         # 绘制标记图像
         marked_img = result[0].plot()
         
         # 在中心点画一个标记点
         h, w = marked_img.shape[:2]
-        center_x, center_y = w // 2, h // 2
+        center_x, center_y = w // 2 + crosshair_offset_vector[0], h // 2 + crosshair_offset_vector[1]
         
         # 标记点参数
         point_radius = 5  # 点的半径
