@@ -1,13 +1,9 @@
 from rx.subject import BehaviorSubject
-from rx.scheduler import ThreadPoolScheduler
-from rx import operators as ops
-from typing import TypeVar, Generic, Callable, Any
 from pydantic import BaseModel, ConfigDict
+from typing import TypeVar, Generic, Callable, Any
+
 
 T = TypeVar('T')
-
-# 全局线程池（根据 CPU 核心数自动分配）
-_thread_pool = ThreadPoolScheduler(20)
 
 class ReactiveVar(Generic[T]):
     """包装一个可观察的变量"""
@@ -17,31 +13,21 @@ class ReactiveVar(Generic[T]):
 
     def set(self, value: T) -> None:
         # 只有当值真正发生变化时才更新并通知
-        if value != self._value:
-            self._value = value
-            self._subject.on_next(value)
+        self._value = value
+        self._subject.on_next(value)
 
     def get(self) -> T:
         return self._value
 
-    def subscribe(self, callback: Callable[[T], None], use_thread: bool = True) -> Any:
-        """
-        订阅值变化。
-        use_thread=True 时，回调在后台线程池异步执行。
-        """
-        observable = self._subject.pipe(
-            ops.observe_on(_thread_pool)
-        ) if use_thread else self._subject
-
-        return observable.subscribe(
-            on_next=callback,
-            on_error=lambda e: print(f"[ReactiveVar Error] {e}")
-        )
+    def subscribe(self, callback: Callable[[T], None]) -> Any:
+        return self._subject.subscribe(callback)
 
     def __repr__(self) -> str:
         return f"ReactiveVar({self._value})"
     
     def __deepcopy__(self, memo):
+        """支持深拷贝操作，创建新的 ReactiveVar 实例"""
+        # 创建一个新的 ReactiveVar 实例，只复制值，不复制 BehaviorSubject
         new_instance = ReactiveVar(self._value)
         return new_instance
 
