@@ -29,26 +29,24 @@ def select_best_by_center_target(result: Results) -> Optional[Boxes]:
     return  boxes[best_index]
 
 
-
-def select_best_target(result: Results,crosshair_offset_vector: Tuple[float, float], selected_target_id: Optional[int] = None) -> Optional[Tuple[Tuple[float, float], Boxes]]:
+def select_best_target(result: Results,crosshair_position: Tuple[float, float], selected_target_id: Optional[int] = None) -> Optional[Boxes]:
     """
     选择与参考向量最相似的目标，返回中心点、边界框、置信度、类别ID
 
     Args:
         result: YOLO 单张图片的结果 (Results 对象)
         selected_class_ids: 选中的类别ID列表，为空时全选
-        crosshair_offset_vector: 准星位置距离中心的偏移量
+        crosshair_position: 准星位置 (x, y)
 
     Returns:
         (selected_target_point, selected_target_bbox, selected_target_confidence, selected_target_class_id)
         如果没有检测结果，返回 None
+    
     """
     boxes = result.boxes
     if boxes is None or len(boxes) == 0:
-        return None, None, None, None
-    
-    h, w = result.orig_shape
-    center_x, center_y = crosshair_offset_vector[0]+ w / 2, crosshair_offset_vector[1]+ h / 2
+        return None
+    center_x, center_y = crosshair_position[0], crosshair_position[1]
 
     def distance_to_center(box: Boxes):
         x1, y1, x2, y2 = box.xyxy[0].tolist()
@@ -65,15 +63,4 @@ def select_best_target(result: Results,crosshair_offset_vector: Tuple[float, flo
     # 找到最近的 box
     best_box: Boxes = get_box_by_id(boxes, selected_target_id) or min(boxes, key=distance_to_center)
 
-
-    # 解析信息
-    x1, y1, x2, y2 = best_box.xyxy[0].tolist()
-    # 瞄准点：X轴居中，Y轴为上四分之一位置（瞄准头部）
-    cx = (x1 + x2) / 2  # X轴：保持水平居中
-    cy = (y1+y2) / 2 - abs(y2 - y1)/2 * 0.7  # Y轴：从顶部往下1/4处（上四分之一）
-    # 计算目标瞄准点到图片中心的向量
-    vector_x = cx - center_x
-    vector_y = cy - center_y
-
-
-    return ( (vector_x, vector_y), best_box )
+    return best_box

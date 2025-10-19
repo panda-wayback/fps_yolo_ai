@@ -18,18 +18,24 @@ class TargetSelectorState:
 
     @staticmethod
     def init_subscribes():
+
         """初始化目标选择器订阅"""
-        from data_center.models.target_selector.subscribes.send_yolo_results import send_yolo_results
-        TargetSelectorState.get_state().yolo_results.subscribe(send_yolo_results)
+        from data_center.models.target_selector.subscribes.select_target import select_target, calculate_target_vector
+        # 订阅YOLO检测结果
+        TargetSelectorState.get_state().yolo_results.subscribe(select_target)
+        # 订阅选中目标边框
+        TargetSelectorState.get_state().selected_target_bbox.subscribe(calculate_target_vector)
 
         from data_center.models.controller_model.subject import  ControllerSubject
-        TargetSelectorState.get_state().selected_target_point.subscribe(ControllerSubject.compute)
-        TargetSelectorState.get_state().selected_target_point.subscribe(
+        # 订阅距离目标的向量
+        TargetSelectorState.get_state().target_vector.subscribe(ControllerSubject.compute)
+        # 订阅更新目标ID
+        TargetSelectorState.get_state().target_vector.subscribe(
             threaded(AutoAttackSubject.update_track_point)
         )
 
-
         from data_center.models.controller_model.subject import  ControllerSubject
+        # 订阅更新目标ID
         TargetSelectorState.get_state().selected_target_id.subscribe(ControllerSubject.update_target_id)
 
         pass

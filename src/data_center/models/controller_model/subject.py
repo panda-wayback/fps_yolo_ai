@@ -4,8 +4,6 @@ PID模型相关的统一接口
 
 
 # 延迟导入，避免循环导入
-
-
 import time
 from data_center.models.controller_model.state import ControllerModelState  
 from singleton_classes.controller.controller import get_controller

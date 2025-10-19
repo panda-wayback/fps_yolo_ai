@@ -15,6 +15,4 @@ class YoloModel(BaseState):
     marked_img: ReactiveVar[np.ndarray] = None        # 标记过目标的图片
     yolo_results: ReactiveVar[List[Any]] = None       # YOLO模型输出
 
-    # 准星位置
-    crosshair_offset_vector: ReactiveVar[Tuple[float, float]] = (0.0, 0.0)
 
