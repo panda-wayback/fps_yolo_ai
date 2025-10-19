@@ -14,7 +14,7 @@ class ControllerSubject:
     
     @staticmethod
     def send_config(order: int, sample_time: float, b0: float, w_cl: float, k_eso: float, output_limits: tuple[float, float], rate_limits: tuple[float, float]):
-        """使用PID配置"""
+        """使用LADRC控制器配置"""
         ControllerModelState.get_state().order.set(order)
         ControllerModelState.get_state().sample_time.set(sample_time)
         ControllerModelState.get_state().b0.set(b0)
@@ -26,7 +26,7 @@ class ControllerSubject:
 
     @staticmethod
     def compute(vector: tuple[float, float]):
-        """发送更新"""
+        """计算LADRC控制器输出"""
         ControllerModelState.get_state().error.set(vector)
         pass
 
